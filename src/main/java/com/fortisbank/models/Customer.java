@@ -55,4 +55,22 @@ public class Customer {
     public void setPhoneNumber(String phoneNumber) {
         this.PhoneNumber = phoneNumber;
     }
+
+   // public boolean VerifyPIN(String inputPIN){
+   // }
+
+    //public Account OpenAccount(String accountType){
+   // }
+
+    //public void PerformTransaction(Transaction transaction){
+    //}
+
+    //public double CheckBalance(Account account){
+    //}
+
+    //public void RequestAccount(String accountType){
+    //}
+
+    //public void CloseAccount(Account account){
+    //}
 }
