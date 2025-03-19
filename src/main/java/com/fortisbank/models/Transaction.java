@@ -14,9 +14,20 @@ public class Transaction {
     private Account destinationAccount;
     private BigDecimal fees;
 
+    // CORRECTED CONSTRUCTOR
+    public Transaction(String transactionNumber, String description, String transactionType, BigDecimal amount,
+                       Account sourceAccount, Account destinationAccount, BigDecimal fees) {
+        this.transactionNumber = transactionNumber;
+        this.description = description;
+        this.transactionType = transactionType;
+        this.amount = amount;
+        this.sourceAccount = sourceAccount;
+        this.destinationAccount = destinationAccount;
+        this.fees = fees;
+        this.transactionDate = new Date(); // ACTUAL DATE
+    }
 
-// GET + SET
-
+    // GET + SET METHODS
     public String getTransactionNumber() {
         return transactionNumber;
     }
@@ -81,65 +92,31 @@ public class Transaction {
         this.fees = fees;
     }
 
-    // TO DO: VERIFICATION OF BigDecimal fees
-
-    //SAVE THE TRANSACTION
-
+    // SAVE THE TRANSACTION
     public void recordTransaction() {
         if (sourceAccount != null) {
-            sourceAccount.addTransaction(this); //ADD THE TRANSAC TO THE SOURCE ACCOUNT
+            sourceAccount.addTransaction(this); // ADD THE TRANSAC TO THE SOURCE ACCOUNT
         }
         if (destinationAccount != null) {
-            destinationAccount.addTransaction(this); //ADD THE TRANSAC TO THE MAIN ACCOUNT
+            destinationAccount.addTransaction(this); // ADD THE TRANSAC TO THE MAIN ACCOUNT
         }
         System.out.println("Transaction recorded : " + this);
     }
 
-    //PROCESS THE TRANSACTION ACCORDING TO HIS OWN TYPE
-
+    // PROCESS THE TRANSACTION ACCORDING TO HIS OWN TYPE
     public void processTransaction() {
         switch (transactionType.toUpperCase()) {
             case "DEPOSIT":
                 if (destinationAccount != null) {
-                    destinationAccount.deposit(amount); //DEPOSIT IN THE DESTINATION ACCOUNT
-                }
-                else {
+                    destinationAccount.deposit(amount); // DEPOSIT IN THE DESTINATION ACCOUNT
+                } else {
                     throw new IllegalArgumentException("Destination account missing for a deposit.");
                 }
                 break;
             case "WITHDRAW":
                 if (sourceAccount != null) {
-                    sourceAccount.withdraw(amount, fees); //WIDRAW FROM ACCOUNT SOURCE
-                }
-                else {
+                    sourceAccount.withdraw(amount, fees); // WITHDRAW FROM ACCOUNT SOURCE
+                } else {
                     throw new IllegalArgumentException("Account missing for withdrawal");
                 }
-                break;
-            case "TRANSFER":
-                if (sourceAccount != null && destinationAccount != null) {
-                    sourceAccount.transfer(destinationAccount, amount); //TRANSFER BETTWEEN ACC.
-                }
-                else {
-                    throw new IllegalArgumentException("Destination account is missing for a transfer");
-                }
-                break;
-            default:
-                throw new IllegalArgumentException("Unsupported transaction type : " + transactionType);
-        }
-        System.out.println("Transaction processed : " + this);
-    }
-
-    @Override
-    public String toString() {
-        return "Transaction{" +
-                "transactionNumber='" + transactionNumber + '\'' +
-                ", description='" + description + '\'' +
-                ", transactionDate=" + transactionDate +
-                ", transactionType='" + transactionType + '\'' +
-                ", amount=" + amount +
-                ", fees=" + fees +
-                ", sourceAccount=" + (sourceAccount != null ? sourceAccount.getAccountNumber() : "N/A") +
-                ", destinationAccount=" + (destinationAccount != null ? destinationAccount.getAccountNumber() : "N/A") +
-                '}';
-    }
- }
+                break
