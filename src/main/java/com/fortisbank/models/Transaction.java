@@ -1,18 +1,24 @@
 package com.fortisbank.models;
 
 import com.fortisbank.utils.IdGenerator;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Date;
 
-public class Transaction {
+public class Transaction implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+
+
     private String transactionNumber;
     private String description;
     private Date transactionDate;
-    private String transactionType;
+    private String transactionType; // TODO: Refactor to use an Enum (TransactionType)
     private BigDecimal amount;
     private Account sourceAccount;
     private Account destinationAccount;
+    // TODO: Question--> FEES are simply another transaction type right? maybe we can simplify this by removing fees and just adding a transaction type for fees
     private BigDecimal fees;
 
     // Default Constructor for Serialization and Database Mapping
