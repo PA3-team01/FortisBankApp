@@ -4,9 +4,9 @@ import com.fortisbank.models.Transaction;
 import java.util.List;
 
 public interface ITransactionRepository {
-    Transaction getTransactionById(String transactionId);
-    List<Transaction> getTransactionsByAccountId(String accountId);
+    Transaction getTransactionByNumber(String transactionNumber);
+    List<Transaction> getTransactionsByAccount(String accountId);
     List<Transaction> getAllTransactions();
     void insertTransaction(Transaction transaction);
-    void deleteTransaction(String transactionId);
+    void deleteTransaction(String transactionNumber);
 }
