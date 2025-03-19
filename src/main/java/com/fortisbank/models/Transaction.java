@@ -2,9 +2,8 @@ package com.fortisbank.models;
 
 import java.math.BigDecimal;
 import java.util.Date;
-
 public class Transaction {
-}
+
 private String transactionNumber;
 private String description;
 private Date transactionDate;
