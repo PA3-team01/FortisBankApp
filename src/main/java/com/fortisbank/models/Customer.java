@@ -1,12 +1,28 @@
 package com.fortisbank.models;
 
-public class Customer {
+import java.io.Serializable;
+
+public class Customer implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String CustomerID;
     private String FirstName;
     private String LastName;
     private String PINHash;
     private String Email;
     private String PhoneNumber;
+
+    public Customer() {
+    }
+
+    public Customer(String customerID, String firstName, String lastName, String PINHash, String email, String phoneNumber) {
+        this.CustomerID = customerID;
+        this.FirstName = firstName;
+        this.LastName = lastName;
+        this.PINHash = PINHash;
+        this.Email = email;
+        this.PhoneNumber = phoneNumber;
+    }
 
     public String getCustomerID() {
         return CustomerID;
@@ -73,4 +89,16 @@ public class Customer {
 
     //public void CloseAccount(Account account){
     //}
+
+    @Override
+    public String toString(){
+        return "Customer{" +
+                "CustomerID='" + CustomerID + '\'' +
+                ", FirstName='" + FirstName + '\'' +
+                ", LastName='" + LastName + '\'' +
+                ", PINHash='" + PINHash + '\'' +
+                ", Email='" + Email + '\'' +
+                ", PhoneNumber='" + PhoneNumber + '\'' +
+                '}';
+    }
 }

@@ -1,10 +1,12 @@
 package com.fortisbank.data.database;
 
+import java.sql.Connection;
+
 public interface IDatabaseConnection {
 
-    String _connectionString = "";
-    Object _connection = null;
-
-    public void Connect();
-    public void Disconnect();
+    // Methods to be implemented by DatabaseConnection
+    void Connect();
+    void Disconnect();
+    boolean TestConnection();
+    Connection getConnection();
 }
