@@ -89,7 +89,7 @@ public class Transaction implements Serializable {
         if (transactionType == null || transactionType.isEmpty()) {
             throw new IllegalArgumentException("Transaction type cannot be null or empty.");
         }
-
+        // TODO: Refactor to use an Enum (TransactionType) *** Fits with Account changes proposed about fees
         switch (transactionType.toUpperCase()) {
             case "DEPOSIT":
                 if (destinationAccount != null) {

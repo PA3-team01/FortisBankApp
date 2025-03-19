@@ -60,6 +60,7 @@ public abstract class Account {
         this.transactions.add(transaction);
     }
 
+    // TODO: Check proposition for fees in Account class and modify accordingly if needed
     public void applyFees(BigDecimal fees, String description) {
         if (availableBalance.compareTo(fees) >= 0) {
             availableBalance = availableBalance.subtract(fees);
