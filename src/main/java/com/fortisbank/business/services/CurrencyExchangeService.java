@@ -1,4 +1,4 @@
-package com.fortisbank.models;
+package com.fortisbank.business.services;
 
 public class CurrencyExchangeService {
 }

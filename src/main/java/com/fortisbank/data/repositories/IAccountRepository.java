@@ -1,6 +1,6 @@
 package com.fortisbank.data.repositories;
 
-import com.fortisbank.models.Account;
+import com.fortisbank.models.accounts.Account;
 import java.util.List;
 
 public interface IAccountRepository {

@@ -2,19 +2,24 @@ package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.*;
+import com.fortisbank.models.accounts.*;
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AccountRepository implements IAccountRepository {
+    private static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
+
     private final DatabaseConnection dbConnection;
-    private final CustomerRepository customerRepository; // Used to fetch Customer object
+    private final CustomerRepository customerRepository;
 
     public AccountRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
-        this.customerRepository = new CustomerRepository(); // Dependency for customer retrieval
+        this.customerRepository = new CustomerRepository();
     }
 
     @Override
@@ -30,7 +35,7 @@ public class AccountRepository implements IAccountRepository {
                 return mapResultSetToAccount(rs);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error retrieving account {0}: {1}", new Object[]{accountId, e.getMessage()});
         }
         return null;
     }
@@ -50,7 +55,7 @@ public class AccountRepository implements IAccountRepository {
                 accounts.add(mapResultSetToAccount(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error retrieving accounts for customer {0}: {1}", new Object[]{customerId, e.getMessage()});
         }
         return accounts;
     }
@@ -68,7 +73,7 @@ public class AccountRepository implements IAccountRepository {
                 accounts.add(mapResultSetToAccount(rs));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error retrieving all accounts: {0}", e.getMessage());
         }
         return accounts;
     }
@@ -82,14 +87,15 @@ public class AccountRepository implements IAccountRepository {
 
             stmt.setString(1, account.getAccountNumber());
             stmt.setString(2, account.getCustomer().getCustomerID());
-            stmt.setString(3, account.getAccountType());
+            stmt.setString(3, account.getAccountType().name()); // Use enum instead of raw string
             stmt.setDate(4, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(5, account.getAvailableBalance());
             stmt.setBoolean(6, account.isActive());
 
             stmt.executeUpdate();
+            LOGGER.log(Level.INFO, "Account {0} inserted successfully.", account.getAccountNumber());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error inserting account: {0}", e.getMessage());
         }
     }
 
@@ -101,15 +107,16 @@ public class AccountRepository implements IAccountRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, account.getCustomer().getCustomerID());
-            stmt.setString(2, account.getAccountType());
+            stmt.setString(2, account.getAccountType().name()); // Use enum
             stmt.setDate(3, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(4, account.getAvailableBalance());
             stmt.setBoolean(5, account.isActive());
             stmt.setString(6, account.getAccountNumber());
 
             stmt.executeUpdate();
+            LOGGER.log(Level.INFO, "Account {0} updated successfully.", account.getAccountNumber());
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error updating account: {0}", e.getMessage());
         }
     }
 
@@ -122,37 +129,37 @@ public class AccountRepository implements IAccountRepository {
 
             stmt.setString(1, accountId);
             stmt.executeUpdate();
+            LOGGER.log(Level.INFO, "Account {0} deleted successfully.", accountId);
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error deleting account: {0}", e.getMessage());
         }
     }
 
-    // **Fixed mapResultSetToAccount to return the correct subclass**
+    // **Fixed mapResultSetToAccount to use Enum and correct account mapping**
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
         String accountId = rs.getString("AccountID");
         String customerId = rs.getString("CustomerID");
-        String accountType = rs.getString("AccountType");
+        AccountType accountType = AccountType.valueOf(rs.getString("AccountType").toUpperCase());
         Date openedDate = rs.getDate("OpenedDate");
         BigDecimal availableBalance = rs.getBigDecimal("AvailableBalance");
         boolean isActive = rs.getBoolean("isActive");
 
-        // Fetch Customer object (as it's necessary to add the user object instead of just the ID for serialization)
+        // Fetch Customer object
         Customer customer = customerRepository.getCustomerById(customerId);
 
-        switch (accountType.toUpperCase()) { // TODO: Fix --> check all account types and their constructor parameters
-            case "CHECKING":
+        switch (accountType) {
+            case CHECKING:
                 return new CheckingAccount(accountId, customer, openedDate, availableBalance, rs.getInt("FreeTransactionLimit"));
-            case "SAVINGS":
+            case SAVINGS:
                 return new SavingsAccount(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("AnnualInterestRate"));
-            case "CREDIT":
+            case CREDIT:
                 return new CreditAccount(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("CreditLimit"), rs.getBigDecimal("InterestRate"));
-            case "LINE_OF_CREDIT":
+            case LINE_OF_CREDIT:
                 return new LineOfCredit(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("CreditLimit"), rs.getBigDecimal("InterestRate"));
-            case "CURRENCY":
+            case CURRENCY:
                 return new CurrencyAccount(accountId, customer, openedDate, availableBalance, rs.getString("CurrencyType"), rs.getBigDecimal("ExchangeRate"));
             default:
                 throw new IllegalArgumentException("Unknown account type: " + accountType);
         }
     }
-
 }

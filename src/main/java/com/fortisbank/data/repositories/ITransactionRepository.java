@@ -1,6 +1,6 @@
 package com.fortisbank.data.repositories;
 
-import com.fortisbank.models.Transaction;
+import com.fortisbank.models.transactions.Transaction;
 import java.util.List;
 
 public interface ITransactionRepository {

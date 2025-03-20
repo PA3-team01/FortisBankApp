@@ -48,6 +48,10 @@ public class Customer implements Serializable {
         this.LastName = lastName;
     }
 
+    public String getFullName(){
+        return FirstName + " " + LastName;
+    }
+
     public String getPINHash() {
         return PINHash;
     }

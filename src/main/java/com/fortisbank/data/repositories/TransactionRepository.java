@@ -1,16 +1,21 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.Transaction;
-import com.fortisbank.models.Account;
+import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.transactions.TransactionFactory;
+import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.IdGenerator;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigDecimal;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class TransactionRepository implements ITransactionRepository {
+    private static final Logger LOGGER = Logger.getLogger(TransactionRepository.class.getName());
+
     private final DatabaseConnection dbConnection;
     private final AccountRepository accountRepository;
 
@@ -33,7 +38,7 @@ public class TransactionRepository implements ITransactionRepository {
                 return mapResultSetToTransaction(rs);
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving transaction: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving transaction: {0}", e.getMessage());
         }
         return null;
     }
@@ -54,7 +59,7 @@ public class TransactionRepository implements ITransactionRepository {
                 transactions.add(mapResultSetToTransaction(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving transactions for account " + accountId + ": " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving transactions for account {0}: {1}", new Object[]{accountId, e.getMessage()});
         }
         return transactions;
     }
@@ -72,15 +77,15 @@ public class TransactionRepository implements ITransactionRepository {
                 transactions.add(mapResultSetToTransaction(rs));
             }
         } catch (SQLException e) {
-            System.err.println("Error retrieving all transactions: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error retrieving all transactions: {0}", e.getMessage());
         }
         return transactions;
     }
 
     @Override
     public void insertTransaction(Transaction transaction) {
-        String query = "INSERT INTO transactions (TransactionNumber, Description, TransactionDate, TransactionType, Amount, Fees, SourceAccount, DestinationAccount) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO transactions (TransactionNumber, Description, TransactionDate, TransactionType, Amount, SourceAccount, DestinationAccount) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -89,15 +94,15 @@ public class TransactionRepository implements ITransactionRepository {
             stmt.setString(1, transactionId);
             stmt.setString(2, transaction.getDescription());
             stmt.setDate(3, new java.sql.Date(transaction.getTransactionDate().getTime()));
-            stmt.setString(4, transaction.getTransactionType());
+            stmt.setString(4, transaction.getTransactionType().name()); // Enum instead of String
             stmt.setBigDecimal(5, transaction.getAmount());
-            stmt.setBigDecimal(6, (transaction.getFees() != null) ? transaction.getFees() : BigDecimal.ZERO);
-            stmt.setString(7, transaction.getSourceAccount().getAccountNumber());
-            stmt.setString(8, (transaction.getDestinationAccount() != null) ? transaction.getDestinationAccount().getAccountNumber() : null);
+            stmt.setString(6, transaction.getSourceAccount().getAccountNumber());
+            stmt.setString(7, (transaction.getDestinationAccount() != null) ? transaction.getDestinationAccount().getAccountNumber() : null);
 
             stmt.executeUpdate();
+            LOGGER.log(Level.INFO, "Transaction {0} inserted successfully.", transactionId);
         } catch (SQLException e) {
-            System.err.println("Error inserting transaction: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error inserting transaction: {0}", e.getMessage());
         }
     }
 
@@ -110,8 +115,9 @@ public class TransactionRepository implements ITransactionRepository {
 
             stmt.setString(1, transactionNumber);
             stmt.executeUpdate();
+            LOGGER.log(Level.INFO, "Transaction {0} deleted successfully.", transactionNumber);
         } catch (SQLException e) {
-            System.err.println("Error deleting transaction: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error deleting transaction: {0}", e.getMessage());
         }
     }
 
@@ -124,15 +130,15 @@ public class TransactionRepository implements ITransactionRepository {
             destinationAccount = accountRepository.getAccountById(rs.getString("DestinationAccount"));
         }
 
-        return new Transaction(
-                rs.getString("TransactionNumber"),
+        TransactionType transactionType = TransactionType.valueOf(rs.getString("TransactionType").toUpperCase());
+
+        return (Transaction) TransactionFactory.createTransaction(
+                transactionType,
                 rs.getString("Description"),
                 rs.getDate("TransactionDate"),
-                rs.getString("TransactionType"),
                 rs.getBigDecimal("Amount"),
                 sourceAccount,
-                destinationAccount,
-                (rs.getBigDecimal("Fees") != null) ? rs.getBigDecimal("Fees") : BigDecimal.ZERO
+                destinationAccount
         );
     }
 }
