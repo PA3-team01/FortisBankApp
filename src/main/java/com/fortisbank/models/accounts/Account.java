@@ -5,21 +5,24 @@ import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.IdGenerator;
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public abstract class Account {
-    private String accountNumber;
-    private Customer customer;
-    private AccountType accountType;
-    private Date openedDate;
-    private BigDecimal availableBalance;
-    private List<Transaction> transactions;
-    private boolean isActive;
+public abstract class Account implements AccountInterface, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    // Default Constructor
+    protected String accountNumber;
+    protected Customer customer;
+    protected AccountType accountType;
+    protected Date openedDate;
+    protected BigDecimal availableBalance;
+    protected List<Transaction> transactions;
+    protected boolean isActive;
+
     public Account() {
         this.accountNumber = IdGenerator.generateId();
         this.transactions = new ArrayList<>();
@@ -27,7 +30,6 @@ public abstract class Account {
         this.isActive = true;
     }
 
-    // Constructor with Initial Values
     public Account(String accountNumber, Customer customer, AccountType accountType, Date openedDate, BigDecimal initialBalance) {
         this.accountNumber = (accountNumber != null) ? accountNumber : IdGenerator.generateId();
         this.customer = customer;
@@ -38,7 +40,52 @@ public abstract class Account {
         this.isActive = true;
     }
 
-    // Getters
+    @Override
+    public void deposit(BigDecimal amount) {
+        availableBalance = availableBalance.add(amount);
+        recordTransaction(TransactionType.DEPOSIT, amount, this, null);
+    }
+
+    @Override
+    public void withdraw(BigDecimal amount) {
+        if (availableBalance.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient balance.");
+        }
+        availableBalance = availableBalance.subtract(amount);
+        recordTransaction(TransactionType.WITHDRAWAL, amount, this, null);
+    }
+
+    @Override
+    public void transfer(Account targetAccount, BigDecimal amount) {
+        if (availableBalance.compareTo(amount) < 0) {
+            throw new IllegalArgumentException("Insufficient balance.");
+        }
+        this.withdraw(amount);
+        targetAccount.deposit(amount);
+        recordTransaction(TransactionType.TRANSFER, amount, this, targetAccount);
+    }
+
+    private void recordTransaction(TransactionType type, BigDecimal amount, Account source, Account destination) {
+        Transaction transaction = (Transaction) TransactionFactory.createTransaction(
+                type,
+                "Transaction: " + type,
+                new Date(),
+                amount,
+                source,
+                destination
+        );
+        transactions.add(transaction);
+    }
+
+    public void applyFees(BigDecimal fees, String description) {
+        if (availableBalance.compareTo(fees) >= 0) {
+            availableBalance = availableBalance.subtract(fees);
+            recordTransaction(TransactionType.FEE, fees, this, null);
+        } else {
+            throw new IllegalArgumentException("Insufficient balance to apply fees.");
+        }
+    }
+
     public String getAccountNumber() { return accountNumber; }
     public Customer getCustomer() { return customer; }
     public AccountType getAccountType() { return accountType; }
@@ -47,46 +94,9 @@ public abstract class Account {
     public List<Transaction> getTransactions() { return transactions; }
     public boolean isActive() { return isActive; }
 
-    // Setters
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
-    public void setCustomer(Customer customer) { this.customer = customer; }
-    public void setAccountType(AccountType accountType) { this.accountType = accountType; }
-    public void setOpenedDate(Date openedDate) { this.openedDate = openedDate; }
     public void setAvailableBalance(BigDecimal availableBalance) { this.availableBalance = availableBalance; }
-    public void setTransactions(List<Transaction> transactions) { this.transactions = transactions; }
-    public void setActive(boolean active) { isActive = active; }
+    public void setActive(boolean active) { this.isActive = active; }
 
-    // Balance Inquiry
-    public BigDecimal viewBalance() {
-        return availableBalance;
-    }
-
-    // Adds a transaction to the account
-    public void addTransaction(Transaction transaction) {
-        this.transactions.add(transaction);
-    }
-
-    // Apply Fees (Refactored to Use `FeeTransaction`)
-    public void applyFees(BigDecimal fees, String description) {
-        if (availableBalance.compareTo(fees) >= 0) {
-            availableBalance = availableBalance.subtract(fees);
-
-            // Create and add a FeeTransaction using TransactionFactory
-            Transaction feeTransaction = (Transaction) TransactionFactory.createTransaction(
-                    TransactionType.FEE,
-                    description,
-                    new Date(),
-                    fees,
-                    this,
-                    null
-            );
-            addTransaction(feeTransaction);
-        } else {
-            throw new IllegalArgumentException("Insufficient balance to apply fees.");
-        }
-    }
-
-    // Close Account
     public void closeAccount() {
         if (availableBalance.compareTo(BigDecimal.ZERO) == 0) {
             isActive = false;
@@ -95,11 +105,6 @@ public abstract class Account {
             throw new IllegalStateException("Unable to close the account: balance is not zero.");
         }
     }
-
-    // Abstract Methods for Account-Specific Operations
-    public abstract void deposit(BigDecimal amount);
-    public abstract void withdraw(BigDecimal amount);
-    public abstract void transfer(Account targetAccount, BigDecimal amount);
 
     @Override
     public String toString() {

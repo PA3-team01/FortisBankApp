@@ -1,12 +1,14 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.*;
+import com.fortisbank.models.Customer;
 import com.fortisbank.models.accounts.*;
+import com.fortisbank.models.transactions.Transaction;
 
 import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,10 +18,12 @@ public class AccountRepository implements IAccountRepository {
 
     private final DatabaseConnection dbConnection;
     private final CustomerRepository customerRepository;
+    private final TransactionRepository transactionRepository;
 
     public AccountRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
         this.customerRepository = new CustomerRepository();
+        this.transactionRepository = new TransactionRepository();
     }
 
     @Override
@@ -87,7 +91,7 @@ public class AccountRepository implements IAccountRepository {
 
             stmt.setString(1, account.getAccountNumber());
             stmt.setString(2, account.getCustomer().getCustomerID());
-            stmt.setString(3, account.getAccountType().name()); // Use enum instead of raw string
+            stmt.setString(3, account.getAccountType().name());
             stmt.setDate(4, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(5, account.getAvailableBalance());
             stmt.setBoolean(6, account.isActive());
@@ -107,7 +111,7 @@ public class AccountRepository implements IAccountRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, account.getCustomer().getCustomerID());
-            stmt.setString(2, account.getAccountType().name()); // Use enum
+            stmt.setString(2, account.getAccountType().name());
             stmt.setDate(3, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(4, account.getAvailableBalance());
             stmt.setBoolean(5, account.isActive());
@@ -135,7 +139,6 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
-    // **Fixed mapResultSetToAccount to use Enum and correct account mapping**
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
         String accountId = rs.getString("AccountID");
         String customerId = rs.getString("CustomerID");
@@ -144,22 +147,30 @@ public class AccountRepository implements IAccountRepository {
         BigDecimal availableBalance = rs.getBigDecimal("AvailableBalance");
         boolean isActive = rs.getBoolean("isActive");
 
-        // Fetch Customer object
         Customer customer = customerRepository.getCustomerById(customerId);
 
         switch (accountType) {
             case CHECKING:
-                return new CheckingAccount(accountId, customer, openedDate, availableBalance, rs.getInt("FreeTransactionLimit"));
+                return new CheckingAccount(accountId, customer, openedDate, availableBalance);
             case SAVINGS:
                 return new SavingsAccount(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("AnnualInterestRate"));
             case CREDIT:
-                return new CreditAccount(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("CreditLimit"), rs.getBigDecimal("InterestRate"));
-            case LINE_OF_CREDIT:
-                return new LineOfCredit(accountId, customer, openedDate, availableBalance, rs.getBigDecimal("CreditLimit"), rs.getBigDecimal("InterestRate"));
+                return new CreditAccount(accountId, customer, openedDate, rs.getBigDecimal("CreditLimit"), rs.getBigDecimal("InterestRate"));
             case CURRENCY:
-                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, rs.getString("CurrencyType"), rs.getBigDecimal("ExchangeRate"));
+                String currencyCode = rs.getString("CurrencyType");
+                BigDecimal exchangeRate = CurrencyType.getInstance().getExchangeRate(currencyCode);
+                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, currencyCode);
             default:
                 throw new IllegalArgumentException("Unknown account type: " + accountType);
         }
+    }
+
+    public void recordTransaction(Transaction transaction) {
+        transactionRepository.insertTransaction(transaction);
+        LOGGER.log(Level.INFO, "Transaction {0} recorded successfully.", transaction.getTransactionNumber());
+    }
+
+    public List<Transaction> getTransactionsForAccount(String accountId) {
+        return transactionRepository.getTransactionsByAccount(accountId);
     }
 }
