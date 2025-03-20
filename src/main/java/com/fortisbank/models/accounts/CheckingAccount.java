@@ -1,5 +1,7 @@
 package com.fortisbank.models.accounts;
 import com.fortisbank.models.Customer;
+import com.fortisbank.utils.IdGenerator;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -7,6 +9,11 @@ public class CheckingAccount extends Account {
     private static final int FREE_TRANSACTION_LIMIT = 2;
     private static final BigDecimal TRANSACTION_FEE = new BigDecimal("5.00");
     private int transactionCount = 0; // TODO: handle this better in database maybe? (check transactions count per month)
+
+    //TO-DO
+    public CheckingAccount(Customer customer, BigDecimal initialBalance) {
+        super(IdGenerator.generateId(), customer, AccountType.CHECKING, new Date(), initialBalance);
+    }
 
     public CheckingAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal initialBalance) {
         super(accountNumber, customer, AccountType.CHECKING, openedDate, initialBalance);
