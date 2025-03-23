@@ -3,6 +3,19 @@
 
 ### Update March 23 - 
 
+### refactor: integrate custom collection classes into all repositories
+
+- Replaced List<T> with model-specific collection classes:
+  - AccountList in AccountRepository
+  - CustomerList in CustomerRepository
+  - TransactionList in TransactionRepository
+- Updated method return types in repositories and interfaces accordingly
+- Improved readability and future extensibility (e.g., filtering, sorting, aggregating)
+- Collection classes are located in models.collections and extend ArrayList<T>
+- Ensures consistency and encapsulation of collection-level logic per model type
+![image](https://github.com/user-attachments/assets/04e331e9-8e93-4255-b93c-c6abc2eac89c)
+
+
 ### feat: add file-based repository system with switchable storage mode
 
 - Implemented CustomerRepositoryFile with file serialization support
