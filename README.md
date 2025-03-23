@@ -1,5 +1,21 @@
 # Fortis Bank `System`
 
+
+### Update March 23 - 
+
+### feat: add file-based repository system with switchable storage mode
+
+- Implemented CustomerRepositoryFile with file serialization support
+- Created FileManager utility for generic file I/O operations
+- Added FileRepository<T> abstract base class for reuse
+- Introduced StorageMode enum to toggle between FILE and DATABASE modes
+- Implemented RepositoryFactory to return appropriate repository implementation
+- Cleaned up structure for modular, pluggable storage architecture
+- Added Markdown documentation and PlantUML diagram for repository flow
+![image](https://github.com/user-attachments/assets/11cc633d-1221-487d-9d23-8bf68f8d141a)
+
+---
+
 ## Updates March 20:
 
 ### Refactored Transaction System and Updated Related Repositories
@@ -72,4 +88,6 @@ This refactoring improves modularity, maintainability, and ensures consistency a
 
 This update ensures transaction-driven operations for all accounts, enables accurate currency exchange handling, and improves system maintainability.
 ![image](https://github.com/user-attachments/assets/3dde4cf0-17c2-4093-9e00-952093fc627c)
+
+---
 
