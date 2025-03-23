@@ -25,4 +25,9 @@ public class CreditAccount extends Account {
         BigDecimal interest = availableBalance.multiply(interestRate);
         applyFees(interest, "Credit account interest applied.");
     }
+
+    @Override
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
+    }
 }

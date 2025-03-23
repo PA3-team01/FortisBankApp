@@ -72,4 +72,26 @@ public abstract class Transaction implements Serializable, TransactionInterface 
                 ", destinationAccount=" + (destinationAccount != null ? destinationAccount.getAccountNumber() : "N/A") +
                 '}';
     }
+
+    public BigDecimal getSignedAmountFor(Account contextAccount) {
+        switch (transactionType) {
+            case DEPOSIT:
+                return amount;
+            case WITHDRAWAL:
+            case FEE:
+                return amount.negate();
+            case TRANSFER:
+                if (sourceAccount != null && sourceAccount.equals(contextAccount)) {
+                    return amount.negate();
+                } else if (destinationAccount != null && destinationAccount.equals(contextAccount)) {
+                    return amount;
+                }
+                break;
+        }
+        return BigDecimal.ZERO;
+    }
+
+
+
+
 }

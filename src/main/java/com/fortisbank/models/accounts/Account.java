@@ -2,14 +2,11 @@ package com.fortisbank.models.accounts;
 
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.transactions.Transaction;
-import com.fortisbank.models.transactions.TransactionFactory;
-import com.fortisbank.models.transactions.TransactionType;
+import com.fortisbank.models.transactions.*;
 import com.fortisbank.utils.IdGenerator;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,6 +21,7 @@ public abstract class Account implements AccountInterface, Serializable {
     protected TransactionList transactions;
     protected boolean isActive;
 
+    // Constructors
     public Account() {
         this.accountNumber = IdGenerator.generateId();
         this.transactions = new TransactionList();
@@ -41,52 +39,79 @@ public abstract class Account implements AccountInterface, Serializable {
         this.isActive = true;
     }
 
+    // Deposit
     @Override
     public void deposit(BigDecimal amount) {
-        availableBalance = availableBalance.add(amount);
-        recordTransaction(TransactionType.DEPOSIT, amount, this, null);
+        DepositTransaction tx = (DepositTransaction) TransactionFactory.createTransaction(
+                TransactionType.DEPOSIT,
+                "Deposit to account",
+                new Date(),
+                amount,
+                this,
+                null
+        );
+        tx.processTransaction();
     }
 
+    // Withdraw
     @Override
     public void withdraw(BigDecimal amount) {
         if (availableBalance.compareTo(amount) < 0) {
             throw new IllegalArgumentException("Insufficient balance.");
         }
-        availableBalance = availableBalance.subtract(amount);
-        recordTransaction(TransactionType.WITHDRAWAL, amount, this, null);
-    }
 
-    @Override
-    public void transfer(Account targetAccount, BigDecimal amount) {
-        if (availableBalance.compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient balance.");
-        }
-        this.withdraw(amount);
-        targetAccount.deposit(amount);
-        recordTransaction(TransactionType.TRANSFER, amount, this, targetAccount);
-    }
-
-    private void recordTransaction(TransactionType type, BigDecimal amount, Account source, Account destination) {
-        Transaction transaction = (Transaction) TransactionFactory.createTransaction(
-                type,
-                "Transaction: " + type,
+        WithdrawalTransaction tx = (WithdrawalTransaction) TransactionFactory.createTransaction(
+                TransactionType.WITHDRAWAL,
+                "Withdrawal from account",
                 new Date(),
                 amount,
-                source,
-                destination
+                this,
+                null
         );
+        tx.processTransaction();
+    }
+
+    // Transfer
+    @Override
+    public void transfer(Account targetAccount, BigDecimal amount) {
+        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0");
+        }
+
+        TransferTransaction tx = (TransferTransaction) TransactionFactory.createTransaction(
+                TransactionType.TRANSFER,
+                "Transfer to " + targetAccount.getAccountNumber(),
+                new Date(),
+                amount,
+                this,
+                targetAccount
+        );
+        tx.processTransaction();
+    }
+
+    // Apply Fee
+    public void applyFees(BigDecimal feeAmount, String description) {
+        if (availableBalance.compareTo(feeAmount) < 0) {
+            throw new IllegalArgumentException("Insufficient balance to apply fee.");
+        }
+
+        FeeTransaction tx = (FeeTransaction) TransactionFactory.createTransaction(
+                TransactionType.FEE,
+                description != null ? description : "Fee applied",
+                new Date(),
+                feeAmount,
+                this,
+                null
+        );
+        tx.processTransaction();
+    }
+
+    // Add transaction manually (used by transaction.recordTransaction())
+    public void addTransaction(Transaction transaction) {
         transactions.add(transaction);
     }
 
-    public void applyFees(BigDecimal fees, String description) {
-        if (availableBalance.compareTo(fees) >= 0) {
-            availableBalance = availableBalance.subtract(fees);
-            recordTransaction(TransactionType.FEE, fees, this, null);
-        } else {
-            throw new IllegalArgumentException("Insufficient balance to apply fees.");
-        }
-    }
-
+    // Getters
     public String getAccountNumber() { return accountNumber; }
     public Customer getCustomer() { return customer; }
     public AccountType getAccountType() { return accountType; }
@@ -95,9 +120,11 @@ public abstract class Account implements AccountInterface, Serializable {
     public List<Transaction> getTransactions() { return transactions; }
     public boolean isActive() { return isActive; }
 
+    // Setters
     public void setAvailableBalance(BigDecimal availableBalance) { this.availableBalance = availableBalance; }
     public void setActive(boolean active) { this.isActive = active; }
 
+    // Close Account
     public void closeAccount() {
         if (availableBalance.compareTo(BigDecimal.ZERO) == 0) {
             isActive = false;
@@ -118,4 +145,6 @@ public abstract class Account implements AccountInterface, Serializable {
                 ", isActive=" + isActive +
                 '}';
     }
+
+    public abstract BigDecimal getCreditLimit();
 }

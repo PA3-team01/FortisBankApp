@@ -2,6 +2,9 @@ package com.fortisbank.data.repositories;
 
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ITransactionRepository {
@@ -10,4 +13,9 @@ public interface ITransactionRepository {
     TransactionList getAllTransactions();
     void insertTransaction(Transaction transaction);
     void deleteTransaction(String transactionNumber);
+
+    TransactionList getTransactionsByCustomerAndDateRange(String customerID, LocalDate start, LocalDate end);
+
+    BigDecimal getBalanceBeforeDate(String customerID, LocalDate start);
 }
+
