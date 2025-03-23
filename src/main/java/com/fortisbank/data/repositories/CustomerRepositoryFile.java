@@ -2,6 +2,7 @@ package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.file.FileRepository;
 import com.fortisbank.models.Customer;
+import com.fortisbank.models.collections.CustomerList;
 
 import java.util.List;
 
@@ -28,7 +29,7 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
 
     @Override
     public void updateCustomer(Customer customer) {
-        List<Customer> customers = readAll();
+        var customers = readAll();
         for (int i = 0; i < customers.size(); i++) {
             if (customers.get(i).getCustomerID().equals(customer.getCustomerID())) {
                 customers.set(i, customer);
@@ -40,13 +41,13 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
 
     @Override
     public void deleteCustomer(String id) {
-        List<Customer> customers = readAll();
+        var customers = readAll();
         customers.removeIf(c -> c.getCustomerID().equals(id));
         writeAll(customers);
     }
 
     @Override
-    public List<Customer> getAllCustomers() {
-        return readAll();
+    public CustomerList getAllCustomers() {
+        return (CustomerList) readAll();
     }
 }

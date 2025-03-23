@@ -1,6 +1,7 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.models.Customer;
+
 import java.util.List;
 
 public interface ICustomerRepository {

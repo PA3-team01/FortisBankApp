@@ -1,6 +1,7 @@
 package com.fortisbank.models.accounts;
 
 import com.fortisbank.models.Customer;
+import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
@@ -20,12 +21,12 @@ public abstract class Account implements AccountInterface, Serializable {
     protected AccountType accountType;
     protected Date openedDate;
     protected BigDecimal availableBalance;
-    protected List<Transaction> transactions;
+    protected TransactionList transactions;
     protected boolean isActive;
 
     public Account() {
         this.accountNumber = IdGenerator.generateId();
-        this.transactions = new ArrayList<>();
+        this.transactions = new TransactionList();
         this.availableBalance = BigDecimal.ZERO;
         this.isActive = true;
     }
@@ -36,7 +37,7 @@ public abstract class Account implements AccountInterface, Serializable {
         this.accountType = accountType;
         this.openedDate = openedDate;
         this.availableBalance = initialBalance;
-        this.transactions = new ArrayList<>();
+        this.transactions = new TransactionList();
         this.isActive = true;
     }
 

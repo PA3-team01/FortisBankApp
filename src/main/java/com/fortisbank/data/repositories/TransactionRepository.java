@@ -2,14 +2,13 @@ package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.IdGenerator;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,8 +43,8 @@ public class TransactionRepository implements ITransactionRepository {
     }
 
     @Override
-    public List<Transaction> getTransactionsByAccount(String accountId) {
-        List<Transaction> transactions = new ArrayList<>();
+    public TransactionList getTransactionsByAccount(String accountId) {
+        var transactions = new TransactionList();
         String query = "SELECT * FROM transactions WHERE SourceAccount = ? OR DestinationAccount = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -65,8 +64,8 @@ public class TransactionRepository implements ITransactionRepository {
     }
 
     @Override
-    public List<Transaction> getAllTransactions() {
-        List<Transaction> transactions = new ArrayList<>();
+    public TransactionList getAllTransactions() {
+        var transactions = new TransactionList();
         String query = "SELECT * FROM transactions";
 
         try (Connection conn = dbConnection.getConnection();

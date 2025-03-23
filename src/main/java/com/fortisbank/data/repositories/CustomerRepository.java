@@ -2,10 +2,10 @@ package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.Customer;
+import com.fortisbank.models.collections.CustomerList;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CustomerRepository implements ICustomerRepository {
@@ -35,7 +35,7 @@ public class CustomerRepository implements ICustomerRepository {
 
     @Override
     public List<Customer> getAllCustomers() {
-        List<Customer> customers = new ArrayList<>();
+        var customers = new CustomerList();
         String query = "SELECT * FROM customers";
 
         try (Connection conn = dbConnection.getConnection();

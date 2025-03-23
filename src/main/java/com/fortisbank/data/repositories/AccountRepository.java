@@ -3,11 +3,11 @@ package com.fortisbank.data.repositories;
 import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.accounts.*;
+import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.transactions.Transaction;
 
 import java.math.BigDecimal;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -45,8 +45,8 @@ public class AccountRepository implements IAccountRepository {
     }
 
     @Override
-    public List<Account> getAccountsByCustomerId(String customerId) {
-        List<Account> accounts = new ArrayList<>();
+    public AccountList getAccountsByCustomerId(String customerId) {
+        var accounts = new AccountList();
         String query = "SELECT * FROM accounts WHERE CustomerID = ?";
 
         try (Connection conn = dbConnection.getConnection();
@@ -65,8 +65,8 @@ public class AccountRepository implements IAccountRepository {
     }
 
     @Override
-    public List<Account> getAllAccounts() {
-        List<Account> accounts = new ArrayList<>();
+    public AccountList getAllAccounts() {
+        var accounts = new AccountList();
         String query = "SELECT * FROM accounts";
 
         try (Connection conn = dbConnection.getConnection();
@@ -159,7 +159,7 @@ public class AccountRepository implements IAccountRepository {
             case CURRENCY:
                 String currencyCode = rs.getString("CurrencyType");
                 BigDecimal exchangeRate = CurrencyType.getInstance().getExchangeRate(currencyCode);
-                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, currencyCode);
+                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, currencyCode, (BigDecimal) extraParams[1]);
             default:
                 throw new IllegalArgumentException("Unknown account type: " + accountType);
         }

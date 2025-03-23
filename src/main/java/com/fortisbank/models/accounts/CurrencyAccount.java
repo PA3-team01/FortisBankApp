@@ -8,7 +8,7 @@ public class CurrencyAccount extends Account {
     private String currencyCode;
     private Date lastActiveDate;
 
-    public CurrencyAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal initialBalance, String currencyCode) {
+    public CurrencyAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal initialBalance, String currencyCode, BigDecimal extraParam) {
         super(accountNumber, customer, AccountType.CURRENCY, openedDate, initialBalance);
         this.currencyCode = currencyCode.toUpperCase();
         this.lastActiveDate = new Date();
