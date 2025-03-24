@@ -25,6 +25,7 @@ public class TransactionRepository implements ITransactionRepository {
         this.dbConnection = DatabaseConnection.getInstance();
         this.accountRepository = AccountRepository.getInstance();
     }
+
     public static TransactionRepository getInstance() {
         if(instance == null){
             instance = new TransactionRepository();

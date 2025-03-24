@@ -37,7 +37,7 @@ public class AccountRepository implements IAccountRepository {
     private final TransactionRepository transactionRepository;
 
 
-    public AccountRepository() {
+    private AccountRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
         this.customerRepository = CustomerRepository.getInstance();
         this.transactionRepository = TransactionRepository.getInstance();

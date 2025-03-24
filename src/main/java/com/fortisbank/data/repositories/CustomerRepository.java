@@ -15,7 +15,7 @@ public class CustomerRepository implements ICustomerRepository {
     private final DatabaseConnection dbConnection;
     private static CustomerRepository instance;
 
-    public CustomerRepository() {
+    private CustomerRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
