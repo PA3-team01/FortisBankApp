@@ -6,8 +6,8 @@ import java.util.List;
 public abstract class FileRepository<T> {
     protected final File file;
 
-    protected FileRepository() {
-        this.file = new File("data/customers.ser");
+    protected FileRepository(File file) {
+        this.file = file;
     }
 
     protected List<T> readAll() {
@@ -18,4 +18,3 @@ public abstract class FileRepository<T> {
         FileManager.writeListToFile(file, list);
     }
 }
-

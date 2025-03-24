@@ -4,12 +4,13 @@ import com.fortisbank.data.file.FileRepository;
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.collections.CustomerList;
 
+import java.io.File;
 import java.util.List;
 
 public class CustomerRepositoryFile extends FileRepository<Customer> implements ICustomerRepository {
 
     public CustomerRepositoryFile() {
-        super();
+        super(new File("data/customers.ser"));
     }
 
     @Override
