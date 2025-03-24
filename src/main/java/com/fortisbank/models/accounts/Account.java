@@ -169,6 +169,7 @@ public abstract class Account implements AccountInterface, Serializable {
                 ", accountType=" + accountType +
                 ", openedDate=" + openedDate +
                 ", availableBalance=" + availableBalance +
+                ", transactionList=" + transactions +
                 ", isActive=" + isActive +
                 '}';
     }
