@@ -3,6 +3,7 @@ package com.fortisbank.models.collections;
 import com.fortisbank.models.Customer;
 import com.fortisbank.utils.CustomerComparators;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -33,7 +34,7 @@ public class CustomerList extends ArrayList<Customer> {
     //Filter list by name containing a substring (case-insensitive)
     public CustomerList filterByNameContains(String substring) {
         return this.stream()
-                .filter(c -> c.getName().toLowerCase().contains(substring.toLowerCase()))
+                .filter(c -> c.getFullName().toLowerCase().contains(substring.toLowerCase()))
                 .collect(Collectors.toCollection(CustomerList::new));
     }
 

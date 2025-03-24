@@ -1,9 +1,11 @@
 package com.fortisbank.models;
 
+import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 public class Customer implements Serializable {
     @Serial
@@ -83,6 +85,16 @@ public class Customer implements Serializable {
 
     public AccountList getAccounts() {return accounts;}
     public void setAccounts(AccountList accounts) {this.accounts = accounts;}
+    public BigDecimal getBalance() {
+        BigDecimal totalBalance = BigDecimal.ZERO;
+
+        if (accounts != null) {
+            for (Account account : accounts) {
+                totalBalance = totalBalance.add(account.getAvailableBalance());
+            }
+        }
+        return totalBalance;
+    }
 
     @Override
     public String toString() {
