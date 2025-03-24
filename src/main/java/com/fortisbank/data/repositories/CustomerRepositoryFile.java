@@ -7,24 +7,22 @@ import com.fortisbank.models.collections.CustomerList;
 import java.io.File;
 import java.util.List;
 
-/**
- * CustomerRepositoryFile is an implementation of the ICustomerRepository interface
- * that handles the persistence of customer data using file storage.
- * This class extends the generic FileRepository to provide specialized functionality
- * for Customer objects.
- */
 public class CustomerRepositoryFile extends FileRepository<Customer> implements ICustomerRepository {
 
-    public CustomerRepositoryFile() {
-        super(new File("data/customers.ser"));
+    private static final File file = new File("data/customers.ser");
+    private static CustomerRepositoryFile instance;
+
+    private CustomerRepositoryFile() {
+        super(file);
     }
 
-    /**
-     * Retrieves a customer by their unique ID.
-     *
-     * @param id the unique identifier of the customer to retrieve
-     * @return the Customer object with the specified ID, or null if no customer is found
-     */
+    public static synchronized CustomerRepositoryFile getInstance() {
+        if (instance == null) {
+            instance = new CustomerRepositoryFile();
+        }
+        return instance;
+    }
+
     @Override
     public Customer getCustomerById(String id) {
         return readAll().stream()
@@ -33,13 +31,6 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
                 .orElse(null);
     }
 
-    /**
-     * Inserts a new customer into the repository. The customer is added to the
-     * existing list of customers, and the updated list is saved back to the
-     * storage medium.
-     *
-     * @param customer the Customer object to be inserted into the repository
-     */
     @Override
     public void insertCustomer(Customer customer) {
         List<Customer> customers = readAll();
@@ -47,15 +38,6 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
         writeAll(customers);
     }
 
-    /**
-     * Updates an existing customer's information in the repository. The method searches
-     * for a customer in the repository with the same unique customer ID as the given
-     * Customer object. If a match is found, the customer's information is replaced
-     * with the new details provided.
-     *
-     * @param customer the Customer object containing updated information, including the
-     *                 customer's unique ID to identify the record to be updated
-     */
     @Override
     public void updateCustomer(Customer customer) {
         var customers = readAll();
@@ -68,13 +50,6 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
         writeAll(customers);
     }
 
-    /**
-     * Deletes a customer from the repository based on their unique ID. The method
-     * removes the customer with the specified identifier from the current list of
-     * customers and saves the updated list back to the storage medium.
-     *
-     * @param id the unique identifier of the customer to be deleted
-     */
     @Override
     public void deleteCustomer(String id) {
         var customers = readAll();
@@ -82,11 +57,6 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
         writeAll(customers);
     }
 
-    /**
-     * Retrieves all customers from the repository.
-     *
-     * @return a CustomerList containing all the customers fetched from the file storage
-     */
     @Override
     public CustomerList getAllCustomers() {
         return (CustomerList) readAll();

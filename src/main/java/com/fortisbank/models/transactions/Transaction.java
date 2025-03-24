@@ -39,7 +39,7 @@ public abstract class Transaction implements Serializable, TransactionInterface 
     public abstract void processTransaction();
 
     // Record transaction in account history
-    public void recordTransaction() {
+    public void recordTransaction() { //TODO: Verify record transaction logic
         if (sourceAccount != null) sourceAccount.addTransaction(this);
         if (destinationAccount != null) destinationAccount.addTransaction(this);
         System.out.println("Transaction recorded: " + this);

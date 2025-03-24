@@ -1,11 +1,9 @@
 package com.fortisbank.models;
 
-import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 public class Customer implements Serializable {
     @Serial
@@ -85,28 +83,6 @@ public class Customer implements Serializable {
 
     public AccountList getAccounts() {return accounts;}
     public void setAccounts(AccountList accounts) {this.accounts = accounts;}
-
-    //Get customer balance (all account balance)
-
-    public BigDecimal getBalance(){
-        return accounts.stream()
-                .map(Account::getAvailableBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    //get transaction count
-    public int getTransactionCount(){
-        return accounts.stream()
-                .mapToInt(Account -> accounts.getTransactions().size())
-                .sum();
-    }
-
-    //Get customer name
-    public String getName(){
-        return getFullName();
-    }
-
-
 
     @Override
     public String toString() {
