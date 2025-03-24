@@ -1,11 +1,13 @@
 package com.fortisbank.models.accounts;
+
 import com.fortisbank.models.Customer;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
 public class CreditAccount extends Account {
-    private BigDecimal creditLimit;
-    private BigDecimal interestRate; // TODO: Implement interest applying logic in business logic layer.
+    private final BigDecimal creditLimit;
+    private final BigDecimal interestRate; // TODO: Implement interest applying logic in business logic layer.
 
     public CreditAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal creditLimit, BigDecimal interestRate) {
         super(accountNumber, customer, AccountType.CREDIT, openedDate, BigDecimal.ZERO);
@@ -24,5 +26,10 @@ public class CreditAccount extends Account {
     public void applyInterest() {
         BigDecimal interest = availableBalance.multiply(interestRate);
         applyFees(interest, "Credit account interest applied.");
+    }
+
+    @Override
+    public BigDecimal getCreditLimit() {
+        return creditLimit;
     }
 }

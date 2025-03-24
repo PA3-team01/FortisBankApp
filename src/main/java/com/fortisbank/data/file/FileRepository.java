@@ -6,8 +6,8 @@ import java.util.List;
 public abstract class FileRepository<T> {
     protected final File file;
 
-    protected FileRepository(String filePath) {
-        this.file = new File(filePath);
+    protected FileRepository() {
+        this.file = new File("data/customers.ser");
     }
 
     protected List<T> readAll() {

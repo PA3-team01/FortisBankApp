@@ -1,4 +1,5 @@
 package com.fortisbank.models.accounts;
+
 import com.fortisbank.models.Customer;
 import com.fortisbank.utils.IdGenerator;
 
@@ -29,6 +30,11 @@ public class CheckingAccount extends Account {
     public void transfer(Account targetAccount, BigDecimal amount) {
         super.transfer(targetAccount, amount);
         applyTransactionFee();
+    }
+
+    @Override
+    public BigDecimal getCreditLimit() {
+        return null;
     }
 
     private void applyTransactionFee() {

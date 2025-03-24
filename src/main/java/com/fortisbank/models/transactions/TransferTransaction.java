@@ -15,7 +15,12 @@ public class TransferTransaction extends Transaction {
         if (sourceAccount == null || destinationAccount == null) {
             throw new IllegalArgumentException("Source or destination account missing for transfer.");
         }
-        sourceAccount.transfer(destinationAccount, amount);
+
+        sourceAccount.setAvailableBalance(sourceAccount.getAvailableBalance().subtract(amount));
+        destinationAccount.setAvailableBalance(destinationAccount.getAvailableBalance().add(amount));
+
+        this.recordTransaction(); // Record only this TransferTransaction
         System.out.println("Transfer transaction processed: " + this);
     }
+
 }

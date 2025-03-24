@@ -2,11 +2,14 @@ package com.fortisbank.models.transactions;
 
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.utils.IdGenerator;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public abstract class Transaction implements Serializable, TransactionInterface {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected String transactionNumber;
@@ -43,22 +46,62 @@ public abstract class Transaction implements Serializable, TransactionInterface 
     }
 
     // Getters
-    public String getTransactionNumber() { return transactionNumber; }
-    public String getDescription() { return description; }
-    public Date getTransactionDate() { return transactionDate; }
-    public TransactionType getTransactionType() { return transactionType; }
-    public BigDecimal getAmount() { return amount; }
-    public Account getSourceAccount() { return sourceAccount; }
-    public Account getDestinationAccount() { return destinationAccount; }
+    public String getTransactionNumber() {
+        return transactionNumber;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getTransactionDate() {
+        return transactionDate;
+    }
+
+    public TransactionType getTransactionType() {
+        return transactionType;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public Account getSourceAccount() {
+        return sourceAccount;
+    }
+
+    public Account getDestinationAccount() {
+        return destinationAccount;
+    }
 
     // Setters
-    public void setTransactionNumber(String transactionNumber) { this.transactionNumber = transactionNumber; }
-    public void setDescription(String description) { this.description = description; }
-    public void setTransactionDate(Date transactionDate) { this.transactionDate = transactionDate; }
-    public void setTransactionType(TransactionType transactionType) { this.transactionType = transactionType; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
-    public void setSourceAccount(Account sourceAccount) { this.sourceAccount = sourceAccount; }
-    public void setDestinationAccount(Account destinationAccount) { this.destinationAccount = destinationAccount; }
+    public void setTransactionNumber(String transactionNumber) {
+        this.transactionNumber = transactionNumber;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public void setTransactionDate(Date transactionDate) {
+        this.transactionDate = transactionDate;
+    }
+
+    public void setTransactionType(TransactionType transactionType) {
+        this.transactionType = transactionType;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public void setSourceAccount(Account sourceAccount) {
+        this.sourceAccount = sourceAccount;
+    }
+
+    public void setDestinationAccount(Account destinationAccount) {
+        this.destinationAccount = destinationAccount;
+    }
 
     @Override
     public String toString() {
@@ -72,4 +115,24 @@ public abstract class Transaction implements Serializable, TransactionInterface 
                 ", destinationAccount=" + (destinationAccount != null ? destinationAccount.getAccountNumber() : "N/A") +
                 '}';
     }
+
+    public BigDecimal getSignedAmountFor(Account contextAccount) {
+        switch (transactionType) {
+            case DEPOSIT:
+                return amount;
+            case WITHDRAWAL:
+            case FEE:
+                return amount.negate();
+            case TRANSFER:
+                if (sourceAccount != null && sourceAccount.equals(contextAccount)) {
+                    return amount.negate();
+                } else if (destinationAccount != null && destinationAccount.equals(contextAccount)) {
+                    return amount;
+                }
+                break;
+        }
+        return BigDecimal.ZERO;
+    }
+
+
 }

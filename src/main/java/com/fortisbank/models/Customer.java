@@ -1,8 +1,10 @@
 package com.fortisbank.models;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public class Customer implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private String CustomerID;
@@ -48,7 +50,7 @@ public class Customer implements Serializable {
         this.LastName = lastName;
     }
 
-    public String getFullName(){
+    public String getFullName() {
         return FirstName + " " + LastName;
     }
 
@@ -76,26 +78,9 @@ public class Customer implements Serializable {
         this.PhoneNumber = phoneNumber;
     }
 
-   // public boolean VerifyPIN(String inputPIN){
-   // }
-
-    //public Account OpenAccount(String accountType){
-   // }
-
-    //public void PerformTransaction(Transaction transaction){
-    //}
-
-    //public double CheckBalance(Account account){
-    //}
-
-    //public void RequestAccount(String accountType){
-    //}
-
-    //public void CloseAccount(Account account){
-    //}
 
     @Override
-    public String toString(){
+    public String toString() {
         return "Customer{" +
                 "CustomerID='" + CustomerID + '\'' +
                 ", FirstName='" + FirstName + '\'' +

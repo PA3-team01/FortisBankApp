@@ -15,7 +15,18 @@ public class RepositoryFactory {
         };
     }
 
-    // Future extension
-    // public IAccountRepository getAccountRepository() { ... }
-    // public ITransactionRepository getTransactionRepository() { ... }
+    public IAccountRepository getAccountRepository() {
+        return switch (mode) {
+            case FILE -> new AccountRepositoryFile();
+            case DATABASE -> new AccountRepository();
+        };
+    }
+
+    public ITransactionRepository getTransactionRepository() {
+        return switch (mode) {
+            case FILE -> new TransactionRepositoryFile();
+            case DATABASE -> new TransactionRepository();
+        };
+    }
 }
+

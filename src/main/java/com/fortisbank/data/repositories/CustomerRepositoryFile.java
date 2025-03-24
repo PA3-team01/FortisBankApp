@@ -9,7 +9,7 @@ import java.util.List;
 public class CustomerRepositoryFile extends FileRepository<Customer> implements ICustomerRepository {
 
     public CustomerRepositoryFile() {
-        super("data/customers.ser");
+        super();
     }
 
     @Override

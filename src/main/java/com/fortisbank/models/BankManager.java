@@ -1,22 +1,24 @@
 package com.fortisbank.models;
 
 import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.accounts.CheckingAccount;
 import com.fortisbank.utils.IdGenerator;
+
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
 public class BankManager implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    private String managerID;
-    private String firstName;
-    private String lastName;
-    private String email;
-    private List<Customer> customers;
+    private final String managerID;
+    private final String firstName;
+    private final String lastName;
+    private final String email;
+    private final List<Customer> customers;
 
     public BankManager(String firstName, String lastName, String email) {
         this.managerID = IdGenerator.generateId();
