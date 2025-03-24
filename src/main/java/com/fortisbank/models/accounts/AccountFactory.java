@@ -13,7 +13,7 @@ public class AccountFactory {
             case CREDIT:
                 return new CreditAccount(accountNumber, customer, openedDate, (BigDecimal) extraParams[0], (BigDecimal) extraParams[1]);
             case CURRENCY:
-                return new CurrencyAccount(accountNumber, customer, openedDate, initialBalance, (String) extraParams[0], (BigDecimal) extraParams[1]);
+                return new CurrencyAccount(accountNumber, customer, openedDate, initialBalance, (String) extraParams[0]);
             default:
                 throw new IllegalArgumentException("Unsupported account type.");
         }

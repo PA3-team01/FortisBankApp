@@ -159,7 +159,7 @@ public class AccountRepository implements IAccountRepository {
             case CURRENCY:
                 String currencyCode = rs.getString("CurrencyType");
                 BigDecimal exchangeRate = CurrencyType.getInstance().getExchangeRate(currencyCode);
-                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, currencyCode, (BigDecimal) extraParams[1]);
+                return new CurrencyAccount(accountId, customer, openedDate, availableBalance, currencyCode);
             default:
                 throw new IllegalArgumentException("Unknown account type: " + accountType);
         }

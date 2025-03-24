@@ -8,7 +8,7 @@ public class CurrencyAccount extends Account {
     private String currencyCode;
     private Date lastActiveDate;
 
-    public CurrencyAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal initialBalance, String currencyCode, BigDecimal extraParam) {
+    public CurrencyAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal initialBalance, String currencyCode) {
         super(accountNumber, customer, AccountType.CURRENCY, openedDate, initialBalance);
         this.currencyCode = currencyCode.toUpperCase();
         this.lastActiveDate = new Date();
@@ -24,6 +24,11 @@ public class CurrencyAccount extends Account {
     public void withdraw(BigDecimal amount) {
         super.withdraw(amount);
         lastActiveDate = new Date();
+    }
+
+    @Override
+    public BigDecimal getCreditLimit() {
+        return null;
     }
 
     public void depositInDifferentCurrency(BigDecimal amount, String fromCurrency) {
