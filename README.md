@@ -3,6 +3,21 @@
 
 ### Update March 23 - 
 
+refactor: redesign report system as runtime-generated logic, not persistent data
+
+- Replaced the old Serializable Report model with an abstract Report base class
+- Reports are now fully dynamic, generated at runtime from repositories
+- No longer treated as persistent data — reports are NOT stored in the database
+- Created specialized report classes:
+  - CustomerStatementReport: per-customer monthly activity
+  - BankSummaryReport: global snapshot of all customers, accounts, and transactions
+- Updated ReportService to centralize report generation logic
+- Promotes clean separation of responsibilities: data is retrieved, aggregated, and presented without altering persistence layers
+- Future-ready for export capabilities (PDF, CSV, JSON) using polymorphism on the Report base class
+- Added UML diagram to help the team understand the new report flow
+![image](https://github.com/user-attachments/assets/2e80cba7-e2e4-4e8e-be5f-b68dd9730a55)
+
+
 ### refactor: integrate custom collection classes into all repositories
 
 - Replaced List<T> with model-specific collection classes:
