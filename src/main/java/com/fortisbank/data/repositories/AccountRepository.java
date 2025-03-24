@@ -15,7 +15,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+//TODO: SINGLETON
 public class AccountRepository implements IAccountRepository {
     private static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
 
@@ -24,7 +24,7 @@ public class AccountRepository implements IAccountRepository {
     private final TransactionRepository transactionRepository;
 
     public AccountRepository() {
-        this.dbConnection = DatabaseConnection.getInstance();
+        this.dbConnection = DatabaseConnection.getInstance(); // Get the instance of DatabaseConnection
         this.customerRepository = new CustomerRepository();
         this.transactionRepository = new TransactionRepository();
     }
