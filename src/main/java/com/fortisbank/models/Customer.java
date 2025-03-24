@@ -84,7 +84,6 @@ public class Customer implements Serializable {
     public AccountList getAccounts() {return accounts;}
     public void setAccounts(AccountList accounts) {this.accounts = accounts;}
 
-
     @Override
     public String toString() {
         return "Customer{" +
@@ -94,6 +93,7 @@ public class Customer implements Serializable {
                 ", PINHash='" + PINHash + '\'' +
                 ", Email='" + Email + '\'' +
                 ", PhoneNumber='" + PhoneNumber + '\'' +
+                 "accounts=" + accounts + '\'' +
                 //TODO: Add accounts to toString
                 '}';
     }
