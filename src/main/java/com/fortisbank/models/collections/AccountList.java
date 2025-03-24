@@ -44,11 +44,21 @@ public class AccountList extends ArrayList<Account> {
                 .collect(Collectors.toCollection(AccountList::new));
     }
 
-   //toString generates a formatted string that displays the list of accounts
+    public AccountList filterByActive(){
+        return this.stream()
+                .filter(Account::isActive)
+                .collect(Collectors.toCollection(AccountList::new));
+    }
+
+   //toString generates string that displays the list of accounts
     @Override
     public String toString() {
-        return this.stream()
-                .map(Account::toString)
-                .collect(Collectors.joining(",\n", "[\n", "\n]"));
+         StringBuilder builder = new StringBuilder();
+         builder.append("AccountList:\n");
+         for (Account account : this) {
+             builder.append(account.toString()).append("\n");
+         }
+        return builder.toString();
+
     }
 }
