@@ -17,4 +17,9 @@ public class SavingsAccount extends Account {
         BigDecimal interest = availableBalance.multiply(annualInterestRate);
         deposit(interest);
     }
+
+    @Override
+    public BigDecimal getCreditLimit() {
+        return null;
+    }
 }

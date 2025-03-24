@@ -32,6 +32,11 @@ public class CheckingAccount extends Account {
         applyTransactionFee();
     }
 
+    @Override
+    public BigDecimal getCreditLimit() {
+        return null;
+    }
+
     private void applyTransactionFee() {
         if (transactionCount >= FREE_TRANSACTION_LIMIT) {
             applyFees(TRANSACTION_FEE, "Transaction fee after " + FREE_TRANSACTION_LIMIT + " free transactions.");
