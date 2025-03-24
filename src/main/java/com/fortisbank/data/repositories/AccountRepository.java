@@ -15,18 +15,39 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-//TODO: SINGLETON
+
+/**
+ * The AccountRepository class is responsible for managing account-related operations
+ * such as retrieving, inserting, updating, and deleting accounts from the database.
+ * It also provides functionality for handling account transactions and querying
+ * accounts by customer or ID.
+ *
+ * This class implements the IAccountRepository interface.
+ *
+ * AccountRepository uses a singleton pattern for centralized database operations
+ * and depends on CustomerRepository, TransactionRepository, and DatabaseConnection
+ * for its operations.
+ */
 public class AccountRepository implements IAccountRepository {
     private static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
+    private static AccountRepository instance;
 
     private final DatabaseConnection dbConnection;
     private final CustomerRepository customerRepository;
     private final TransactionRepository transactionRepository;
 
-    public AccountRepository() {
-        this.dbConnection = DatabaseConnection.getInstance(); // Get the instance of DatabaseConnection
-        this.customerRepository = new CustomerRepository();
-        this.transactionRepository = new TransactionRepository();
+
+    private AccountRepository() {
+        this.dbConnection = DatabaseConnection.getInstance();
+        this.customerRepository = CustomerRepository.getInstance();
+        this.transactionRepository = TransactionRepository.getInstance();
+    }
+
+    public static AccountRepository getInstance() {
+        if(instance == null){
+            instance = new AccountRepository();
+        }
+        return instance;
     }
 
     @Override
@@ -142,6 +163,15 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
+    /**
+     * Maps a {@code ResultSet} object to an {@code Account} instance.
+     * Based on the data in the provided {@code ResultSet}, this method determines the account type
+     * and constructs the corresponding account object (e.g., {@code CheckingAccount}, {@code SavingsAccount}, etc.).
+     *
+     * @param rs the {@code ResultSet} object containing account data retrieved from the database
+     * @return an {@code Account} object representing the mapped account data
+     * @throws SQLException if a database access error occurs or if the {@code ResultSet} cannot be read
+     */
     private Account mapResultSetToAccount(ResultSet rs) throws SQLException {
         String accountId = rs.getString("AccountID");
         String customerId = rs.getString("CustomerID");
