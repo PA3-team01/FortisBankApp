@@ -16,13 +16,20 @@ import java.util.logging.Logger;
 
 public class TransactionRepository implements ITransactionRepository {
     private static final Logger LOGGER = Logger.getLogger(TransactionRepository.class.getName());
+    private static TransactionRepository instance;
 
     private final DatabaseConnection dbConnection;
     private final AccountRepository accountRepository;
 
     public TransactionRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
-        this.accountRepository = new AccountRepository();
+        this.accountRepository = AccountRepository.getInstance();
+    }
+    public static TransactionRepository getInstance() {
+        if(instance == null){
+            instance = new TransactionRepository();
+        }
+        return instance;
     }
 
     @Override

@@ -13,9 +13,17 @@ import java.util.List;
 
 public class CustomerRepository implements ICustomerRepository {
     private final DatabaseConnection dbConnection;
+    private static CustomerRepository instance;
 
     public CustomerRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
+    }
+
+    public static CustomerRepository getInstance() {
+        if(instance == null){
+            instance = new CustomerRepository();
+        }
+        return instance;
     }
 
     @Override

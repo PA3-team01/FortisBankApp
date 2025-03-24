@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 
 public class AccountRepository implements IAccountRepository {
     private static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
+    private static AccountRepository instance;
 
     private final DatabaseConnection dbConnection;
     private final CustomerRepository customerRepository;
@@ -25,8 +26,15 @@ public class AccountRepository implements IAccountRepository {
 
     public AccountRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
-        this.customerRepository = new CustomerRepository();
-        this.transactionRepository = new TransactionRepository();
+        this.customerRepository = CustomerRepository.getInstance();
+        this.transactionRepository = TransactionRepository.getInstance();
+    }
+
+    public static AccountRepository getInstance() {
+        if(instance == null){
+            instance = new AccountRepository();
+        }
+        return instance;
     }
 
     @Override
