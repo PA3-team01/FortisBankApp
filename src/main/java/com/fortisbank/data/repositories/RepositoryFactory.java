@@ -10,21 +10,21 @@ public class RepositoryFactory {
 
     public ICustomerRepository getCustomerRepository() {
         return switch (mode) {
-            case FILE -> new CustomerRepositoryFile();
+            case FILE -> CustomerRepositoryFile.getInstance();
             case DATABASE -> CustomerRepository.getInstance();
         };
     }
 
     public IAccountRepository getAccountRepository() {
         return switch (mode) {
-            case FILE -> new AccountRepositoryFile();
+            case FILE -> AccountRepositoryFile.getInstance();
             case DATABASE -> AccountRepository.getInstance();
         };
     }
 
     public ITransactionRepository getTransactionRepository() {
         return switch (mode) {
-            case FILE -> new TransactionRepositoryFile();
+            case FILE -> TransactionRepositoryFile.getInstance();
             case DATABASE -> TransactionRepository.getInstance();
         };
     }

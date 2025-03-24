@@ -1,44 +1,86 @@
 package com.fortisbank.data.repositories;
 
+import com.fortisbank.data.file.FileRepository;
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.ZoneId;
 
-public class TransactionRepositoryFile implements ITransactionRepository {
+public class TransactionRepositoryFile extends FileRepository<Transaction> implements ITransactionRepository {
+    private static final File file = new File("data/transactions.ser");
+    private static TransactionRepositoryFile instance;
+
+    private TransactionRepositoryFile() {
+        super(file);
+    }
+
+    public static synchronized TransactionRepositoryFile getInstance() {
+        if (instance == null) {
+            instance = new TransactionRepositoryFile();
+        }
+        return instance;
+    }
+
     @Override
     public Transaction getTransactionByNumber(String transactionNumber) {
-        return null;
+        return readAll().stream()
+                .filter(t -> t.getTransactionNumber().equals(transactionNumber))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
     public TransactionList getTransactionsByAccount(String accountId) {
-        return null;
+        return readAll().stream()
+                .filter(t -> t.getSourceAccount().getAccountNumber().equals(accountId))
+                .collect(TransactionList::new, TransactionList::add, TransactionList::addAll);
     }
 
     @Override
     public TransactionList getAllTransactions() {
-        return null;
+        return (TransactionList) readAll();
     }
 
     @Override
     public void insertTransaction(Transaction transaction) {
-
+        var transactions = readAll();
+        transactions.add(transaction);
+        writeAll(transactions);
     }
 
     @Override
     public void deleteTransaction(String transactionNumber) {
-
+        var transactions = readAll();
+        transactions.removeIf(t -> t.getTransactionNumber().equals(transactionNumber));
+        writeAll(transactions);
     }
 
     @Override
     public TransactionList getTransactionsByCustomerAndDateRange(String customerID, LocalDate start, LocalDate end) {
-        return null;
+        ZoneId zone = ZoneId.systemDefault();
+        return readAll().stream()
+                .filter(t -> {
+                    String transactionCustomerID = t.getSourceAccount().getCustomer().getCustomerID();
+                    LocalDate transactionDate = t.getTransactionDate().toInstant().atZone(zone).toLocalDate();
+                    return transactionCustomerID.equals(customerID) &&
+                            (!transactionDate.isBefore(start) && !transactionDate.isAfter(end));
+                })
+                .collect(TransactionList::new, TransactionList::add, TransactionList::addAll);
     }
 
     @Override
     public BigDecimal getBalanceBeforeDate(String customerID, LocalDate start) {
-        return null;
+        ZoneId zone = ZoneId.systemDefault();
+        return readAll().stream()
+                .filter(t -> {
+                    String transactionCustomerID = t.getSourceAccount().getCustomer().getCustomerID();
+                    LocalDate transactionDate = t.getTransactionDate().toInstant().atZone(zone).toLocalDate();
+                    return transactionCustomerID.equals(customerID) && transactionDate.isBefore(start);
+                })
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }
