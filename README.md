@@ -1,6 +1,91 @@
 # Fortis Bank `System`
+# Project Architecture Overview
 
 
+---
+
+## `com.fortisbank` Package Breakdown
+
+### 1. `business.services`
+**Purpose:** Contains the business logic of the application.
+
+- Implements services like `AccountService`, `CustomerService`, `TransactionService`, etc.
+- Each service uses a corresponding repository (defined in `repositories`) to fetch or persist data.
+- Interfaces like `IAccountService` define contracts, and implementations like `AccountService` fulfill them.
+
+**Depends on:**
+- `repositories` (for data access)
+- `models` (for data types and business entities)
+
+---
+
+### 2. `data.database`
+**Purpose:** Manages the connection to the database.
+
+- `DatabaseConnection` and `IDatabaseConnection` handle low-level DB access logic.
+
+**Used by:**
+- `repositories` that interact with relational data.
+
+---
+
+### 3. `data.file`
+**Purpose:** Handles file-based operations.
+
+- `FileManager` and `FileRepository` are used to read/write data to files (e.g., reports, logs).
+
+**Used by:**
+- `repositories` using file-based storage (e.g., `AccountRepositoryFile`)
+- `utils.ReportExporter`
+
+---
+
+### 4. `repositories`
+**Purpose:** Acts as the Data Access Layer (DAL).
+
+- Includes both database and file-based repositories for Accounts, Customers, and Transactions.
+- `IAccountRepository`, `ICustomerRepository`, etc. are interfaces for abstraction.
+- `RepositoryFactory` dynamically provides the correct repository depending on the chosen `StorageMode`.
+
+**Used by:**
+- `services` to abstract data storage
+- `ui` indirectly via services
+
+---
+
+### 5. `models`
+**Purpose:** Defines the domain models/entities used across the app.
+
+**Sub-packages:**
+- `accounts`: `Account`, `CheckingAccount`, `CreditAccount`, etc.
+- `transactions`: `Transaction`, `DepositTransaction`, `WithdrawalTransaction`, etc.
+- `reports`: `Report`, `CustomerStatementReport`, etc.
+- `collections`: Helper collections like `AccountList`, `CustomerList`
+- `BankManager`, `Customer`: user entities.
+
+**Used by:**
+- `services`, `repositories`, `ui`
+
+---
+
+### 6. `ui`
+**Purpose:** Contains the user interface logic.
+
+- UIs like `CustomerUI`, `BankManagerUI`, `TransactionUI`, etc. represent views for different users.
+- Uses `services` to retrieve/update data and `models` to display data.
+
+---
+
+### 7. `utils`
+**Purpose:** General-purpose utility classes.
+
+- `Constants`, `Logger`, `IdGenerator`, `ReportExporter`, `SecurityUtils`, etc.
+- Used throughout the app for things like generating IDs, exporting reports, logging, etc.
+
+---
+---
+# UPDATES SECTION
+---
 ### Update March 23 - 
 
 ## `ReportExporter` Utility (Package: `com.fortisbank.utils`)
