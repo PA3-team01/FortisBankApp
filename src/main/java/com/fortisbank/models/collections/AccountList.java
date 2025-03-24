@@ -1,6 +1,7 @@
 package com.fortisbank.models.collections;
 
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.utils.AccountComparators;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -50,15 +51,23 @@ public class AccountList extends ArrayList<Account> {
                 .collect(Collectors.toCollection(AccountList::new));
     }
 
-   //toString generates string that displays the list of accounts
-    @Override
-    public String toString() {
-         StringBuilder builder = new StringBuilder();
-         builder.append("AccountList:\n");
-         for (Account account : this) {
-             builder.append(account.toString()).append("\n");
-         }
-        return builder.toString();
-
+    public List<Transaction> getTransactions() {
+        List<Transaction> transactions = new ArrayList<>();
+        for (Account account : this) {
+            transactions.addAll(account.getTransactions()); // Assuming Account has getTransactions method
+        }
+        return transactions;
     }
+
+   //toString generates string that displays the list of accounts
+   @Override
+   public String toString() {
+       StringBuilder builder = new StringBuilder();
+       builder.append("AccountList: ").append(this.size()).append(" accounts\n");
+       for (Account account : this) {
+           builder.append("  - ").append(account.toString()).append("\n");
+       }
+       return builder.toString();
+   }
+
 }
