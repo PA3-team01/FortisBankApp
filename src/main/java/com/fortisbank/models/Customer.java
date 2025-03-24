@@ -1,5 +1,7 @@
 package com.fortisbank.models;
 
+import com.fortisbank.models.collections.AccountList;
+
 import java.io.Serial;
 import java.io.Serializable;
 
@@ -13,6 +15,7 @@ public class Customer implements Serializable {
     private String PINHash;
     private String Email;
     private String PhoneNumber;
+    private AccountList accounts;
 
     public Customer() {
     }
@@ -78,6 +81,9 @@ public class Customer implements Serializable {
         this.PhoneNumber = phoneNumber;
     }
 
+    public AccountList getAccounts() {return accounts;}
+    public void setAccounts(AccountList accounts) {this.accounts = accounts;}
+
 
     @Override
     public String toString() {
@@ -88,6 +94,7 @@ public class Customer implements Serializable {
                 ", PINHash='" + PINHash + '\'' +
                 ", Email='" + Email + '\'' +
                 ", PhoneNumber='" + PhoneNumber + '\'' +
+                //TODO: Add accounts to toString
                 '}';
     }
 }
