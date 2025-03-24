@@ -15,21 +15,13 @@ public class TransactionFactory {
             Account sourceAccount,
             Account destinationAccount) {
 
-        switch (type) {
-            case DEPOSIT:
-                return new DepositTransaction(description, transactionDate, amount, destinationAccount);
-
-            case WITHDRAWAL:
-                return new WithdrawalTransaction(description, transactionDate, amount, sourceAccount);
-
-            case TRANSFER:
-                return new TransferTransaction(description, transactionDate, amount, sourceAccount, destinationAccount);
-
-            case FEE:
-                return new FeeTransaction(description, transactionDate, amount, sourceAccount);
-
-            default:
-                throw new IllegalArgumentException("Invalid transaction type: " + type);
-        }
+        return switch (type) {
+            case DEPOSIT -> new DepositTransaction(description, transactionDate, amount, destinationAccount);
+            case WITHDRAWAL -> new WithdrawalTransaction(description, transactionDate, amount, sourceAccount);
+            case TRANSFER ->
+                    new TransferTransaction(description, transactionDate, amount, sourceAccount, destinationAccount);
+            case FEE -> new FeeTransaction(description, transactionDate, amount, sourceAccount);
+            default -> throw new IllegalArgumentException("Invalid transaction type: " + type);
+        };
     }
 }

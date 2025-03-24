@@ -5,7 +5,6 @@ import com.fortisbank.models.transactions.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 
 public interface ITransactionRepository {
     Transaction getTransactionByNumber(String transactionNumber);

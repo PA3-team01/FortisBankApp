@@ -9,7 +9,6 @@ import com.fortisbank.models.transactions.Transaction;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Set;
 
 public class ReportExporter {
 

@@ -3,6 +3,7 @@ package com.fortisbank.models.accounts;
 import com.fortisbank.models.Customer;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Date;
 
 public class CurrencyAccount extends Account {
@@ -47,7 +48,7 @@ public class CurrencyAccount extends Account {
         if (exchangeRate.compareTo(BigDecimal.ZERO) == 0) {
             throw new IllegalArgumentException("Invalid currency: " + toCurrency);
         }
-        BigDecimal convertedAmount = amount.divide(exchangeRate, 4, BigDecimal.ROUND_HALF_UP);
+        BigDecimal convertedAmount = amount.divide(exchangeRate, 4, RoundingMode.HALF_UP);
         super.withdraw(convertedAmount);
         lastActiveDate = new Date();
     }

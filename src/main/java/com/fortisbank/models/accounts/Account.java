@@ -5,20 +5,22 @@ import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.*;
 import com.fortisbank.utils.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
 public abstract class Account implements AccountInterface, Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
-    protected String accountNumber;
+    protected final String accountNumber;
     protected Customer customer;
     protected AccountType accountType;
     protected Date openedDate;
     protected BigDecimal availableBalance;
-    protected TransactionList transactions;
+    protected final TransactionList transactions;
     protected boolean isActive;
 
     // Constructors

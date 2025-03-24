@@ -3,11 +3,13 @@ package com.fortisbank.models.transactions;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.utils.IdGenerator;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
 public abstract class Transaction implements Serializable, TransactionInterface {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     protected String transactionNumber;
