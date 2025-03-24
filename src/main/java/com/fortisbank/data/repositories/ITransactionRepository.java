@@ -9,9 +9,13 @@ import java.util.List;
 
 public interface ITransactionRepository {
     Transaction getTransactionByNumber(String transactionNumber);
+
     TransactionList getTransactionsByAccount(String accountId);
+
     TransactionList getAllTransactions();
+
     void insertTransaction(Transaction transaction);
+
     void deleteTransaction(String transactionNumber);
 
     TransactionList getTransactionsByCustomerAndDateRange(String customerID, LocalDate start, LocalDate end);

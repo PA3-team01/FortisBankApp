@@ -6,7 +6,10 @@ public interface IDatabaseConnection {
 
     // Methods to be implemented by DatabaseConnection
     void Connect();
+
     void Disconnect();
+
     boolean TestConnection();
+
     Connection getConnection();
 }

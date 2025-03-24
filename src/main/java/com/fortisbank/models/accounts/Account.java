@@ -112,17 +112,42 @@ public abstract class Account implements AccountInterface, Serializable {
     }
 
     // Getters
-    public String getAccountNumber() { return accountNumber; }
-    public Customer getCustomer() { return customer; }
-    public AccountType getAccountType() { return accountType; }
-    public Date getOpenedDate() { return openedDate; }
-    public BigDecimal getAvailableBalance() { return availableBalance; }
-    public List<Transaction> getTransactions() { return transactions; }
-    public boolean isActive() { return isActive; }
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public Customer getCustomer() {
+        return customer;
+    }
+
+    public AccountType getAccountType() {
+        return accountType;
+    }
+
+    public Date getOpenedDate() {
+        return openedDate;
+    }
+
+    public BigDecimal getAvailableBalance() {
+        return availableBalance;
+    }
+
+    public List<Transaction> getTransactions() {
+        return transactions;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
 
     // Setters
-    public void setAvailableBalance(BigDecimal availableBalance) { this.availableBalance = availableBalance; }
-    public void setActive(boolean active) { this.isActive = active; }
+    public void setAvailableBalance(BigDecimal availableBalance) {
+        this.availableBalance = availableBalance;
+    }
+
+    public void setActive(boolean active) {
+        this.isActive = active;
+    }
 
     // Close Account
     public void closeAccount() {

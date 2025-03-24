@@ -48,7 +48,7 @@ public class Customer implements Serializable {
         this.LastName = lastName;
     }
 
-    public String getFullName(){
+    public String getFullName() {
         return FirstName + " " + LastName;
     }
 
@@ -77,9 +77,8 @@ public class Customer implements Serializable {
     }
 
 
-
     @Override
-    public String toString(){
+    public String toString() {
         return "Customer{" +
                 "CustomerID='" + CustomerID + '\'' +
                 ", FirstName='" + FirstName + '\'' +

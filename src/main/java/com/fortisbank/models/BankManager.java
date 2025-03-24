@@ -4,6 +4,7 @@ import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.accounts.CheckingAccount;
 import com.fortisbank.utils.IdGenerator;
+
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;

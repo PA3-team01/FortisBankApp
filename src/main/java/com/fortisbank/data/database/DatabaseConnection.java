@@ -12,7 +12,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     private final String password = "your_password"; // TODO: Change this
 
     // Private constructor to prevent direct instantiation
-    private DatabaseConnection() {}
+    private DatabaseConnection() {
+    }
 
     // Singleton Instance Method
     public static DatabaseConnection getInstance() {

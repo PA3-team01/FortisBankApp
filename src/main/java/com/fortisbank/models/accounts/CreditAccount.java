@@ -1,5 +1,7 @@
 package com.fortisbank.models.accounts;
+
 import com.fortisbank.models.Customer;
+
 import java.math.BigDecimal;
 import java.util.Date;
 
