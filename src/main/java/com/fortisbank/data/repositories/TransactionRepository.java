@@ -21,7 +21,7 @@ public class TransactionRepository implements ITransactionRepository {
     private final DatabaseConnection dbConnection;
     private final AccountRepository accountRepository;
 
-    public TransactionRepository() {
+    private TransactionRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
         this.accountRepository = AccountRepository.getInstance();
     }
