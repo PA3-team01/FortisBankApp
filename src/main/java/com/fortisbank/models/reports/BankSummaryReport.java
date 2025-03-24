@@ -1,10 +1,9 @@
 package com.fortisbank.models.reports;
 
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.collections.TransactionList;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Map;
 
 public class BankSummaryReport extends Report {
@@ -15,8 +14,8 @@ public class BankSummaryReport extends Report {
     private final BigDecimal totalBalance;
     private final BigDecimal totalCreditUsed;
     private final BigDecimal totalFeesCollected;
-    private final List<Transaction> allTransactions;
-    private final List<Account> lowBalanceAccounts;
+    private final TransactionList allTransactions;
+    private final AccountList lowBalanceAccounts;
 
     public BankSummaryReport(
             int totalCustomers,
@@ -25,8 +24,8 @@ public class BankSummaryReport extends Report {
             BigDecimal totalBalance,
             BigDecimal totalCreditUsed,
             BigDecimal totalFeesCollected,
-            List<Transaction> allTransactions,
-            List<Account> lowBalanceAccounts
+            TransactionList allTransactions,
+            AccountList lowBalanceAccounts
     ) {
         super("Bank Summary");
         this.totalCustomers = totalCustomers;
@@ -48,5 +47,37 @@ public class BankSummaryReport extends Report {
     }
 
     // Getters and setters
+
+    public int getTotalCustomers() {
+        return totalCustomers;
+    }
+
+    public int getTotalAccounts() {
+        return totalAccounts;
+    }
+
+    public Map<String, Long> getAccountTypeCounts() {
+        return accountTypeCounts;
+    }
+
+    public BigDecimal getTotalBalance() {
+        return totalBalance;
+    }
+
+    public BigDecimal getTotalCreditUsed() {
+        return totalCreditUsed;
+    }
+
+    public BigDecimal getTotalFeesCollected() {
+        return totalFeesCollected;
+    }
+
+    public TransactionList getAllTransactions() {
+        return allTransactions;
+    }
+
+    public AccountList getLowBalanceAccounts() {
+        return lowBalanceAccounts;
+    }
 
 }

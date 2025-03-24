@@ -12,7 +12,9 @@ import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.reports.BankSummaryReport;
 import com.fortisbank.models.reports.CustomerStatementReport;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.utils.ReportExporter;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -44,20 +46,25 @@ public class ReportService {
 
         BigDecimal openingBalance = transactionRepository.getBalanceBeforeDate(customer.getCustomerID(), start);
 
-        // Fetch all customer account IDs for context
-        Set<String> customerAccountIds = accountRepository
-                .getAccountsByCustomerId(customer.getCustomerID())
-                .stream()
-                .map(Account::getAccountNumber)
-                .collect(Collectors.toSet());
+        // Fetch all customer accounts (not just IDs!)
+        AccountList customerAccounts = accountRepository
+                .getAccountsByCustomerId(customer.getCustomerID());
 
         BigDecimal closingBalance = openingBalance;
+
         for (Transaction t : transactions) {
-            closingBalance = closingBalance.add(t.getSignedAmountFor((Account) customerAccountIds));
+            for (Account acc : customerAccounts) {
+                BigDecimal signed = t.getSignedAmountFor(acc);
+                if (signed.compareTo(BigDecimal.ZERO) != 0) {
+                    closingBalance = closingBalance.add(signed);
+                    break; // Stop after finding the matching context
+                }
+            }
         }
 
         return new CustomerStatementReport(customer, transactions, openingBalance, closingBalance, start, end);
     }
+
 
     /**
      * Generates a full bank-wide summary report.
@@ -79,7 +86,7 @@ public class ReportService {
 
         BigDecimal totalCreditUsed = accounts.stream()
                 .filter(acc -> acc.getAccountType() == AccountType.CREDIT)
-                .map(Account::getCreditLimit) //
+                .map(Account::getCreditLimit)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalFees = transactions.stream()
@@ -103,5 +110,25 @@ public class ReportService {
                 transactions,
                 lowBalanceAccounts
         );
+    }
+
+    public void saveCustomerStatementReportToCSV(CustomerStatementReport report, String filePath) {
+        try {
+            AccountList customerAccounts = accountRepository
+                    .getAccountsByCustomerId(report.getCustomer().getCustomerID());
+
+            ReportExporter.exportCustomerStatementToCSV(report, filePath, customerAccounts);
+        } catch (IOException e) {
+            System.err.println("Error exporting customer report: " + e.getMessage());
+        }
+    }
+
+
+    public void saveBankSummaryReportToCSV(BankSummaryReport report, String filePath) {
+        try {
+            ReportExporter.exportBankSummaryToCSV(report, filePath);
+        } catch (IOException e) {
+            System.err.println("Error exporting bank report: " + e.getMessage());
+        }
     }
 }

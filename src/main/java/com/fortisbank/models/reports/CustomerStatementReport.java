@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-public class CustomerStatementReport {
+public class CustomerStatementReport extends Report {
 
     private final Customer customer;
     private final List<Transaction> transactions;
@@ -24,6 +24,7 @@ public class CustomerStatementReport {
             LocalDate periodStart,
             LocalDate periodEnd
     ) {
+        super(CustomerStatementReport.class.getSimpleName());
         this.customer = customer;
         this.transactions = transactions;
         this.openingBalance = openingBalance;
@@ -56,4 +57,10 @@ public class CustomerStatementReport {
         return periodEnd;
     }
 
+    @Override
+    public String getSummary() {
+        return "Statement for " + customer.getFullName() +
+                " | Period: " + periodStart + " to " + periodEnd +
+                " | Closing Balance: " + closingBalance;
+    }
 }
