@@ -3,7 +3,34 @@
 
 ### Update March 23 - 
 
-refactor: redesign report system as runtime-generated logic, not persistent data
+## `ReportExporter` Utility (Package: `com.fortisbank.utils`)
+
+This utility class provides functionality to export banking reports to **CSV files**, making them easily viewable in **Excel** and other spreadsheet applications.
+
+---
+
+### ✦ Responsibilities
+
+#### **CustomerStatementReport Export**
+- Outputs a detailed monthly statement for a specific customer.
+- Includes report metadata (ID, period, balances).
+- Lists all related transactions with correctly signed amounts based on customer account context.
+
+#### **BankSummaryReport Export**
+- Outputs a high-level summary of the bank’s overall status.
+- Includes total customers, account types, total balance, credit usage, and collected fees.
+- Provides a breakdown of low-balance accounts (< $50) for financial risk monitoring.
+
+---
+
+### ✦ Notes
+- Report files are saved in `.csv` format for **Excel compatibility**.
+- Uses a simple `FileWriter` approach for lightweight and readable output.
+- Automatically handles **contextual transaction signing** based on the accounts involved.
+
+---
+
+### refactor: redesign report system as runtime-generated logic, not persistent data
 
 - Replaced the old Serializable Report model with an abstract Report base class
 - Reports are now fully dynamic, generated at runtime from repositories
