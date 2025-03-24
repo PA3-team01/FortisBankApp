@@ -20,27 +20,37 @@ public class Customer implements Serializable {
     public Customer() {
     }
 
-    public Customer(String customerID, String firstName, String lastName, String PINHash, String email, String phoneNumber, AccountList accounts) {
+    public Customer(String customerID, String firstName, String lastName, String PINHash, String email, String phoneNumber) {
         this.CustomerID = customerID;
         this.FirstName = firstName;
         this.LastName = lastName;
         this.PINHash = PINHash;
         this.Email = email;
         this.PhoneNumber = phoneNumber;
-        this.accounts = accounts;
     }
 
-    // Getters
     public String getCustomerID() {
         return CustomerID;
+    }
+
+    public void setCustomerID(String customerID) {
+        this.CustomerID = customerID;
     }
 
     public String getFirstName() {
         return FirstName;
     }
 
+    public void setFirstName(String firstName) {
+        this.FirstName = firstName;
+    }
+
     public String getLastName() {
         return LastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.LastName = lastName;
     }
 
     public String getFullName() {
@@ -51,46 +61,29 @@ public class Customer implements Serializable {
         return PINHash;
     }
 
-    public String getEmail() {
-        return Email;
-    }
-
-    public String getPhoneNumber() {
-        return PhoneNumber;
-    }
-
-    public AccountList getAccounts() {
-        return accounts;
-    }
-
-    // Setters
-    public void setCustomerID(String customerID) {
-        this.CustomerID = customerID;
-    }
-
-    public void setFirstName(String firstName) {
-        this.FirstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.LastName = lastName;
-    }
-
     public void setPINHash(String PINHash) {
         this.PINHash = PINHash;
+    }
+
+    public String getEmail() {
+        return Email;
     }
 
     public void setEmail(String email) {
         this.Email = email;
     }
 
+    public String getPhoneNumber() {
+        return PhoneNumber;
+    }
+
     public void setPhoneNumber(String phoneNumber) {
         this.PhoneNumber = phoneNumber;
     }
 
-    public void setAccounts(AccountList accounts) {
-        this.accounts = accounts;
-    }
+    public AccountList getAccounts() {return accounts;}
+    public void setAccounts(AccountList accounts) {this.accounts = accounts;}
+
 
     @Override
     public String toString() {
@@ -101,7 +94,7 @@ public class Customer implements Serializable {
                 ", PINHash='" + PINHash + '\'' +
                 ", Email='" + Email + '\'' +
                 ", PhoneNumber='" + PhoneNumber + '\'' +
-                ", accounts=" + accounts +
+                //TODO: Add accounts to toString
                 '}';
     }
 }
