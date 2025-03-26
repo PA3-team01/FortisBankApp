@@ -17,30 +17,30 @@ public class CustomerList extends ArrayList<Customer> {
         customers.forEach(this::add);
     }
 
-
-    //Sort list name ascending order
+    // Sorting methods
     public void sortByName() {
         this.sort(CustomerComparators.BY_NAME);
     }
 
-    // Sort list balance descending order
     public void sortByBalanceDescending() {
         this.sort(CustomerComparators.BY_BALANCE.reversed());
     }
 
-    //Sort list transaction ascending order
-    public void sortByTransactionCount() {
+    public void sortByTransactionCountAscending() {
         this.sort(CustomerComparators.BY_TRANSACTION_COUNT);
     }
 
-    //Filter list by minimum balance
+    public void sortByTransactionCountDescending() {
+        this.sort(CustomerComparators.BY_TRANSACTION_COUNT.reversed());
+    }
+
+    // Filtering methods
     public CustomerList filterByMinBalance(double minBalance) {
         return this.stream()
                 .filter(c -> c.getBalance().compareTo(BigDecimal.valueOf(minBalance)) >= 0)
                 .collect(Collectors.toCollection(CustomerList::new));
     }
 
-    //Filter list by name containing a substring (case-insensitive)
     public CustomerList filterByNameContains(String substring) {
         return this.stream()
                 .filter(c -> c.getFullName().toLowerCase().contains(substring.toLowerCase()))
