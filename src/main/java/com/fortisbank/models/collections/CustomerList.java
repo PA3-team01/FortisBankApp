@@ -9,6 +9,15 @@ import java.util.stream.Collectors;
 
 public class CustomerList extends ArrayList<Customer> {
 
+    public CustomerList() {
+        super();
+    }
+
+    public CustomerList(Iterable<Customer> customers) {
+        customers.forEach(this::add);
+    }
+
+
     //Sort list name ascending order
     public void sortByName() {
         this.sort(CustomerComparators.BY_NAME);
