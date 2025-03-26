@@ -4,12 +4,18 @@ import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.collections.CustomerList;
 import org.jetbrains.annotations.NotNull;
+import com.fortisbank.exceptions.CustomerNotFoundException;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.logging.Level;
+
+
+
+import static com.fortisbank.data.repositories.AccountRepository.LOGGER;
 
 public class CustomerRepository implements ICustomerRepository {
     private final DatabaseConnection dbConnection;
@@ -37,12 +43,16 @@ public class CustomerRepository implements ICustomerRepository {
 
             if (rs.next()) {
                 return mapResultSetToCustomer(rs);
+            } else {
+                LOGGER.log(Level.WARNING, "Customer with ID {0} not found.", customerId);
+                throw new CustomerNotFoundException("Customer with ID " + customerId + " not found.");
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error retrieving customer {0}: {1}", new Object[]{customerId, e.getMessage()});
+            throw new CustomerNotFoundException("Error retrieving customer " + customerId);
         }
-        return null;
     }
+
 
     @Override
     public List<Customer> getAllCustomers() {

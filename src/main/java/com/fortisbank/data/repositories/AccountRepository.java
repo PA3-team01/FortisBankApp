@@ -5,6 +5,7 @@ import com.fortisbank.models.Customer;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.exceptions.AccountNotFoundException;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -29,7 +30,7 @@ import java.util.logging.Logger;
  * for its operations.
  */
 public class AccountRepository implements IAccountRepository {
-    private static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
+    protected static final Logger LOGGER = Logger.getLogger(AccountRepository.class.getName());
     private static AccountRepository instance;
 
     private final DatabaseConnection dbConnection;
@@ -61,12 +62,16 @@ public class AccountRepository implements IAccountRepository {
 
             if (rs.next()) {
                 return mapResultSetToAccount(rs);
+            } else {
+
+                throw new AccountNotFoundException("Account with ID " + accountId + " not found.");
             }
         } catch (SQLException e) {
             LOGGER.log(Level.SEVERE, "Error retrieving account {0}: {1}", new Object[]{accountId, e.getMessage()});
+            throw new AccountNotFoundException("Error retrieving account " + accountId);
         }
-        return null;
     }
+
 
     @Override
     public AccountList getAccountsByCustomerId(String customerId) {
