@@ -3,6 +3,7 @@ package com.fortisbank.data.repositories;
 import com.fortisbank.data.file.FileRepository;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 
 import java.io.File;
@@ -11,6 +12,7 @@ import java.util.List;
 public class AccountRepositoryFile extends FileRepository<Account> implements IAccountRepository {
     private static final File file = new File("data/accounts.ser");
     private static AccountRepositoryFile instance;
+    private TransactionRepositoryFile transactionRepositoryFile = TransactionRepositoryFile.getInstance();
 
     private AccountRepositoryFile() {
         super(file);
@@ -75,16 +77,11 @@ public class AccountRepositoryFile extends FileRepository<Account> implements IA
 
     @Override
     public void recordTransaction(Transaction transaction) {
-        //TODO: Implement this method
-        // will need to call the TransactionRepositoryFile to record the transaction
-        // then update the account
+        transactionRepositoryFile.insertTransaction(transaction);
     }
 
     @Override
-    public List<Transaction> getTransactionsForAccount(String accountId) {
-        //TODO: Implement this method
-        // will need to call the TransactionRepositoryFile to get the transactions
-        // filter where the transaction account number matches the given account ID
-        return List.of();
+    public TransactionList getTransactionsForAccount(String accountId) {
+        return transactionRepositoryFile.getTransactionsByAccount(accountId);
     }
 }

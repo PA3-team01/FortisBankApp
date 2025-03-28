@@ -4,6 +4,7 @@ import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.exceptions.AccountNotFoundException;
 
@@ -13,7 +14,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -208,7 +208,7 @@ public class AccountRepository implements IAccountRepository {
         LOGGER.log(Level.INFO, "Transaction {0} recorded successfully.", transaction.getTransactionNumber());
     }
 
-    public List<Transaction> getTransactionsForAccount(String accountId) {
+    public TransactionList getTransactionsForAccount(String accountId) {
         return transactionRepository.getTransactionsByAccount(accountId);
     }
 }
