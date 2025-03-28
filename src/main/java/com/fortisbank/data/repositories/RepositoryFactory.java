@@ -2,10 +2,18 @@ package com.fortisbank.data.repositories;
 
 public class RepositoryFactory {
 
+    private static RepositoryFactory instance;
     private final StorageMode mode;
 
-    public RepositoryFactory(StorageMode mode) {
+    private RepositoryFactory(StorageMode mode) {
         this.mode = mode;
+    }
+
+    public static synchronized RepositoryFactory getInstance(StorageMode mode) {
+        if (instance == null) {
+            instance = new RepositoryFactory(mode);
+        }
+        return instance;
     }
 
     public ICustomerRepository getCustomerRepository() {
@@ -29,4 +37,3 @@ public class RepositoryFactory {
         };
     }
 }
-

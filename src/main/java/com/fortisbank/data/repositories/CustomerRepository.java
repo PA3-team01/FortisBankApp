@@ -55,7 +55,7 @@ public class CustomerRepository implements ICustomerRepository {
 
 
     @Override
-    public List<Customer> getAllCustomers() {
+    public CustomerList getAllCustomers() {
         var customers = new CustomerList();
         String query = "SELECT * FROM customers";
 
