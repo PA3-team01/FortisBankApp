@@ -66,7 +66,7 @@ public class TransactionRepositoryFile extends FileRepository<Transaction> imple
         ZoneId zone = ZoneId.systemDefault();
         return readAll().stream()
                 .filter(t -> {
-                    String transactionCustomerID = t.getSourceAccount().getCustomer().getCustomerID();
+                    String transactionCustomerID = t.getSourceAccount().getCustomer().getUserId();
                     LocalDate transactionDate = t.getTransactionDate().toInstant().atZone(zone).toLocalDate();
                     return transactionCustomerID.equals(customerID) &&
                             (!transactionDate.isBefore(start) && !transactionDate.isAfter(end));
@@ -79,7 +79,7 @@ public class TransactionRepositoryFile extends FileRepository<Transaction> imple
         ZoneId zone = ZoneId.systemDefault();
         return readAll().stream()
                 .filter(t -> {
-                    String transactionCustomerID = t.getSourceAccount().getCustomer().getCustomerID();
+                    String transactionCustomerID = t.getSourceAccount().getCustomer().getUserId();
                     LocalDate transactionDate = t.getTransactionDate().toInstant().atZone(zone).toLocalDate();
                     return transactionCustomerID.equals(customerID) && transactionDate.isBefore(start);
                 })

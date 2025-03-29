@@ -1,6 +1,6 @@
 package com.fortisbank.models.accounts;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.utils.IdGenerator;
 
 import java.math.BigDecimal;

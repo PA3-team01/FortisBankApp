@@ -1,6 +1,6 @@
 package com.fortisbank.utils;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 
 import java.util.Comparator;
 

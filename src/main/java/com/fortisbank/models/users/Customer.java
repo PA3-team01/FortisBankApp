@@ -1,4 +1,4 @@
-package com.fortisbank.models;
+package com.fortisbank.models.users;
 
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
@@ -8,48 +8,41 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Customer implements Serializable {
+public class Customer extends User implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private String CustomerID;
-    private String FirstName;
-    private String LastName;
-    private String PINHash;
-    private String Email;
-    private String PhoneNumber;
+    private String phoneNumber;
 
     // Not serialized; loaded dynamically at runtime
     private transient AccountList accounts;
 
     public Customer() {
+        this.role = Role.CUSTOMER;
     }
 
-    public Customer(String customerID, String firstName, String lastName, String PINHash, String email, String phoneNumber) {
-        this.CustomerID = customerID;
-        this.FirstName = firstName;
-        this.LastName = lastName;
-        this.PINHash = PINHash;
-        this.Email = email;
-        this.PhoneNumber = phoneNumber;
+    public Customer(String userId, String firstName, String lastName, String pinHash, String email, String phoneNumber) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.PINHash = pinHash;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.role = Role.CUSTOMER;
     }
 
     // ------------------------- GETTERS -------------------------
 
-    public String getCustomerID() {
-        return CustomerID;
+    public String getUserId() {
+        return userId;
     }
 
     public String getFirstName() {
-        return FirstName;
+        return firstName;
     }
 
     public String getLastName() {
-        return LastName;
-    }
-
-    public String getFullName() {
-        return FirstName + " " + LastName;
+        return lastName;
     }
 
     public String getPINHash() {
@@ -57,11 +50,11 @@ public class Customer implements Serializable {
     }
 
     public String getEmail() {
-        return Email;
+        return email;
     }
 
     public String getPhoneNumber() {
-        return PhoneNumber;
+        return phoneNumber;
     }
 
     public AccountList getAccounts() {
@@ -77,7 +70,7 @@ public class Customer implements Serializable {
         }
         return totalBalance;
     }
-    
+
     public TransactionList getTransactions() {
         TransactionList all = new TransactionList();
         if (accounts != null) {
@@ -90,19 +83,18 @@ public class Customer implements Serializable {
         return all;
     }
 
-
     // ------------------------- SETTERS -------------------------
 
-    public void setCustomerID(String customerID) {
-        this.CustomerID = customerID;
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public void setFirstName(String firstName) {
-        this.FirstName = firstName;
+        this.firstName = firstName;
     }
 
     public void setLastName(String lastName) {
-        this.LastName = lastName;
+        this.lastName = lastName;
     }
 
     public void setPINHash(String PINHash) {
@@ -110,11 +102,11 @@ public class Customer implements Serializable {
     }
 
     public void setEmail(String email) {
-        this.Email = email;
+        this.email = email;
     }
 
     public void setPhoneNumber(String phoneNumber) {
-        this.PhoneNumber = phoneNumber;
+        this.phoneNumber = phoneNumber;
     }
 
     public void setAccounts(AccountList accounts) {
@@ -126,11 +118,11 @@ public class Customer implements Serializable {
     @Override
     public String toString() {
         return "Customer{" +
-                "CustomerID='" + CustomerID + '\'' +
-                ", FirstName='" + FirstName + '\'' +
-                ", LastName='" + LastName + '\'' +
-                ", Email='" + Email + '\'' +
-                ", PhoneNumber='" + PhoneNumber + '\'' +
+                "CustomerID='" + userId + '\'' +
+                ", FirstName='" + firstName + '\'' +
+                ", LastName='" + lastName + '\'' +
+                ", Email='" + email + '\'' +
+                ", PhoneNumber='" + phoneNumber + '\'' +
                 ", Accounts=" + (accounts != null ? accounts.size() + " linked" : "None") +
                 '}';
     }

@@ -1,7 +1,7 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.exceptions.AccountNotFoundException;
@@ -118,7 +118,7 @@ public class AccountRepository implements IAccountRepository {
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
             stmt.setString(1, account.getAccountNumber());
-            stmt.setString(2, account.getCustomer().getCustomerID());
+            stmt.setString(2, account.getCustomer().getUserId());
             stmt.setString(3, account.getAccountType().name());
             stmt.setDate(4, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(5, account.getAvailableBalance());
@@ -138,7 +138,7 @@ public class AccountRepository implements IAccountRepository {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, account.getCustomer().getCustomerID());
+            stmt.setString(1, account.getCustomer().getUserId());
             stmt.setString(2, account.getAccountType().name());
             stmt.setDate(3, new java.sql.Date(account.getOpenedDate().getTime()));
             stmt.setBigDecimal(4, account.getAvailableBalance());

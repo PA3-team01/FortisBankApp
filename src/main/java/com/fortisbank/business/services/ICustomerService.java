@@ -1,6 +1,6 @@
 package com.fortisbank.business.services;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.CustomerList;
 
 public interface ICustomerService {

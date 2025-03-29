@@ -1,6 +1,6 @@
 package com.fortisbank.models.collections;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.utils.CustomerComparators;
 
 import java.math.BigDecimal;

@@ -3,11 +3,8 @@ package com.fortisbank.data.repositories;
 import com.fortisbank.data.file.FileRepository;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
-import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.transactions.Transaction;
 
 import java.io.File;
-import java.util.List;
 
 public class AccountRepositoryFile extends FileRepository<Account> implements IAccountRepository {
     private static final File file = new File("data/accounts.ser");
@@ -37,7 +34,7 @@ public class AccountRepositoryFile extends FileRepository<Account> implements IA
     public AccountList getAccountsByCustomerId(String customerId) {
         AccountList accounts = new AccountList();
         for (Account account : readAll()) {
-            if (account.getCustomer() != null && customerId.equals(account.getCustomer().getCustomerID())) {
+            if (account.getCustomer() != null && customerId.equals(account.getCustomer().getUserId())) {
                 accounts.add(account);
             }
         }

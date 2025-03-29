@@ -1,6 +1,6 @@
 package com.fortisbank.models.reports;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.transactions.Transaction;
 
 import java.math.BigDecimal;

@@ -1,6 +1,6 @@
 package com.fortisbank.models.accounts;
 
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.utils.IdGenerator;

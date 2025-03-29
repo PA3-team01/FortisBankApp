@@ -4,7 +4,7 @@ import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ICustomerRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.collections.AccountList;
@@ -41,13 +41,13 @@ public class ReportService {
         LocalDate end = month.atEndOfMonth();
 
         TransactionList transactions = transactionRepository
-                .getTransactionsByCustomerAndDateRange(customer.getCustomerID(), start, end);
+                .getTransactionsByCustomerAndDateRange(customer.getUserId(), start, end);
 
-        BigDecimal openingBalance = transactionRepository.getBalanceBeforeDate(customer.getCustomerID(), start);
+        BigDecimal openingBalance = transactionRepository.getBalanceBeforeDate(customer.getUserId(), start);
 
         // Fetch all customer accounts (not just IDs!)
         AccountList customerAccounts = accountRepository
-                .getAccountsByCustomerId(customer.getCustomerID());
+                .getAccountsByCustomerId(customer.getUserId());
 
         BigDecimal closingBalance = openingBalance;
 
@@ -114,7 +114,7 @@ public class ReportService {
     public void saveCustomerStatementReportToCSV(CustomerStatementReport report, String filePath) {
         try {
             AccountList customerAccounts = accountRepository
-                    .getAccountsByCustomerId(report.getCustomer().getCustomerID());
+                    .getAccountsByCustomerId(report.getCustomer().getUserId());
 
             ReportExporter.exportCustomerStatementToCSV(report, filePath, customerAccounts);
         } catch (IOException e) {

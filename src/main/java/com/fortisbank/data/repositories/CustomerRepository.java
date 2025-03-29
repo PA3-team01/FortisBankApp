@@ -1,7 +1,7 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.CustomerList;
 import org.jetbrains.annotations.NotNull;
 import com.fortisbank.exceptions.CustomerNotFoundException;
@@ -10,7 +10,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.logging.Level;
 
 
@@ -79,7 +78,7 @@ public class CustomerRepository implements ICustomerRepository {
         try (Connection conn = dbConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, customer.getCustomerID());
+            stmt.setString(1, customer.getUserId());
             stmt.setString(2, customer.getFirstName());
             stmt.setString(3, customer.getLastName());
             stmt.setString(4, customer.getEmail());
@@ -104,7 +103,7 @@ public class CustomerRepository implements ICustomerRepository {
             stmt.setString(3, customer.getEmail());
             stmt.setString(4, customer.getPhoneNumber());
             stmt.setString(5, customer.getPINHash());
-            stmt.setString(6, customer.getCustomerID());
+            stmt.setString(6, customer.getUserId());
 
             stmt.executeUpdate();
         } catch (SQLException e) {

@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
+//TODO : Extend to trigger Alerts (low balance, overdraft, etc.)
+
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);

@@ -3,7 +3,7 @@ package com.fortisbank.business.services;
 import com.fortisbank.data.repositories.ICustomerRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.Customer;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.collections.CustomerList;
 
@@ -64,7 +64,7 @@ public class CustomerService implements ICustomerService {
     public CustomerList getAllCustomers() {
         CustomerList customers = customerRepository.getAllCustomers();
         for (Customer customer : customers) {
-            AccountList accounts = accountService.getAccountsByCustomerId(customer.getCustomerID());
+            AccountList accounts = accountService.getAccountsByCustomerId(customer.getUserId());
             customer.setAccounts(accounts);
         }
         return customers;
