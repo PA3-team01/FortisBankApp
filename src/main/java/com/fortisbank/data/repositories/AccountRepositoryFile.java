@@ -75,13 +75,4 @@ public class AccountRepositoryFile extends FileRepository<Account> implements IA
         writeAll(accounts);
     }
 
-    @Override
-    public void recordTransaction(Transaction transaction) {
-        transactionRepositoryFile.insertTransaction(transaction);
-    }
-
-    @Override
-    public TransactionList getTransactionsForAccount(String accountId) {
-        return transactionRepositoryFile.getTransactionsByAccount(accountId);
-    }
 }

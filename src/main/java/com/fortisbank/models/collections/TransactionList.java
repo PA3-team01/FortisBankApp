@@ -1,12 +1,16 @@
 package com.fortisbank.models.collections;
 
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.TransactionComparators;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import java.time.ZoneId;
 
 public class TransactionList extends ArrayList<Transaction> {
 
@@ -49,6 +53,34 @@ public class TransactionList extends ArrayList<Transaction> {
                 .filter(t -> !t.getTransactionDate().before(start) && !t.getTransactionDate().after(end))
                 .collect(Collectors.toCollection(TransactionList::new));
     }
+
+
+
+    public TransactionList filterByMonth(LocalDate targetDate) {
+        int year = targetDate.getYear();
+        int month = targetDate.getMonthValue();
+
+        return this.stream()
+                .filter(tx -> {
+                    LocalDate txDate = tx.getTransactionDate().toInstant()
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate();
+                    return txDate.getYear() == year && txDate.getMonthValue() == month;
+                })
+                .collect(Collectors.toCollection(TransactionList::new));
+    }
+
+
+
+    public TransactionList filterByTypes(TransactionType... types) {
+        List<TransactionType> typeList = List.of(types);
+
+        return this.stream()
+                .filter(tx -> typeList.contains(tx.getTransactionType()))
+                .collect(Collectors.toCollection(TransactionList::new));
+    }
+
+
 
     @Override
     public String toString() {

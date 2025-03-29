@@ -13,9 +13,8 @@ public class SavingsAccount extends Account {
         this.annualInterestRate = interestRate;
     }
 
-    public void applyAnnualInterest() {
-        BigDecimal interest = availableBalance.multiply(annualInterestRate);
-        deposit(interest);
+    public BigDecimal getAnnualInterestRate() {
+        return annualInterestRate;
     }
 
     @Override

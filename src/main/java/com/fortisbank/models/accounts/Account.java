@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public abstract class Account implements AccountInterface, Serializable {
+public abstract class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 

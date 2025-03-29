@@ -4,9 +4,10 @@ import com.fortisbank.data.repositories.ITransactionRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.exceptions.InvalidTransactionException;
-import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.ValidationUtils;
 
@@ -29,7 +30,9 @@ public class TransactionService implements ITransactionService {
         return instances.computeIfAbsent(storageMode, TransactionService::new);
     }
 
-    // Core API for safely processing and saving a transaction
+    // ---------------------------------------------------------------------------------------
+    // CORE BUSINESS METHOD
+    // ---------------------------------------------------------------------------------------
     public void executeTransaction(Transaction transaction) {
         ValidationUtils.validateNotNull(transaction, "Transaction");
         ValidationUtils.validateAmount(transaction.getAmount());
@@ -48,19 +51,23 @@ public class TransactionService implements ITransactionService {
 
             case WITHDRAWAL:
                 validateNotNull(source, "Source account");
+                validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
+                applyTransactionFeeIfRequired(source);
                 break;
 
             case TRANSFER:
                 validateNotNull(source, "Source account");
                 validateNotNull(destination, "Destination account");
+                validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
                 adjustBalance(source, amount.negate());
                 adjustBalance(destination, amount);
                 source.addTransaction(transaction);
                 destination.addTransaction(transaction);
+                applyTransactionFeeIfRequired(source);
                 break;
 
             case FEE:
@@ -77,24 +84,55 @@ public class TransactionService implements ITransactionService {
         transactionRepository.insertTransaction(transaction);
     }
 
-    private void validateNotNull(Object obj, String fieldName) {
-        if (obj == null) {
-            throw new InvalidTransactionException(fieldName + " cannot be null.");
+    // ---------------------------------------------------------------------------------------
+    // INTEREST & CURRENCY OPERATIONS
+    // ---------------------------------------------------------------------------------------
+
+    public void applyInterestToCreditAccount(CreditAccount account) {
+        BigDecimal rate = account.getInterestRate();
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
+
+        BigDecimal interest = account.getAvailableBalance().multiply(rate);
+        if (interest.compareTo(BigDecimal.ZERO) > 0) {
+            applyFee(account, interest, "Monthly interest applied.");
         }
     }
 
-    private void validateSufficientFunds(Account account, BigDecimal amount) {
-        if (!account.hasSufficientFunds(amount)) {
-            throw new InvalidTransactionException("Insufficient funds in account: " + account.getAccountNumber());
+    public void applyAnnualInterestToSavingsAccount(SavingsAccount account) {
+        BigDecimal rate = account.getAnnualInterestRate();
+        if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
+
+        BigDecimal interest = account.getAvailableBalance().multiply(rate);
+        if (interest.compareTo(BigDecimal.ZERO) > 0) {
+            Transaction tx = TransactionFactory.createTransaction(
+                    TransactionType.DEPOSIT,
+                    "Annual interest applied",
+                    new Date(),
+                    interest,
+                    null,
+                    account
+            );
+
+            adjustBalance(account, interest);
+            account.addTransaction(tx);
+            transactionRepository.insertTransaction(tx);
         }
     }
 
-    private void adjustBalance(Account account, BigDecimal delta) {
-        BigDecimal updated = account.getAvailableBalance().add(delta);
-        account.setAvailableBalance(updated);
+    public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
+        Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
+        Date endDate = new Date();
+
+        if (startDate.after(endDate)) {
+            throw new InvalidTransactionException("Invalid date range: start date cannot be after end date.");
+        }
+
+        return transactions.filterByDateRange(startDate, endDate);
     }
 
-    // Repository passthrough methods
+    // ---------------------------------------------------------------------------------------
+    // REPOSITORY WRAPPERS
+    // ---------------------------------------------------------------------------------------
     @Override
     public void createTransaction(Transaction transaction) {
         transactionRepository.insertTransaction(transaction);
@@ -130,14 +168,67 @@ public class TransactionService implements ITransactionService {
         return transactionRepository.getBalanceBeforeDate(customerID, start);
     }
 
-    public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
-        Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
-        Date endDate = new Date();
-
-        if (startDate.after(endDate)) {
-            throw new InvalidTransactionException("Invalid date range: start date cannot be after end date.");
+    // ---------------------------------------------------------------------------------------
+    // VALIDATION HELPERS
+    // ---------------------------------------------------------------------------------------
+    private void validateNotNull(Object obj, String fieldName) {
+        if (obj == null) {
+            throw new InvalidTransactionException(fieldName + " cannot be null.");
         }
+    }
 
-        return transactions.filterByDateRange(startDate, endDate);
+    private void validateSufficientFunds(Account account, BigDecimal amount) {
+        if (!account.hasSufficientFunds(amount)) {
+            throw new InvalidTransactionException("Insufficient funds in account: " + account.getAccountNumber());
+        }
+    }
+
+    private void validateCreditLimit(Account account, BigDecimal withdrawalAmount) {
+        if (account instanceof CreditAccount creditAccount) {
+            BigDecimal totalAvailable = creditAccount.getAvailableBalance().add(creditAccount.getCreditLimit());
+            if (totalAvailable.compareTo(withdrawalAmount) < 0) {
+                throw new InvalidTransactionException("Withdrawal exceeds credit limit.");
+            }
+        }
+    }
+
+    // ---------------------------------------------------------------------------------------
+    // INTERNAL OPERATIONS
+    // ---------------------------------------------------------------------------------------
+    private void adjustBalance(Account account, BigDecimal delta) {
+        BigDecimal updated = account.getAvailableBalance().add(delta);
+        account.setAvailableBalance(updated);
+    }
+
+    private void applyTransactionFeeIfRequired(Account account) {
+        if (account.getAccountType() != AccountType.CHECKING) return;
+
+        TransactionList transactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
+        long transactionCountThisMonth = transactions
+                .filterByMonth(LocalDate.now())
+                .filterByTypes(TransactionType.WITHDRAWAL, TransactionType.TRANSFER)
+                .size();
+
+        if (transactionCountThisMonth >= CheckingAccount.FREE_TRANSACTION_LIMIT) {
+            applyFee(account, CheckingAccount.TRANSACTION_FEE,
+                    "Transaction fee after " + CheckingAccount.FREE_TRANSACTION_LIMIT + " free transactions.");
+        }
+    }
+
+    private void applyFee(Account account, BigDecimal feeAmount, String description) {
+        validateSufficientFunds(account, feeAmount);
+
+        Transaction feeTx = TransactionFactory.createTransaction(
+                TransactionType.FEE,
+                description,
+                new Date(),
+                feeAmount,
+                account,
+                null
+        );
+
+        adjustBalance(account, feeAmount.negate());
+        account.addTransaction(feeTx);
+        transactionRepository.insertTransaction(feeTx);
     }
 }

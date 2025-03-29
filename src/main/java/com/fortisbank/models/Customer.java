@@ -2,6 +2,7 @@ package com.fortisbank.models;
 
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.collections.TransactionList;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -17,7 +18,9 @@ public class Customer implements Serializable {
     private String PINHash;
     private String Email;
     private String PhoneNumber;
-    private AccountList accounts;
+
+    // Not serialized; loaded dynamically at runtime
+    private transient AccountList accounts;
 
     public Customer() {
     }
@@ -31,28 +34,18 @@ public class Customer implements Serializable {
         this.PhoneNumber = phoneNumber;
     }
 
+    // ------------------------- GETTERS -------------------------
+
     public String getCustomerID() {
         return CustomerID;
-    }
-
-    public void setCustomerID(String customerID) {
-        this.CustomerID = customerID;
     }
 
     public String getFirstName() {
         return FirstName;
     }
 
-    public void setFirstName(String firstName) {
-        this.FirstName = firstName;
-    }
-
     public String getLastName() {
         return LastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.LastName = lastName;
     }
 
     public String getFullName() {
@@ -63,31 +56,20 @@ public class Customer implements Serializable {
         return PINHash;
     }
 
-    public void setPINHash(String PINHash) {
-        this.PINHash = PINHash;
-    }
-
     public String getEmail() {
         return Email;
-    }
-
-    public void setEmail(String email) {
-        this.Email = email;
     }
 
     public String getPhoneNumber() {
         return PhoneNumber;
     }
 
-    public void setPhoneNumber(String phoneNumber) {
-        this.PhoneNumber = phoneNumber;
+    public AccountList getAccounts() {
+        return accounts;
     }
 
-    public AccountList getAccounts() {return accounts;}
-    public void setAccounts(AccountList accounts) {this.accounts = accounts;}
     public BigDecimal getBalance() {
         BigDecimal totalBalance = BigDecimal.ZERO;
-
         if (accounts != null) {
             for (Account account : accounts) {
                 totalBalance = totalBalance.add(account.getAvailableBalance());
@@ -95,6 +77,51 @@ public class Customer implements Serializable {
         }
         return totalBalance;
     }
+    
+    public TransactionList getTransactions() {
+        TransactionList all = new TransactionList();
+        if (accounts != null) {
+            for (Account account : accounts) {
+                if (account.getTransactions() != null) {
+                    all.addAll(account.getTransactions());
+                }
+            }
+        }
+        return all;
+    }
+
+
+    // ------------------------- SETTERS -------------------------
+
+    public void setCustomerID(String customerID) {
+        this.CustomerID = customerID;
+    }
+
+    public void setFirstName(String firstName) {
+        this.FirstName = firstName;
+    }
+
+    public void setLastName(String lastName) {
+        this.LastName = lastName;
+    }
+
+    public void setPINHash(String PINHash) {
+        this.PINHash = PINHash;
+    }
+
+    public void setEmail(String email) {
+        this.Email = email;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.PhoneNumber = phoneNumber;
+    }
+
+    public void setAccounts(AccountList accounts) {
+        this.accounts = accounts;
+    }
+
+    // ------------------------- TO STRING -------------------------
 
     @Override
     public String toString() {
@@ -102,11 +129,9 @@ public class Customer implements Serializable {
                 "CustomerID='" + CustomerID + '\'' +
                 ", FirstName='" + FirstName + '\'' +
                 ", LastName='" + LastName + '\'' +
-                ", PINHash='" + PINHash + '\'' +
                 ", Email='" + Email + '\'' +
                 ", PhoneNumber='" + PhoneNumber + '\'' +
-                 "accounts=" + accounts + '\'' +
-                //TODO: Add accounts to toString
+                ", Accounts=" + (accounts != null ? accounts.size() + " linked" : "None") +
                 '}';
     }
 }

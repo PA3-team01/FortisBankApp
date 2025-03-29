@@ -4,9 +4,8 @@ import com.fortisbank.data.database.DatabaseConnection;
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
-import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.exceptions.AccountNotFoundException;
+import com.fortisbank.utils.CurrencyType;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
@@ -203,12 +202,5 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
-    public void recordTransaction(Transaction transaction) {
-        transactionRepository.insertTransaction(transaction);
-        LOGGER.log(Level.INFO, "Transaction {0} recorded successfully.", transaction.getTransactionNumber());
-    }
 
-    public TransactionList getTransactionsForAccount(String accountId) {
-        return transactionRepository.getTransactionsByAccount(accountId);
-    }
 }
