@@ -101,6 +101,10 @@ public class Customer extends User implements Serializable {
         this.PINHash = PINHash;
     }
 
+    public void setHashedPassword(String hashedPassword) {
+        this.hashedPassword = hashedPassword;
+    }
+
     public void setEmail(String email) {
         this.email = email;
     }

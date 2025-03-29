@@ -4,8 +4,15 @@ import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.accounts.AccountFactory;
+import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.users.Customer;
 
+import java.math.BigDecimal;
+
+
+import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
@@ -54,4 +61,24 @@ public class AccountService implements IAccountService {
     public AccountList getAllAccounts() {
         return accountRepository.getAllAccounts();
     }
+    /**
+     * Creates and persists a default checking account for a new customer using the factory.
+     * The account is initialized with zero balance and marked active by default.
+     *
+     * @param customer the customer for whom to create the account
+     * @return the created Account instance
+     */
+    public Account createDefaultCheckingAccountFor(Customer customer) {
+        Account checkingAccount = AccountFactory.createAccount(
+                AccountType.CHECKING,
+                null, // let the factory assign ID via constructor if null
+                customer,
+                new Date(),
+                BigDecimal.ZERO
+        );
+
+        createAccount(checkingAccount); // persist
+        return checkingAccount;
+    }
+
 }

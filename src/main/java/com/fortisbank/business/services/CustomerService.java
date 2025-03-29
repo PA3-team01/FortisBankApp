@@ -69,4 +69,39 @@ public class CustomerService implements ICustomerService {
         }
         return customers;
     }
+
+    // ------------------- Additional Methods -------------------
+    /**
+     * Checks if a customer with the given email already exists.
+     *
+     * @param email the email to check
+     * @return true if the email is already used, false otherwise
+     */
+    public boolean emailExists(String email) {
+        CustomerList allCustomers = customerRepository.getAllCustomers();
+        for (Customer customer : allCustomers) {
+            if (customer.getEmail().equalsIgnoreCase(email)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks if a customer with the given phone number already exists.
+     *
+     * @param phoneNumber the phone number to check
+     * @return true if the phone number is already used, false otherwise
+     */
+    public boolean phoneExists(String phoneNumber) {
+        CustomerList allCustomers = customerRepository.getAllCustomers();
+        for (Customer customer : allCustomers) {
+            if (customer.getPhoneNumber().equals(phoneNumber)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 }
