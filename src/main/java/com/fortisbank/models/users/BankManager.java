@@ -16,6 +16,18 @@ public class BankManager extends User implements Serializable {
 
     private final List<Customer> customers;
 
+    // ------------------------- CONSTRUCTORS -------------------------
+    public BankManager() {
+        this.userId = IdGenerator.generateId();
+        this.firstName = "";
+        this.lastName = "";
+        this.email = "";
+        this.hashedPassword = "";
+        this.PINHash = "";
+        this.role = Role.MANAGER;
+        this.customers = new ArrayList<>(); //TODO: implement use of CustomerList
+    }
+
     public BankManager(String firstName, String lastName, String email, String hashedPassword, String pinHash) {
         this.userId = IdGenerator.generateId();
         this.firstName = firstName;

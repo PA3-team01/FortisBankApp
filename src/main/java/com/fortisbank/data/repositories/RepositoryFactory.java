@@ -47,4 +47,11 @@ public class RepositoryFactory {
             case DATABASE -> TransactionRepository.getInstance();
         };
     }
+
+    public IBankManagerRepository getBankManagerRepository() {
+        return switch (mode) {
+            case FILE -> BankManagerRepositoryFile.getInstance();
+            case DATABASE -> BankManagerRepository.getInstance();
+        };
+    }
 }
