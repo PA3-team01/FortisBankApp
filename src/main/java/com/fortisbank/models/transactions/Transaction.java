@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
 
-public abstract class Transaction implements Serializable, TransactionInterface {
+public abstract class Transaction implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -20,10 +20,9 @@ public abstract class Transaction implements Serializable, TransactionInterface 
     protected Account sourceAccount;
     protected Account destinationAccount;
 
-    // Constructor
     public Transaction(String transactionNumber, String description, Date transactionDate,
-                       TransactionType transactionType, BigDecimal amount, Account sourceAccount,
-                       Account destinationAccount) {
+                       TransactionType transactionType, BigDecimal amount,
+                       Account sourceAccount, Account destinationAccount) {
         this.transactionNumber = (transactionNumber != null && !transactionNumber.isEmpty())
                 ? transactionNumber
                 : IdGenerator.generateId();
@@ -35,17 +34,6 @@ public abstract class Transaction implements Serializable, TransactionInterface 
         this.destinationAccount = destinationAccount;
     }
 
-    // Abstract method for processing the transaction
-    public abstract void processTransaction();
-
-    // Record transaction in account history
-    public void recordTransaction() { //TODO: Verify record transaction logic
-        if (sourceAccount != null) sourceAccount.addTransaction(this);
-        if (destinationAccount != null) destinationAccount.addTransaction(this);
-        System.out.println("Transaction recorded: " + this);
-    }
-
-    // Getters
     public String getTransactionNumber() {
         return transactionNumber;
     }
@@ -74,7 +62,6 @@ public abstract class Transaction implements Serializable, TransactionInterface 
         return destinationAccount;
     }
 
-    // Setters
     public void setTransactionNumber(String transactionNumber) {
         this.transactionNumber = transactionNumber;
     }
@@ -133,6 +120,4 @@ public abstract class Transaction implements Serializable, TransactionInterface 
         }
         return BigDecimal.ZERO;
     }
-
-
 }

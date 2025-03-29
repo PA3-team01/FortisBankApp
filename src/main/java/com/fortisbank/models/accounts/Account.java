@@ -2,7 +2,7 @@ package com.fortisbank.models.accounts;
 
 import com.fortisbank.models.Customer;
 import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.transactions.*;
+import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.utils.IdGenerator;
 
 import java.io.Serial;
@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
-public abstract class Account implements AccountInterface, Serializable {
+public abstract class Account implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -20,7 +20,10 @@ public abstract class Account implements AccountInterface, Serializable {
     protected AccountType accountType;
     protected Date openedDate;
     protected BigDecimal availableBalance;
-    protected final TransactionList transactions;
+
+    // Prevents transactions from being serialized to file — for runtime only.
+    protected transient TransactionList transactions;
+
     protected boolean isActive;
 
     // Constructors
@@ -41,76 +44,11 @@ public abstract class Account implements AccountInterface, Serializable {
         this.isActive = true;
     }
 
-    // Deposit
-    @Override
-    public void deposit(BigDecimal amount) {
-        DepositTransaction tx = (DepositTransaction) TransactionFactory.createTransaction(
-                TransactionType.DEPOSIT,
-                "Deposit to account",
-                new Date(),
-                amount,
-                this,
-                null
-        );
-        tx.processTransaction();
-    }
-
-    // Withdraw
-    @Override
-    public void withdraw(BigDecimal amount) {
-        if (availableBalance.compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Insufficient balance.");
-        }
-
-        WithdrawalTransaction tx = (WithdrawalTransaction) TransactionFactory.createTransaction(
-                TransactionType.WITHDRAWAL,
-                "Withdrawal from account",
-                new Date(),
-                amount,
-                this,
-                null
-        );
-        tx.processTransaction();
-    }
-
-    // Transfer
-    @Override
-    public void transfer(Account targetAccount, BigDecimal amount) {
-        if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Amount must be greater than 0");
-        }
-
-        TransferTransaction tx = (TransferTransaction) TransactionFactory.createTransaction(
-                TransactionType.TRANSFER,
-                "Transfer to " + targetAccount.getAccountNumber(),
-                new Date(),
-                amount,
-                this,
-                targetAccount
-        );
-        tx.processTransaction();
-    }
-
-    // Apply Fee
-    public void applyFees(BigDecimal feeAmount, String description) {
-        if (availableBalance.compareTo(feeAmount) < 0) {
-            throw new IllegalArgumentException("Insufficient balance to apply fee.");
-        }
-
-        FeeTransaction tx = (FeeTransaction) TransactionFactory.createTransaction(
-                TransactionType.FEE,
-                description != null ? description : "Fee applied",
-                new Date(),
-                feeAmount,
-                this,
-                null
-        );
-        tx.processTransaction();
-    }
-
-    // Add transaction manually (used by transaction.recordTransaction())
+    // Add transaction to the in-memory transaction history (for business use only)
     public void addTransaction(Transaction transaction) {
-        transactions.add(transaction);
+        if (transactions != null) {
+            transactions.add(transaction);
+        }
     }
 
     // Getters
@@ -151,7 +89,11 @@ public abstract class Account implements AccountInterface, Serializable {
         this.isActive = active;
     }
 
-    // Close Account
+    // Utility
+    public boolean hasSufficientFunds(BigDecimal amount) {
+        return availableBalance.compareTo(amount) >= 0;
+    }
+
     public void closeAccount() {
         if (availableBalance.compareTo(BigDecimal.ZERO) == 0) {
             isActive = false;

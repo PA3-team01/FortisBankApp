@@ -7,7 +7,7 @@ import java.util.Date;
 
 public class CreditAccount extends Account {
     private final BigDecimal creditLimit;
-    private final BigDecimal interestRate; // TODO: Implement interest applying logic in business logic layer.
+    private final BigDecimal interestRate;
 
     public CreditAccount(String accountNumber, Customer customer, Date openedDate, BigDecimal creditLimit, BigDecimal interestRate) {
         super(accountNumber, customer, AccountType.CREDIT, openedDate, BigDecimal.ZERO);
@@ -15,17 +15,8 @@ public class CreditAccount extends Account {
         this.interestRate = interestRate;
     }
 
-    @Override
-    public void withdraw(BigDecimal amount) {
-        if (availableBalance.add(creditLimit).compareTo(amount) < 0) {
-            throw new IllegalArgumentException("Exceeds credit limit.");
-        }
-        super.withdraw(amount);
-    }
-
-    public void applyInterest() {
-        BigDecimal interest = availableBalance.multiply(interestRate);
-        applyFees(interest, "Credit account interest applied.");
+    public BigDecimal getInterestRate() {
+        return interestRate;
     }
 
     @Override

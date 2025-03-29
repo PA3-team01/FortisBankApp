@@ -35,9 +35,12 @@ public class TransactionRepositoryFile extends FileRepository<Transaction> imple
     @Override
     public TransactionList getTransactionsByAccount(String accountId) {
         return readAll().stream()
-                .filter(t -> t.getSourceAccount().getAccountNumber().equals(accountId))
+                .filter(t -> t.getSourceAccount().getAccountNumber().equals(accountId)
+                        || (t.getDestinationAccount() != null
+                        && t.getDestinationAccount().getAccountNumber().equals(accountId)))
                 .collect(TransactionList::new, TransactionList::add, TransactionList::addAll);
     }
+
 
     @Override
     public TransactionList getAllTransactions() {

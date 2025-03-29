@@ -15,10 +15,10 @@ public class ReportExporter {
     public static void exportCustomerStatementToCSV(CustomerStatementReport report, String filePath, AccountList customerAccounts) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Customer Statement Report\n");
-            writer.write("Report ID:," + report.getReportId() + "\n");
-            writer.write("Generated:," + report.getGeneratedDate() + "\n");
-            writer.write("Customer:," + report.getCustomer().getFullName() + "\n");
-            writer.write("Period:," + report.getPeriodStart() + " to " + report.getPeriodEnd() + "\n");
+            writer.write("Report ID:," + csvEscape(report.getReportId()) + "\n");
+            writer.write("Generated:," + csvEscape(report.getGeneratedDate().toString()) + "\n");
+            writer.write("Customer:," + csvEscape(report.getCustomer().getFullName()) + "\n");
+            writer.write("Period:," + csvEscape(report.getPeriodStart().toString()) + " to " + csvEscape(report.getPeriodEnd().toString()) + "\n");
             writer.write("Opening Balance:," + report.getOpeningBalance() + "\n");
             writer.write("Closing Balance:," + report.getClosingBalance() + "\n\n");
 
@@ -30,15 +30,15 @@ public class ReportExporter {
                 for (Account account : customerAccounts) {
                     signed = t.getSignedAmountFor(account);
                     if (signed.compareTo(BigDecimal.ZERO) != 0) {
-                        break; // We found the matching context account
+                        break;
                     }
                 }
 
                 writer.write(String.join(",",
-                        t.getTransactionNumber(),
-                        t.getTransactionDate().toString(),
-                        t.getTransactionType().name(),
-                        t.getDescription().replace(",", " "),
+                        csvEscape(t.getTransactionNumber()),
+                        csvEscape(t.getTransactionDate().toString()),
+                        csvEscape(t.getTransactionType().name()),
+                        csvEscape(t.getDescription()),
                         signed.toString()
                 ));
                 writer.write("\n");
@@ -46,13 +46,12 @@ public class ReportExporter {
         }
     }
 
-
     public static void exportBankSummaryToCSV(BankSummaryReport report, String filePath) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Bank Summary Report\n");
-            writer.write("Report ID:," + report.getReportId() + "\n");
-            writer.write("Generated:," + report.getGeneratedDate() + "\n");
-            writer.write("Summary:," + report.getSummary() + "\n\n");
+            writer.write("Report ID:," + csvEscape(report.getReportId()) + "\n");
+            writer.write("Generated:," + csvEscape(report.getGeneratedDate().toString()) + "\n");
+            writer.write("Summary:," + csvEscape(report.getSummary()) + "\n\n");
 
             writer.write("Total Customers:," + report.getTotalCustomers() + "\n");
             writer.write("Total Accounts:," + report.getTotalAccounts() + "\n");
@@ -63,7 +62,7 @@ public class ReportExporter {
             writer.write("Accounts by Type:\nType,Count\n");
             report.getAccountTypeCounts().forEach((type, count) -> {
                 try {
-                    writer.write(type + "," + count + "\n");
+                    writer.write(csvEscape(type) + "," + count + "\n");
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -72,11 +71,18 @@ public class ReportExporter {
             writer.write("\nLow Balance Accounts (< $50):\nAccountNumber,Customer,Balance\n");
             for (Account acc : report.getLowBalanceAccounts()) {
                 writer.write(String.join(",",
-                        acc.getAccountNumber(),
-                        acc.getCustomer().getFullName(),
+                        csvEscape(acc.getAccountNumber()),
+                        csvEscape(acc.getCustomer().getFullName()),
                         acc.getAvailableBalance().toString()
-                ) + "\n");
+                ));
+                writer.write("\n");
             }
         }
+    }
+
+    // Escapes special characters for CSV compatibility
+    private static String csvEscape(String input) {
+        if (input == null) return "";
+        return "\"" + input.replace("\"", "\"\"") + "\"";
     }
 }

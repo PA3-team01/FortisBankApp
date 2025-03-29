@@ -7,11 +7,9 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 public class CheckingAccount extends Account {
-    private static final int FREE_TRANSACTION_LIMIT = 2;
-    private static final BigDecimal TRANSACTION_FEE = new BigDecimal("5.00");
-    private int transactionCount = 0; // TODO: handle this better in database maybe? (check transactions count per month)
+    public static final int FREE_TRANSACTION_LIMIT = 2;
+    public static final BigDecimal TRANSACTION_FEE = new BigDecimal("5.00");
 
-    //TO-DO
     public CheckingAccount(Customer customer, BigDecimal initialBalance) {
         super(IdGenerator.generateId(), customer, AccountType.CHECKING, new Date(), initialBalance);
     }
@@ -21,26 +19,7 @@ public class CheckingAccount extends Account {
     }
 
     @Override
-    public void withdraw(BigDecimal amount) {
-        super.withdraw(amount);
-        applyTransactionFee();
-    }
-
-    @Override
-    public void transfer(Account targetAccount, BigDecimal amount) {
-        super.transfer(targetAccount, amount);
-        applyTransactionFee();
-    }
-
-    @Override
     public BigDecimal getCreditLimit() {
         return null;
-    }
-
-    private void applyTransactionFee() {
-        if (transactionCount >= FREE_TRANSACTION_LIMIT) {
-            applyFees(TRANSACTION_FEE, "Transaction fee after " + FREE_TRANSACTION_LIMIT + " free transactions.");
-        }
-        transactionCount++;
     }
 }

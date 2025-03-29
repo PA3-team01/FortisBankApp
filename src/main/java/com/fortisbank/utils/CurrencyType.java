@@ -1,4 +1,4 @@
-package com.fortisbank.models.accounts;
+package com.fortisbank.utils;
 
 import java.math.BigDecimal;
 import java.util.Collections;

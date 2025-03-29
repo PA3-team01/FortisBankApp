@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 public class CustomerList extends ArrayList<Customer> {
 
+    // ------------------- Constructors -------------------
+
     public CustomerList() {
         super();
     }
@@ -17,7 +19,8 @@ public class CustomerList extends ArrayList<Customer> {
         customers.forEach(this::add);
     }
 
-    // Sorting methods
+    // ------------------- Sorting Methods -------------------
+
     public void sortByName() {
         this.sort(CustomerComparators.BY_NAME);
     }
@@ -34,7 +37,8 @@ public class CustomerList extends ArrayList<Customer> {
         this.sort(CustomerComparators.BY_TRANSACTION_COUNT.reversed());
     }
 
-    // Filtering methods
+    // ------------------- Filtering Methods -------------------
+
     public CustomerList filterByMinBalance(double minBalance) {
         return this.stream()
                 .filter(c -> c.getBalance().compareTo(BigDecimal.valueOf(minBalance)) >= 0)
@@ -46,6 +50,8 @@ public class CustomerList extends ArrayList<Customer> {
                 .filter(c -> c.getFullName().toLowerCase().contains(substring.toLowerCase()))
                 .collect(Collectors.toCollection(CustomerList::new));
     }
+
+    // ------------------- String Representation -------------------
 
     @Override
     public String toString() {
