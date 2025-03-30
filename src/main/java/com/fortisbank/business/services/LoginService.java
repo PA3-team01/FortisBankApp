@@ -11,14 +11,25 @@ import java.util.Arrays;
 
 import static com.fortisbank.utils.ValidationUtils.*;
 
-public class LoginService { //TODO: Implement login attempt failures and account lockout
+public class LoginService { // TODO: Implement login attempt failures and account lockout
+
+    private static LoginService instance;
 
     private final CustomerService customerService;
     private final BankManagerService managerService;
 
-    public LoginService(CustomerService customerService, BankManagerService managerService) {
+    // Private constructor
+    private LoginService(CustomerService customerService, BankManagerService managerService) {
         this.customerService = customerService;
         this.managerService = managerService;
+    }
+
+    // Singleton access method
+    public static synchronized LoginService getInstance(CustomerService customerService, BankManagerService managerService) {
+        if (instance == null) {
+            instance = new LoginService(customerService, managerService);
+        }
+        return instance;
     }
 
     // ---------------- LOGIN WITH PIN ----------------

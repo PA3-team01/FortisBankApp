@@ -25,11 +25,21 @@ public class BankManagerService implements IBankManagerService {
         return instances.computeIfAbsent(storageMode, BankManagerService::new);
     }
 
+    // ------------------- CRUD OPERATIONS -------------------
+
+    // Create
+
+    public BankManager createManager(BankManager manager) { // ** Do not call directly, use register service **
+        managerRepository.insertManager(manager);
+        return manager;
+    }
+
     // ------------------- Core Business Methods -------------------
 
     @Override
     public Customer createCustomer(String firstName, String lastName, String email, String phone, String hashedPassword, String pinHash) {
         // Implementation depends on whether manager creates users directly or uses RegisterService
+        //TODO: Implement this method
         return null;
     }
 
@@ -74,5 +84,10 @@ public class BankManagerService implements IBankManagerService {
             }
         }
         return null;
+    }
+
+    // ------------------- Utility Methods -------------------
+    public boolean emailExists(String email) {
+        return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
     }
 }
