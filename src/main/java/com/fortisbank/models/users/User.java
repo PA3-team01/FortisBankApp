@@ -12,10 +12,7 @@ public abstract class User implements Serializable {
     protected String lastName;
     protected Role role;
 
-    public enum Role {
-        CUSTOMER,
-        MANAGER
-    }
+
 
     protected User(String userId, String firstName, String lastName, String email,
                    String hashedPassword, String pinHash, Role role) {

@@ -7,6 +7,7 @@ import com.fortisbank.models.collections.TransactionList;
 import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.UUID;
 
 public class Customer extends User implements Serializable {
     @Serial
@@ -22,8 +23,9 @@ public class Customer extends User implements Serializable {
         this.role = Role.CUSTOMER;
     }
 
-    public Customer(String userId, String firstName, String lastName, String email,
-                    String hashedPassword, String pinHash, String phoneNumber) {
+    String customerId = UUID.randomUUID().toString();
+    public Customer(String userId, String firstName, String lastName, String email,String phoneNumber,
+                    String hashedPassword, String pinHash) {
         super(userId, firstName, lastName, email, hashedPassword, pinHash, Role.CUSTOMER);
         this.phoneNumber = phoneNumber;
     }

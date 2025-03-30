@@ -53,7 +53,7 @@ public class RegisterService {
             Arrays.fill(rawPIN, '\0');
 
             String customerId = UUID.randomUUID().toString();
-            Customer newCustomer = new Customer(customerId, firstName, lastName, email, hashedPassword, hashedPIN, phoneNumber);
+            Customer newCustomer = new Customer(customerId, firstName, lastName, email, phoneNumber, hashedPassword, hashedPIN);
 
 
             customerService.createCustomer(newCustomer);
