@@ -3,14 +3,12 @@ package com.fortisbank.ui.forms;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.users.Role;
 import com.fortisbank.session.SessionManager;
-import com.fortisbank.ui.components.NavigationPanel;
 import com.fortisbank.ui.panels.CustomerUi;
 import com.fortisbank.ui.panels.ManagerUi;
 import com.fortisbank.utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
 
 public class DashboardFrame extends JFrame {
 
@@ -23,15 +21,23 @@ public class DashboardFrame extends JFrame {
         setUndecorated(true);
         setLayout(new BorderLayout());
 
-        // Title bar
-        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Dashboard");
-        add(titleBar, BorderLayout.NORTH);
+        // Top-right logout button
+        JButton logoutButton = new JButton("Logout");
+        StyleUtils.styleButton(logoutButton, false);
+        logoutButton.setContentAreaFilled(false);
+        logoutButton.setBorderPainted(false);
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.setFont(new Font("Segoe UI", Font.PLAIN, 13));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.addActionListener(e -> handleLogout());
 
-        // Navigation panel with Logout
-        NavigationPanel navPanel = new NavigationPanel("Logout");
-        navPanel.setButtonAction("Logout", this::handleLogout);
-        StyleUtils.styleFormPanel(navPanel);
-        add(navPanel, BorderLayout.WEST);
+        JPanel rightControls = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        rightControls.setOpaque(false);
+        rightControls.add(logoutButton);
+
+        // Title bar with logout on top right
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Dashboard", rightControls);
+        add(titleBar, BorderLayout.NORTH);
 
         // Main content area
         JPanel contentPanel = new JPanel(new BorderLayout());
@@ -52,12 +58,12 @@ public class DashboardFrame extends JFrame {
         switch (role) {
             case MANAGER -> rolePanel = new ManagerUi();
             case CUSTOMER -> rolePanel = new CustomerUi();
-            default -> rolePanel = new JPanel(); // fallback if unknown role
+            default -> rolePanel = new JPanel(); // fallback
         }
         StyleUtils.styleFormPanel(rolePanel);
         contentPanel.add(rolePanel, BorderLayout.CENTER);
 
-        // Final frame setup
+        // Frame setup
         setSize(800, 500);
         setLocationRelativeTo(null);
         setResizable(false);

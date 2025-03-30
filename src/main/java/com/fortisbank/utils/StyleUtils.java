@@ -13,6 +13,8 @@ public class StyleUtils {
     public static final Color TEXT_COLOR = new Color(240, 240, 240);    // Light text
     public static final Color ERROR_COLOR = new Color(244, 67, 54);     // Red
     public static final Color SUCCESS_COLOR = new Color(76, 175, 80);   // Green
+    public static final Color NAVBAR_BG = new Color(33, 33, 33);        // Darker nav bar
+    public static final Color NAVBAR_BUTTON_COLOR = new Color(66, 66, 66);
 
     // ========== FONTS ==========
     public static final Font LABEL_FONT = new Font("Segoe UI", Font.PLAIN, 13);
@@ -56,6 +58,23 @@ public class StyleUtils {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    public static void styleNavButton(JButton button) {
+        button.setFont(BUTTON_FONT);
+        button.setFocusPainted(false);
+        button.setBackground(NAVBAR_BUTTON_COLOR);
+        button.setForeground(TEXT_COLOR);
+        button.setBorder(BorderFactory.createEmptyBorder(8, 16, 8, 16));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setAlignmentX(Component.CENTER_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
+    }
+
+    public static void styleNavbar(JPanel navbar) {
+        navbar.setBackground(NAVBAR_BG);
+        navbar.setLayout(new BoxLayout(navbar, BoxLayout.Y_AXIS));
+        navbar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+    }
+
     public static void applyGlobalFrameStyle(JFrame frame) {
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
     }
@@ -76,7 +95,8 @@ public class StyleUtils {
         frame.setResizable(false);
     }
 
-    public static JPanel createCustomTitleBar(JFrame frame, String titleText) {
+    // TODO: Migrate this to a more reusable component
+    public static JPanel createCustomTitleBar(JFrame frame, String titleText, JComponent rightControls) {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setBackground(PRIMARY_COLOR);
         titleBar.setPreferredSize(new Dimension(frame.getWidth(), 30));
@@ -84,6 +104,15 @@ public class StyleUtils {
         JLabel title = new JLabel("  " + titleText);
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Segoe UI", Font.BOLD, 14));
+
+        // Right-side button group
+        JPanel buttonGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
+        buttonGroup.setOpaque(false);
+
+        // Optional right controls (like Logout)
+        if (rightControls != null) {
+            buttonGroup.add(rightControls);
+        }
 
         JButton closeButton = new JButton("X");
         closeButton.setFocusPainted(false);
@@ -95,9 +124,12 @@ public class StyleUtils {
         closeButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         closeButton.addActionListener(e -> frame.dispose());
 
-        titleBar.add(title, BorderLayout.WEST);
-        titleBar.add(closeButton, BorderLayout.EAST);
+        buttonGroup.add(closeButton);
 
+        titleBar.add(title, BorderLayout.WEST);
+        titleBar.add(buttonGroup, BorderLayout.EAST);
+
+        // Drag logic
         final Point[] initialClick = {null};
         titleBar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -116,7 +148,7 @@ public class StyleUtils {
 
         return titleBar;
     }
-
+    // TODO: Migrate this to a more reusable component
     public static void showStyledDialog(Component parent, String title, String message, boolean success) {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setUndecorated(true);

@@ -35,7 +35,7 @@ public class LoginFrame extends JFrame {
         setLayout(new BorderLayout());
 
         // Custom Title Bar
-        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Login");
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Login",null);
         add(titleBar, BorderLayout.NORTH);
 
         // Main Content Panel

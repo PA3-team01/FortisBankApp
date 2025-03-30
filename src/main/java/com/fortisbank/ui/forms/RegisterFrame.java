@@ -38,7 +38,7 @@ public class RegisterFrame extends JFrame {
         setUndecorated(true);
         setLayout(new BorderLayout());
 
-        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Register New Customer");
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Register New Customer", null);
         add(titleBar, BorderLayout.NORTH);
 
         JPanel contentPanel = new JPanel(new GridBagLayout());

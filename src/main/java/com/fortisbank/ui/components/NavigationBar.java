@@ -7,17 +7,17 @@ import java.awt.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class NavigationPanel extends JPanel {
+public class NavigationBar extends JPanel {
 
     private final Map<String, JButton> buttons = new LinkedHashMap<>();
 
-    public NavigationPanel(String... labels) {
+    public NavigationBar(String... labels) {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        StyleUtils.styleFormPanel(this);
+        StyleUtils.styleNavbar(this);
 
         for (String label : labels) {
             JButton button = new JButton(label);
-            StyleUtils.styleButton(button, false);
+            StyleUtils.styleNavButton(button);
             button.setAlignmentX(Component.CENTER_ALIGNMENT);
             buttons.put(label, button);
             add(Box.createVerticalStrut(10));
