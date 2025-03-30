@@ -5,6 +5,7 @@ import com.fortisbank.business.services.CustomerService;
 import com.fortisbank.business.services.LoginService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.users.User;
+import com.fortisbank.utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +17,7 @@ public class LoginFrame extends JFrame {
     private final JTextField emailField = new JTextField(20);
     private final JPasswordField passwordField = new JPasswordField(20);
     private final JButton loginButton = new JButton("Login");
+    private final JButton registerButton = new JButton("New User? Register");
     private final JLabel statusLabel = new JLabel(" ");
 
     private final StorageMode storageMode;
@@ -28,45 +30,69 @@ public class LoginFrame extends JFrame {
                 BankManagerService.getInstance(storageMode)
         );
 
-        setTitle("Fortis Bank - Login");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 200);
-        setLocationRelativeTo(null); // Center the window
+        // Remove default OS title bar
+        setUndecorated(true);
+        setLayout(new BorderLayout());
 
-        setLayout(new GridBagLayout());
+        // Custom Title Bar
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Login");
+        add(titleBar, BorderLayout.NORTH);
+
+        // Main Content Panel
+        JPanel contentPanel = new JPanel(new GridBagLayout());
+        StyleUtils.styleFormPanel(contentPanel);
+        add(contentPanel, BorderLayout.CENTER);
+
+        setSize(600, 280);
+        setLocationRelativeTo(null);
+
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 10, 5, 10);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row 0 - Email label and field
+        // Row 0 - Email
         gbc.gridx = 0;
         gbc.gridy = 0;
-        add(new JLabel("Email:"), gbc);
-
+        JLabel emailLabel = new JLabel("Email:");
+        contentPanel.add(emailLabel, gbc);
         gbc.gridx = 1;
-        add(emailField, gbc);
+        contentPanel.add(emailField, gbc);
 
-        // Row 1 - Password label and field
+        // Row 1 - Password
         gbc.gridx = 0;
         gbc.gridy = 1;
-        add(new JLabel("Password / PIN:"), gbc);
-
+        JLabel passwordLabel = new JLabel("Password / PIN:");
+        contentPanel.add(passwordLabel, gbc);
         gbc.gridx = 1;
-        add(passwordField, gbc);
+        contentPanel.add(passwordField, gbc);
 
         // Row 2 - Login button
         gbc.gridx = 0;
         gbc.gridy = 2;
         gbc.gridwidth = 2;
         gbc.anchor = GridBagConstraints.CENTER;
-        add(loginButton, gbc);
+        contentPanel.add(loginButton, gbc);
 
-        // Row 3 - Status label
+        // Row 3 - Register button
         gbc.gridy = 3;
-        add(statusLabel, gbc);
+        contentPanel.add(registerButton, gbc);
+
+        // Row 4 - Status label
+        gbc.gridy = 4;
+        contentPanel.add(statusLabel, gbc);
 
         loginButton.addActionListener(new LoginAction());
+        registerButton.addActionListener(new RegisterAction());
         getRootPane().setDefaultButton(loginButton);
+
+        // Style components
+        StyleUtils.styleLabel(emailLabel);
+        StyleUtils.styleLabel(passwordLabel);
+        StyleUtils.styleLabel(statusLabel);
+        StyleUtils.styleTextField(emailField);
+        StyleUtils.styleTextField(passwordField);
+        StyleUtils.styleButton(loginButton, true);
+        StyleUtils.styleButton(registerButton, false);
     }
 
     private class LoginAction implements ActionListener {
@@ -74,7 +100,7 @@ public class LoginFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String email = emailField.getText();
             char[] input = passwordField.getPassword();
-            char[] passwordCopy = input.clone();  // Save a copy before PIN clears it
+            char[] passwordCopy = input.clone();
 
             try {
                 User user;
@@ -86,13 +112,20 @@ public class LoginFrame extends JFrame {
 
                 statusLabel.setText("Welcome, " + user.getFullName());
                 dispose();
-                new DashboardFrame(storageMode).setVisible(true); // Open the dashboard frame
+                new DashboardFrame(storageMode).setVisible(true);
 
             } catch (Exception ex) {
                 statusLabel.setText("Login failed: " + ex.getMessage());
             } finally {
                 passwordField.setText("");
             }
+        }
+    }
+
+    private class RegisterAction implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            new RegisterFrame(storageMode).setVisible(true);
         }
     }
 }

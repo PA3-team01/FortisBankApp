@@ -1,8 +1,8 @@
 package com.fortisbank.ui.forms;
 
-import com.fortisbank.business.services.LoginService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.session.SessionManager;
+import com.fortisbank.utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -18,27 +18,39 @@ public class DashboardFrame extends JFrame {
     public DashboardFrame(StorageMode storageMode) {
         this.storageMode = storageMode;
 
-        setTitle("Fortis Bank - Dashboard");
-        setSize(500, 300);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
+        // Use custom undecorated frame
+        setUndecorated(true);
         setLayout(new BorderLayout());
 
-        // Welcome label
+        // Create custom title bar
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Dashboard");
+        add(titleBar, BorderLayout.NORTH);
+
+        // Welcome panel
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        StyleUtils.styleFormPanel(contentPanel);
+        add(contentPanel, BorderLayout.CENTER);
+
         String name = SessionManager.getCurrentUser().getFullName();
         welcomeLabel.setText("Welcome, " + name + "!");
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        welcomeLabel.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        welcomeLabel.setForeground(StyleUtils.TEXT_COLOR);
 
         // Logout button
+        StyleUtils.styleButton(logoutButton, false);
         logoutButton.addActionListener(this::handleLogout);
 
         JPanel buttonPanel = new JPanel();
+        StyleUtils.styleFormPanel(buttonPanel);
         buttonPanel.add(logoutButton);
 
-        add(welcomeLabel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        contentPanel.add(welcomeLabel, BorderLayout.CENTER);
+        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        setSize(500, 300);
+        setLocationRelativeTo(null);
+        setResizable(false);
     }
 
     private void handleLogout(ActionEvent e) {
