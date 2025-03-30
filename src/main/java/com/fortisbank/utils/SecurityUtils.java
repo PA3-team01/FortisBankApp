@@ -52,7 +52,6 @@ public class SecurityUtils {
     public static final String HASHING_ALGORITHM = "PBKDF2WithHmacSHA256";
     public static final int HASH_ITERATIONS = 10000;
     public static final int SALT_LENGTH = 16;
-    public static final int HASH_LENGTH = 32; // 256 bits
     public static final int PIN_HASH_LENGTH = 32;
     public static final int PASSWORD_HASH_LENGTH = 32;
 

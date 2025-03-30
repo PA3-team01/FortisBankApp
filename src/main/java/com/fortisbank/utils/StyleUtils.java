@@ -116,4 +116,47 @@ public class StyleUtils {
 
         return titleBar;
     }
+
+    public static void showStyledDialog(Component parent, String title, String message, boolean success) {
+        JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setUndecorated(true);
+        dialog.setLayout(new BorderLayout());
+
+        JPanel panel = new JPanel(new BorderLayout(10, 10));
+        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createLineBorder(success ? SUCCESS_COLOR : ERROR_COLOR, 2));
+
+        JLabel icon = new JLabel(UIManager.getIcon(success ? "OptionPane.informationIcon" : "OptionPane.errorIcon"));
+        JLabel messageLabel = new JLabel(message);
+        messageLabel.setFont(FIELD_FONT);
+        messageLabel.setForeground(success ? SUCCESS_COLOR : ERROR_COLOR);
+
+        JPanel messagePanel = new JPanel(new BorderLayout(10, 10));
+        messagePanel.setBackground(BACKGROUND_COLOR);
+        messagePanel.add(icon, BorderLayout.WEST);
+        messagePanel.add(messageLabel, BorderLayout.CENTER);
+        panel.add(messagePanel, BorderLayout.CENTER);
+
+        JButton okButton = new JButton("OK");
+        styleButton(okButton, success);
+        okButton.addActionListener(e -> dialog.dispose());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBackground(BACKGROUND_COLOR);
+        buttonPanel.add(okButton);
+
+        panel.add(buttonPanel, BorderLayout.SOUTH);
+        dialog.add(panel);
+        dialog.pack();
+        dialog.setLocationRelativeTo(parent);
+        dialog.setVisible(true);
+    }
+
+    public static void showStyledSuccessDialog(Component parent, String message) {
+        showStyledDialog(parent, "Success", message, true);
+    }
+
+    public static void showStyledErrorDialog(Component parent, String message) {
+        showStyledDialog(parent, "Error", message, false);
+    }
 }

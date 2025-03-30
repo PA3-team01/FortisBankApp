@@ -153,18 +153,17 @@ public class RegisterFrame extends JFrame {
             try {
                 boolean success = registerService.registerNewCustomer(firstName, lastName, email, phone, password, pin);
                 if (success) {
-                    JOptionPane.showMessageDialog(RegisterFrame.this,
-                            "Registration successful! You may now log in.",
-                            "Success",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    StyleUtils.showStyledSuccessDialog(RegisterFrame.this,
+                            "Registration successful! You may now log in.");
                     dispose();
                 }
             } catch (Exception ex) {
-                statusLabel.setText("Registration failed: " + ex.getMessage());
+                StyleUtils.showStyledErrorDialog(RegisterFrame.this, "Registration failed: " + ex.getMessage());
             } finally {
                 passwordField.setText("");
                 pinField.setText("");
             }
         }
     }
+
 }
