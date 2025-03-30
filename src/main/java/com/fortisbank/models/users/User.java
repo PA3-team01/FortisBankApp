@@ -6,8 +6,8 @@ public abstract class User implements Serializable {
 
     protected String userId;
     protected String email;
-    protected String hashedPassword; // application password
-    protected String PINHash; // PIN hash for authentication
+    protected String hashedPassword;
+    protected String PINHash;
     protected String firstName;
     protected String lastName;
     protected Role role;
@@ -17,7 +17,20 @@ public abstract class User implements Serializable {
         MANAGER
     }
 
-    // ------------------- Getters -------------------
+    protected User(String userId, String firstName, String lastName, String email,
+                   String hashedPassword, String pinHash, Role role) {
+        this.userId = userId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.hashedPassword = hashedPassword;
+        this.PINHash = pinHash;
+        this.role = role;
+    }
+
+    protected User() {
+        // No-arg constructor for deserialization
+    }
 
     public String getUserId() {
         return userId;
@@ -51,8 +64,6 @@ public abstract class User implements Serializable {
         return firstName + " " + lastName;
     }
 
-    // ------------------- Setters -------------------
-
     public void setUserId(String userId) {
         this.userId = userId;
     }
@@ -81,8 +92,6 @@ public abstract class User implements Serializable {
         this.role = role;
     }
 
-    // ------------------- Debug -------------------
-
     @Override
     public String toString() {
         return "User{" +
@@ -93,3 +102,4 @@ public abstract class User implements Serializable {
                 '}';
     }
 }
+

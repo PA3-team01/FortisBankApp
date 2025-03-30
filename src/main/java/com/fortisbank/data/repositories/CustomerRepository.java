@@ -131,6 +131,7 @@ public class CustomerRepository implements ICustomerRepository {
                 rs.getString(rs.findColumn("FirstName")),
                 rs.getString(rs.findColumn("LastName")),
                 rs.getString(rs.findColumn("Email")),
+                rs.getString(rs.findColumn("PasswordHash")),
                 rs.getString(rs.findColumn("PhoneNumber")),
                 rs.getString(rs.findColumn("PINHash"))
         );

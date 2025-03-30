@@ -59,6 +59,6 @@ public class CustomerRepositoryFile extends FileRepository<Customer> implements 
 
     @Override
     public CustomerList getAllCustomers() {
-        return (CustomerList) readAll();
+        return new CustomerList(readAll());
     }
 }

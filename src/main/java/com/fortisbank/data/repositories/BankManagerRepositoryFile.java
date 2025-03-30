@@ -59,6 +59,14 @@ public class BankManagerRepositoryFile extends FileRepository<BankManager> imple
 
     @Override
     public ManagerList getAllManagers() {
-        return new ManagerList(readAll());
+        List<BankManager> list = readAll();
+        System.out.println("🔍 [getAllManagers] Loaded managers: " + list.size());
+        for (BankManager m : list) {
+            System.out.println(" → Email: " + m.getEmail());
+            System.out.println("   Name: " + m.getFirstName() + " " + m.getLastName());
+            System.out.println("   User ID: " + m.getUserId());
+        }
+
+        return new ManagerList(list);
     }
 }

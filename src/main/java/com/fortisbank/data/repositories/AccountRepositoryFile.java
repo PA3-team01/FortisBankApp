@@ -43,19 +43,19 @@ public class AccountRepositoryFile extends FileRepository<Account> implements IA
 
     @Override
     public AccountList getAllAccounts() {
-        return (AccountList) readAll();
+        return new AccountList(readAll());
     }
 
     @Override
     public void insertAccount(Account account) {
-        AccountList accounts = (AccountList) readAll();
+        AccountList accounts = new AccountList(readAll());
         accounts.add(account);
         writeAll(accounts);
     }
 
     @Override
     public void updateAccount(Account account) {
-        AccountList accounts = (AccountList) readAll();
+        AccountList accounts = new AccountList(readAll()) ;
         for (int i = 0; i < accounts.size(); i++) {
             if (accounts.get(i).getAccountNumber().equals(account.getAccountNumber())) {
                 accounts.set(i, account);
@@ -67,7 +67,7 @@ public class AccountRepositoryFile extends FileRepository<Account> implements IA
 
     @Override
     public void deleteAccount(String accountId) {
-        AccountList accounts = (AccountList) readAll();
+        AccountList accounts = new AccountList(readAll());
         accounts.removeIf(a -> a.getAccountNumber().equals(accountId));
         writeAll(accounts);
     }

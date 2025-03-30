@@ -18,47 +18,30 @@ public class Customer extends User implements Serializable {
     private transient AccountList accounts;
 
     public Customer() {
+        super();
         this.role = Role.CUSTOMER;
     }
 
-    public Customer(String userId, String firstName, String lastName, String pinHash, String email, String phoneNumber) {
-        this.userId = userId;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.PINHash = pinHash;
-        this.email = email;
+    public Customer(String userId, String firstName, String lastName, String email,
+                    String hashedPassword, String pinHash, String phoneNumber) {
+        super(userId, firstName, lastName, email, hashedPassword, pinHash, Role.CUSTOMER);
         this.phoneNumber = phoneNumber;
-        this.role = Role.CUSTOMER;
-    }
-
-    // ------------------------- GETTERS -------------------------
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public String getPINHash() {
-        return PINHash;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
     public AccountList getAccounts() {
         return accounts;
+    }
+
+    public void setAccounts(AccountList accounts) {
+        this.accounts = accounts;
     }
 
     public BigDecimal getBalance() {
@@ -83,42 +66,6 @@ public class Customer extends User implements Serializable {
         return all;
     }
 
-    // ------------------------- SETTERS -------------------------
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setPINHash(String PINHash) {
-        this.PINHash = PINHash;
-    }
-
-    public void setHashedPassword(String hashedPassword) {
-        this.hashedPassword = hashedPassword;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public void setPhoneNumber(String phoneNumber) {
-        this.phoneNumber = phoneNumber;
-    }
-
-    public void setAccounts(AccountList accounts) {
-        this.accounts = accounts;
-    }
-
-    // ------------------------- TO STRING -------------------------
-
     @Override
     public String toString() {
         return "Customer{" +
@@ -131,3 +78,4 @@ public class Customer extends User implements Serializable {
                 '}';
     }
 }
+

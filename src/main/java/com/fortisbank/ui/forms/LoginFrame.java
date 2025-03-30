@@ -74,13 +74,14 @@ public class LoginFrame extends JFrame {
         public void actionPerformed(ActionEvent e) {
             String email = emailField.getText();
             char[] input = passwordField.getPassword();
+            char[] passwordCopy = input.clone();  // Save a copy before PIN clears it
 
             try {
                 User user;
                 try {
                     user = loginService.loginWithPIN(email, input);
                 } catch (Exception pinFail) {
-                    user = loginService.loginWithPassword(email, input);
+                    user = loginService.loginWithPassword(email, passwordCopy);
                 }
 
                 statusLabel.setText("Welcome, " + user.getFullName());
