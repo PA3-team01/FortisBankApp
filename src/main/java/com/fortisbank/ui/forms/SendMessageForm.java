@@ -1,5 +1,8 @@
 package com.fortisbank.ui.forms;
 
+import com.fortisbank.business.services.BankManagerService;
+import com.fortisbank.business.services.NotificationService;
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.users.User;
 import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
@@ -7,15 +10,17 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-
+//TODO: add dropdown for manager selection
 public class SendMessageForm extends JPanel {
 
     private final JTextField fromField = new JTextField();
     private final JTextField toField = new JTextField();
     private final JTextField subjectField = new JTextField();
     private final JTextArea messageArea = new JTextArea(8, 30);
+    private final StorageMode storageMode;
 
-    public SendMessageForm() {
+    public SendMessageForm(StorageMode storageMode) {
+        this.storageMode = storageMode;
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
@@ -73,7 +78,12 @@ public class SendMessageForm extends JPanel {
         StyleUtils.styleButton(cancelBtn, false);
 
         sendBtn.addActionListener(e -> {
+            // get first manager from the list
+            var manager = BankManagerService.getInstance(storageMode).getAllManagers().getFirst();
             if (validateFields()) {
+                // TODO: add notification sending logic here
+                // new instance of NotificationService
+                NotificationService.getInstance().notifyNewMessage(manager, currentUser.getFullName());
                 StyleUtils.showStyledSuccessDialog(this, "Message sent successfully!");
                 clearFields();
             }
