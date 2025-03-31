@@ -1,20 +1,24 @@
 package com.fortisbank.ui.panels.customerPanels;
 
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.users.Customer;
 import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.components.AccountInfo;
+import com.fortisbank.ui.forms.AccountRequestForm;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
 //TODO: implement request new account/loan
 public class AccountPanel extends JPanel {
 
-    public AccountPanel() {
+    private final StorageMode storageMode;
+
+    public AccountPanel(StorageMode storageMode) {
+        this.storageMode = storageMode;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         StyleUtils.styleFormPanel(this);
 
@@ -34,12 +38,21 @@ public class AccountPanel extends JPanel {
             add(info);
         } else {
             for (Account account : accounts) {
-                AccountInfo infoCard = new AccountInfo(account); // Now uses Account object
+                AccountInfo infoCard = new AccountInfo(account);
                 add(Box.createVerticalStrut(15));
                 add(infoCard);
             }
         }
 
+        JButton requestBtn = new JButton("Request New Account");
+        StyleUtils.styleButton(requestBtn, true);
+        requestBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+        requestBtn.addActionListener(e -> {
+            new AccountRequestForm(storageMode).setVisible(true);
+        });
+
+        add(Box.createVerticalStrut(20));
+        add(requestBtn);
         add(Box.createVerticalGlue());
     }
 }

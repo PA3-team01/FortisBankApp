@@ -36,7 +36,7 @@ public class CustomerUi extends JPanel {
 
         // === Navigation Hooks ===
         navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
-        navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel()));
+        navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel(storageMode)));
         navPanel.setButtonAction("Transactions", () -> showContent(new TransactionPanel(storageMode)));
         navPanel.setButtonAction("Settings", () -> showContent(new JLabel("Settings")));
         navPanel.setButtonAction("Help", () -> showContent(new JLabel("Help & Support")));
