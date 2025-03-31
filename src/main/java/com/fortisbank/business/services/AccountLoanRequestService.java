@@ -4,7 +4,6 @@ import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.others.NotificationType;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -34,17 +33,8 @@ public class AccountLoanRequestService {
 
         requestedAccount.setActive(false); // Will only be activated if accepted
 
-        // Notify manager
-        notificationService.sendNotification(manager,
-                NotificationType.ACCOUNT_OPENING_REQUEST,
-                "New Account Opening Request",
-                customer.getFullName() + " requested a " + requestedAccount.getAccountType() + " account.");
-
-        // Notify customer
-        notificationService.sendNotification(customer,
-                NotificationType.INFO,
-                "Request Sent",
-                "Your account request was sent to the manager.");
+        // Notify manager and customer with rich notification
+        notificationService.notifyAccountRequest(manager, customer, requestedAccount);
     }
 
     /**
@@ -52,26 +42,19 @@ public class AccountLoanRequestService {
      */
     public void acceptAccountRequest(Customer customer, Account account) {
         if (customer == null || account == null) return;
+        if (customer.getAccounts().contains(account) && !account.isActive()) {
+            account.setActive(true);
+        } else return;
 
-        account.setActive(true);
-        accountService.createAccount(account);
-        customer.getAccounts().add(account);
-
-        notificationService.sendNotification(customer,
-                NotificationType.ACCOUNT_APPROVAL,
-                "Account Approved",
-                "Your request for a " + account.getAccountType() + " account has been approved.");
+        notificationService.notifyApproval(customer, account);
     }
 
     /**
      * Manager rejects the account request.
      */
-    public void rejectAccountRequest(Customer customer, String reason) {
+    public void rejectAccountRequest(Customer customer, String reason, Account rejectedAccount) {
         if (customer == null) return;
 
-        notificationService.sendNotification(customer,
-                NotificationType.ACCOUNT_REJECTION,
-                "Account Request Denied",
-                "Your account request was declined. Reason: " + reason);
+        notificationService.notifyRejection(customer, reason, rejectedAccount);
     }
 }

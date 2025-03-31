@@ -1,5 +1,6 @@
 package com.fortisbank.business.services;
 
+import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.users.User;
@@ -33,6 +34,12 @@ public class NotificationService {
         recipient.getInbox().add(notification);
     }
 
+    public void sendNotification(User recipient, NotificationType type, String title, String message, Customer customer, Account account) {
+        if (recipient == null) return;
+        Notification notification = new Notification(type, title, message, customer, account);
+        recipient.getInbox().add(notification);
+    }
+
     // === Predefined Notification Helpers ===
 
     public void notifyTransactionReceipt(User user, Transaction tx) {
@@ -42,23 +49,27 @@ public class NotificationService {
         sendNotification(user, NotificationType.TRANSACTION_RECEIPT, title, message);
     }
 
-    public void notifyAccountRequest(Customer customer, String accountType) {
+    public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
         String title = "New Account Request";
         String message = String.format("Customer %s requested a new %s account.",
-                customer.getFullName(), accountType);
-        sendNotification(customer, NotificationType.ACCOUNT_OPENING_REQUEST, title, message);
+                customer.getFullName(), requestedAccount.getAccountType());
+        sendNotification(manager, NotificationType.ACCOUNT_OPENING_REQUEST, title, message, customer, requestedAccount);
+
+        // Confirmation to customer
+        sendNotification(customer, NotificationType.INFO, "Request Sent",
+                "Your account request was sent to the manager.", customer, requestedAccount);
     }
 
-    public void notifyApproval(Customer customer, String accountNumber) {
+    public void notifyApproval(Customer customer, Account approvedAccount) {
         String title = "Account Approved";
-        String message = String.format("Your account (%s) has been approved.", accountNumber);
-        sendNotification(customer, NotificationType.ACCOUNT_APPROVAL, title, message);
+        String message = String.format("Your account (%s) has been approved.", approvedAccount.getAccountNumber());
+        sendNotification(customer, NotificationType.ACCOUNT_APPROVAL, title, message, customer, approvedAccount);
     }
 
-    public void notifyRejection(Customer customer, String reason) {
+    public void notifyRejection(Customer customer, String reason, Account rejectedAccount) {
         String title = "Account Rejected";
         String message = "Your account request was declined: " + reason;
-        sendNotification(customer, NotificationType.ACCOUNT_REJECTION, title, message);
+        sendNotification(customer, NotificationType.ACCOUNT_REJECTION, title, message, customer, rejectedAccount);
     }
 
     public void notifyNewMessage(User user, String fromName) {
