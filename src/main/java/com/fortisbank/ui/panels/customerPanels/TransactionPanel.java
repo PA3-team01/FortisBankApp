@@ -38,6 +38,7 @@ public class TransactionPanel extends JPanel {
 
         populateAccountSelector();
         accountSelector.addActionListener(e -> updateTransactionPreview());
+        StyleUtils.styleDropdown(accountSelector);
 
         // Custom renderer for styled display
         accountSelector.setRenderer(new DefaultListCellRenderer() {

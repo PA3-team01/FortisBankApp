@@ -49,6 +49,27 @@ public class StyleUtils {
         label.setForeground(isValid ? SUCCESS_COLOR : ERROR_COLOR);
     }
 
+    public static void styleDropdown(JComboBox<?> comboBox) {
+        comboBox.setFont(FIELD_FONT);
+        comboBox.setForeground(TEXT_COLOR);
+        comboBox.setBackground(new Color(66, 66, 66));
+        comboBox.setFocusable(false);
+        comboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
+
+        comboBox.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                                                          boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                label.setFont(FIELD_FONT);
+                label.setForeground(TEXT_COLOR);
+                label.setBackground(isSelected ? new Color(97, 97, 97) : new Color(66, 66, 66));
+                return label;
+            }
+        });
+    }
+
+
     public static void styleButton(JButton button, boolean isPrimary) {
         button.setFont(BUTTON_FONT);
         button.setFocusPainted(false);

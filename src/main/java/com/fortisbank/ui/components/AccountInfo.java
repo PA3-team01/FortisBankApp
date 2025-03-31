@@ -39,7 +39,9 @@ public class AccountInfo extends JPanel {
         controls.setOpaque(false);
 
         monthCombo = new JComboBox<>();
+        StyleUtils.styleDropdown(monthCombo);
         yearCombo = new JComboBox<>();
+        StyleUtils.styleDropdown(yearCombo);
         populateMonthYear();
 
         JButton statementBtn = new JButton("Get Statement");

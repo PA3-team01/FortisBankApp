@@ -34,19 +34,7 @@ public class TransferForm extends TransactionForm {
             }
         }
 
-        // Render like [TYPE] — $1234.56
-        destinationSelector.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
-                                                          boolean isSelected, boolean cellHasFocus) {
-                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if (value instanceof Account acc) {
-                    label.setText("[" + acc.getAccountType() + "] — $" + String.format("%.2f", acc.getAvailableBalance()));
-                }
-                StyleUtils.styleLabel(label);
-                return label;
-            }
-        });
+        StyleUtils.styleDropdown(destinationSelector);
     }
 
     private void buildDestinationPanel() {
@@ -55,8 +43,6 @@ public class TransferForm extends TransactionForm {
 
         JLabel destLabel = new JLabel("Destination Account:");
         StyleUtils.styleLabel(destLabel);
-
-        StyleUtils.styleTextField((JTextField) destinationSelector.getEditor().getEditorComponent());
 
         destPanel.add(destLabel, BorderLayout.NORTH);
         destPanel.add(destinationSelector, BorderLayout.CENTER);
