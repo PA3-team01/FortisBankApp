@@ -1,11 +1,11 @@
-package com.fortisbank.ui.forms;
+package com.fortisbank.ui.frames.mainFrames;
 
 import com.fortisbank.business.services.BankManagerService;
 import com.fortisbank.business.services.CustomerService;
 import com.fortisbank.business.services.LoginService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.users.User;
-import com.fortisbank.utils.StyleUtils;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

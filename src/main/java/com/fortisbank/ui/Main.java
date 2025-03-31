@@ -2,7 +2,7 @@ package com.fortisbank.ui;
 
 import com.fortisbank.business.services.RegisterService;
 import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.ui.forms.LoginFrame;
+import com.fortisbank.ui.frames.mainFrames.LoginFrame;
 
 import javax.swing.*;
 

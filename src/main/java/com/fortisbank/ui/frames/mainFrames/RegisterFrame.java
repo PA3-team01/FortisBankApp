@@ -1,8 +1,8 @@
-package com.fortisbank.ui.forms;
+package com.fortisbank.ui.frames.mainFrames;
 
 import com.fortisbank.business.services.RegisterService;
 import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.utils.StyleUtils;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 import com.fortisbank.utils.ValidationUtils;
 
 import javax.swing.*;

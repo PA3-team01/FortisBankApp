@@ -1,7 +1,7 @@
-package com.fortisbank.ui.panels;
+package com.fortisbank.ui.frames.subFrames;
 
 import com.fortisbank.ui.components.NavigationBar;
-import com.fortisbank.utils.StyleUtils;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

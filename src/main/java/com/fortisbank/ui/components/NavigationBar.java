@@ -1,6 +1,6 @@
 package com.fortisbank.ui.components;
 
-import com.fortisbank.utils.StyleUtils;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

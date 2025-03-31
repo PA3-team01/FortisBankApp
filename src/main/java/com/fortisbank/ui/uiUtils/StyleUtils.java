@@ -1,4 +1,4 @@
-package com.fortisbank.utils;
+package com.fortisbank.ui.uiUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
