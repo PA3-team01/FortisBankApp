@@ -93,7 +93,13 @@ public class LoginFrame extends JFrame {
         StyleUtils.styleTextField(passwordField);
         StyleUtils.styleButton(loginButton, true);
         StyleUtils.styleButton(registerButton, false);
+
+        //TODO: remove this in production
+        // prefill the email field and password field
+        emailField.setText("user@test.com");
+        passwordField.setText("1111");
     }
+
 
     private class LoginAction implements ActionListener {
         @Override
