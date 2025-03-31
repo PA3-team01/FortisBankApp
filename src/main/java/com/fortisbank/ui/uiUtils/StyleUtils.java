@@ -79,6 +79,12 @@ public class StyleUtils {
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
     }
 
+    public static void applyGlobalDialogStyle(JDialog dialog) {
+        dialog.getContentPane().setBackground(BACKGROUND_COLOR);
+        dialog.setUndecorated(true);
+        dialog.setModal(true);
+    }
+
     public static void styleFormTitle(JLabel titleLabel) {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(PRIMARY_COLOR);
@@ -90,10 +96,7 @@ public class StyleUtils {
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
-    public static void styleFrame(JFrame frame) {
-        applyGlobalFrameStyle(frame);
-        frame.setResizable(false);
-    }
+
 
     // TODO: Migrate this to a more reusable component
     public static JPanel createCustomTitleBar(JFrame frame, String titleText, JComponent rightControls) {

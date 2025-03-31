@@ -1,7 +1,9 @@
 package com.fortisbank.ui.frames.subFrames;
 
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.components.NavigationBar;
 import com.fortisbank.ui.panels.customerPanels.AccountPanel;
+import com.fortisbank.ui.panels.customerPanels.TransactionPanel;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -11,8 +13,10 @@ public class CustomerUi extends JPanel {
 
     private final NavigationBar navPanel;
     private final JPanel contentPanel;
+    private StorageMode storageMode;
 
-    public CustomerUi() {
+    public CustomerUi(StorageMode storageMode) {
+        this.storageMode = storageMode;
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
@@ -31,7 +35,7 @@ public class CustomerUi extends JPanel {
 
         // === Navigation Hooks ===
         navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel()));
-        navPanel.setButtonAction("Transactions", () -> showContent(new JLabel("Transactions Section")));
+        navPanel.setButtonAction("Transactions", () -> showContent(new TransactionPanel(storageMode)));
         navPanel.setButtonAction("Settings", () -> showContent(new JLabel("Settings")));
         navPanel.setButtonAction("Help", () -> showContent(new JLabel("Help & Support")));
     }

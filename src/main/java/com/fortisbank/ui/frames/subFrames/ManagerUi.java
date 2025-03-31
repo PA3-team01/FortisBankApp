@@ -1,5 +1,6 @@
 package com.fortisbank.ui.frames.subFrames;
 
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.components.NavigationBar;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
@@ -10,8 +11,10 @@ public class ManagerUi extends JPanel {
 
     private final NavigationBar navPanel;
     private final JPanel contentPanel;
+    private StorageMode storageMode;
 
-    public ManagerUi() {
+    public ManagerUi(StorageMode storageMode) {
+        this.storageMode = storageMode;
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 

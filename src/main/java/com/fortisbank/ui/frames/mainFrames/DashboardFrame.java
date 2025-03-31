@@ -59,8 +59,8 @@ public class DashboardFrame extends JFrame {
         JPanel rolePanel;
         Role role = SessionManager.getCurrentUser().getRole();
         switch (role) {
-            case MANAGER -> rolePanel = new ManagerUi();
-            case CUSTOMER -> rolePanel = new CustomerUi();
+            case MANAGER -> rolePanel = new ManagerUi(storageMode);
+            case CUSTOMER -> rolePanel = new CustomerUi(storageMode);
             default -> rolePanel = new JPanel(); // fallback
         }
 
