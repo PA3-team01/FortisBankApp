@@ -1,6 +1,9 @@
 package com.fortisbank.models.users;
 
+import com.fortisbank.models.others.Notification;
+
 import java.io.Serializable;
+import java.util.List;
 
 public abstract class User implements Serializable {
 
@@ -11,6 +14,9 @@ public abstract class User implements Serializable {
     protected String firstName;
     protected String lastName;
     protected Role role;
+
+    // inbox (list of Notifications in models/others)
+    protected List<Notification> inbox;
 
 
 
@@ -23,6 +29,7 @@ public abstract class User implements Serializable {
         this.hashedPassword = hashedPassword;
         this.PINHash = pinHash;
         this.role = role;
+        this.inbox = List.of(); // Initialize inbox as an empty list
     }
 
     protected User() {
@@ -87,6 +94,12 @@ public abstract class User implements Serializable {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+    public List<Notification> getInbox() {
+        return inbox;
+    }
+    public void setInbox(List<Notification> inbox) {
+        this.inbox = inbox;
     }
 
     @Override

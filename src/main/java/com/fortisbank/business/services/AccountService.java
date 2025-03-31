@@ -16,6 +16,8 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
+// TODO: Add data verification and validation for each method and exception handling
+
 /**
  * AccountService manages account-related operations (CRUD) using the selected storage mode.
  * This service is now focused solely on accounts and no longer handles transactions.
@@ -31,7 +33,20 @@ public class AccountService implements IAccountService {
     public static synchronized AccountService getInstance(StorageMode storageMode) {
         return instances.computeIfAbsent(storageMode, AccountService::new);
     }
-
+    /**
+     * DO NOT CALL THIS METHOD DIRECTLY FROM THE UI.
+     *
+     * Account creation must follow a proper request-and-approval process:
+     *  - Customers should **not** create accounts directly.
+     *  - Instead, they must use the AccountLoanRequestService to submit an account request.
+     *  - This request will be sent as a notification to a manager.
+     *  - The manager can then **approve** or **reject** the request.
+     *  - If approved, the AccountLoanRequestService will call this method internally
+     *    to persist the account and mark it as active.
+     *
+     * This separation ensures that account approval workflows and permissions
+     * are properly enforced within the system.
+     */
     @Override
     public void createAccount(Account account) {
         accountRepository.insertAccount(account);

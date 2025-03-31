@@ -11,6 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+//TODO: implement request new account/loan
 public class AccountPanel extends JPanel {
 
     public AccountPanel() {
@@ -24,8 +25,6 @@ public class AccountPanel extends JPanel {
             add(error);
             return;
         }
-        // Debug statement
-        System.out.println("Session user: " + SessionManager.getCurrentUser());
 
         AccountList accounts = customer.getAccounts();
 
