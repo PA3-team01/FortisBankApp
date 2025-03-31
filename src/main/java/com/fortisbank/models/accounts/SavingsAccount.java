@@ -17,8 +17,20 @@ public class SavingsAccount extends Account {
         return annualInterestRate;
     }
 
+
+
     @Override
     public BigDecimal getCreditLimit() {
         return null;
+    }
+
+    @Override
+    public String displayAccountInfo() {
+        return "Account Number: " + getAccountNumber() + "\n" +
+                "Account Type: " + getAccountType() + "\n" +
+                "Opened Date: " + getOpenedDate() + "\n" +
+                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Annual Interest Rate: " + getAnnualInterestRate() + "\n" +
+                "Customer Name: " + getCustomer().getFullName();
     }
 }

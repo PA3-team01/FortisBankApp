@@ -23,33 +23,29 @@ public class ManagerUi extends JPanel {
         // === RIGHT: Content Area ===
         contentPanel = new JPanel(new BorderLayout());
         StyleUtils.styleFormPanel(contentPanel);
-
-        // Title
-        JLabel titleLabel = new JLabel("Manager Dashboard");
-        StyleUtils.styleFormTitle(titleLabel);
-        contentPanel.add(titleLabel, BorderLayout.NORTH);
-
-        // Placeholder content
-        JPanel initialContent = new JPanel();
-        initialContent.setLayout(new BoxLayout(initialContent, BoxLayout.Y_AXIS));
-        initialContent.setOpaque(false);
-
-        JLabel info = new JLabel("Welcome to the Manager Panel.");
-        StyleUtils.styleLabel(info);
-
-        initialContent.add(Box.createVerticalStrut(15));
-        initialContent.add(info);
-
-        contentPanel.add(initialContent, BorderLayout.CENTER);
-
-        // Add content area to main layout
         add(contentPanel, BorderLayout.CENTER);
 
-        // === Button actions ===
+        // Show default welcome content
+        showContent(createWelcomePanel());
+
+        // === Button Actions ===
         navPanel.setButtonAction("Users", () -> showContent(new JLabel("Manage Users Section")));
         navPanel.setButtonAction("Reports", () -> showContent(new JLabel("Financial Reports")));
         navPanel.setButtonAction("Approvals", () -> showContent(new JLabel("Pending Approvals")));
         navPanel.setButtonAction("Settings", () -> showContent(new JLabel("System Settings")));
+    }
+
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+
+        JLabel info = new JLabel("Welcome to the Manager Panel.");
+        StyleUtils.styleLabel(info);
+        panel.add(Box.createVerticalStrut(15));
+        panel.add(info);
+
+        return panel;
     }
 
     /**
@@ -58,25 +54,29 @@ public class ManagerUi extends JPanel {
     private void showContent(JComponent component) {
         contentPanel.removeAll();
 
-        JLabel titleLabel = new JLabel("Customer Dashboard");
+        JLabel titleLabel = new JLabel("Manager Dashboard");
         StyleUtils.styleFormTitle(titleLabel);
         contentPanel.add(titleLabel, BorderLayout.NORTH);
 
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setOpaque(false);
-
-        if (component instanceof JLabel label) {
-            StyleUtils.styleLabel(label);
-        }
+        wrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         wrapper.add(Box.createVerticalStrut(15));
         wrapper.add(component);
 
-        contentPanel.add(wrapper, BorderLayout.CENTER);
+        // Allow component to expand horizontally if possible
+        component.setMaximumSize(new Dimension(Integer.MAX_VALUE, component.getPreferredSize().height));
 
+        JScrollPane scrollPane = new JScrollPane(wrapper);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // Smooth scroll
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
-
 }

@@ -22,4 +22,13 @@ public class CheckingAccount extends Account {
     public BigDecimal getCreditLimit() {
         return null;
     }
+
+    @Override
+    public String displayAccountInfo(){
+        return "Account Number: " + getAccountNumber() + "\n" +
+                "Account Type: " + getAccountType() + "\n" +
+                "Opened Date: " + getOpenedDate() + "\n" +
+                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Customer Name: " + getCustomer().getFullName();
+    }
 }

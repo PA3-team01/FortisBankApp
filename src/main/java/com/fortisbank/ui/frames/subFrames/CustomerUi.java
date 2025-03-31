@@ -1,6 +1,7 @@
 package com.fortisbank.ui.frames.subFrames;
 
 import com.fortisbank.ui.components.NavigationBar;
+import com.fortisbank.ui.panels.customerPanels.AccountPanel;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -23,36 +24,33 @@ public class CustomerUi extends JPanel {
         // === RIGHT: Content Area ===
         contentPanel = new JPanel(new BorderLayout());
         StyleUtils.styleFormPanel(contentPanel);
-
-        // Placeholder title
-        JLabel titleLabel = new JLabel("Customer Dashboard");
-        StyleUtils.styleFormTitle(titleLabel);
-        contentPanel.add(titleLabel, BorderLayout.NORTH);
-
-        // Initial placeholder content
-        JPanel initialContent = new JPanel();
-        initialContent.setLayout(new BoxLayout(initialContent, BoxLayout.Y_AXIS));
-        initialContent.setOpaque(false);
-
-        JLabel info = new JLabel("Welcome! Select an option from the menu.");
-        StyleUtils.styleLabel(info);
-        initialContent.add(Box.createVerticalStrut(15));
-        initialContent.add(info);
-
-        contentPanel.add(initialContent, BorderLayout.CENTER);
-
-        // === Add content panel to main layout ===
         add(contentPanel, BorderLayout.CENTER);
 
-        // === Example button hook ===
-        navPanel.setButtonAction("Accounts", () -> showContent(new JLabel("Accounts Section")));
+        // Show default welcome content
+        showContent(createWelcomePanel());
+
+        // === Navigation Hooks ===
+        navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel()));
         navPanel.setButtonAction("Transactions", () -> showContent(new JLabel("Transactions Section")));
         navPanel.setButtonAction("Settings", () -> showContent(new JLabel("Settings")));
         navPanel.setButtonAction("Help", () -> showContent(new JLabel("Help & Support")));
     }
 
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+
+        JLabel info = new JLabel("Welcome! Select an option from the menu.");
+        StyleUtils.styleLabel(info);
+        panel.add(Box.createVerticalStrut(15));
+        panel.add(info);
+
+        return panel;
+    }
+
     /**
-     * Swap the right-side content dynamically.
+     * Swap the right-side content dynamically with scroll support.
      */
     private void showContent(JComponent component) {
         contentPanel.removeAll();
@@ -64,18 +62,21 @@ public class CustomerUi extends JPanel {
         JPanel wrapper = new JPanel();
         wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
         wrapper.setOpaque(false);
-
-        if (component instanceof JLabel label) {
-            StyleUtils.styleLabel(label);
-        }
-
+        wrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         wrapper.add(Box.createVerticalStrut(15));
         wrapper.add(component);
 
-        contentPanel.add(wrapper, BorderLayout.CENTER);
+        // Let child grow horizontally if possible
+        component.setMaximumSize(new Dimension(Integer.MAX_VALUE, component.getPreferredSize().height));
 
+        JScrollPane scrollPane = new JScrollPane(wrapper);
+        scrollPane.setBorder(null);
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // smoother scrolling
+        scrollPane.setOpaque(false);
+        scrollPane.getViewport().setOpaque(false);
+
+        contentPanel.add(scrollPane, BorderLayout.CENTER);
         contentPanel.revalidate();
         contentPanel.repaint();
     }
-
 }

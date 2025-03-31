@@ -23,4 +23,15 @@ public class CreditAccount extends Account {
     public BigDecimal getCreditLimit() {
         return creditLimit;
     }
+
+    @Override
+    public String displayAccountInfo() {
+        return "Account Number: " + getAccountNumber() + "\n" +
+                "Account Type: " + getAccountType() + "\n" +
+                "Opened Date: " + getOpenedDate() + "\n" +
+                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Credit Limit: " + getCreditLimit() + "\n" +
+                "Interest Rate: " + getInterestRate() + "\n" +
+                "Customer Name: " + getCustomer().getFullName();
+    }
 }

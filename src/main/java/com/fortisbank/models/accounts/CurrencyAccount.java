@@ -35,4 +35,13 @@ public class CurrencyAccount extends Account {
     public void updateLastActiveDate() {
         this.lastActiveDate = new Date();
     }
+    @Override
+    public String displayAccountInfo() {
+        return "Account Number: " + getAccountNumber() + "\n" +
+                "Account Type: " + getAccountType() + "\n" +
+                "Opened Date: " + getOpenedDate() + "\n" +
+                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Currency Code: " + getCurrencyCode() + "\n" +
+                "Customer Name: " + getCustomer().getFullName();
+    }
 }

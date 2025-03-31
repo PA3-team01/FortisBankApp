@@ -17,11 +17,14 @@ public class DashboardFrame extends JFrame {
     public DashboardFrame(StorageMode storageMode) {
         this.storageMode = storageMode;
 
-        // Undecorated window with custom title bar
+        // === Frame setup ===
         setUndecorated(true);
         setLayout(new BorderLayout());
+        setExtendedState(JFrame.MAXIMIZED_BOTH); // Fullscreen
+        setMinimumSize(new Dimension(1000, 600)); // Prevent tiny shrinking
+        setResizable(true); // Allow resizing
 
-        // Top-right logout button
+        // === Top-right Logout Button ===
         JButton logoutButton = new JButton("Logout");
         StyleUtils.styleButton(logoutButton, false);
         logoutButton.setContentAreaFilled(false);
@@ -35,16 +38,16 @@ public class DashboardFrame extends JFrame {
         rightControls.setOpaque(false);
         rightControls.add(logoutButton);
 
-        // Title bar with logout on top right
+        // === Custom Title Bar ===
         JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Dashboard", rightControls);
         add(titleBar, BorderLayout.NORTH);
 
-        // Main content area
+        // === Main Content Panel ===
         JPanel contentPanel = new JPanel(new BorderLayout());
         StyleUtils.styleFormPanel(contentPanel);
         add(contentPanel, BorderLayout.CENTER);
 
-        // Welcome label
+        // === Welcome Label ===
         String name = SessionManager.getCurrentUser().getFullName();
         JLabel welcomeLabel = new JLabel("Welcome, " + name + "!");
         welcomeLabel.setHorizontalAlignment(SwingConstants.CENTER);
@@ -52,7 +55,7 @@ public class DashboardFrame extends JFrame {
         welcomeLabel.setForeground(StyleUtils.TEXT_COLOR);
         contentPanel.add(welcomeLabel, BorderLayout.NORTH);
 
-        // Role-specific panel
+        // === Role-Specific Panel ===
         JPanel rolePanel;
         Role role = SessionManager.getCurrentUser().getRole();
         switch (role) {
@@ -60,13 +63,9 @@ public class DashboardFrame extends JFrame {
             case CUSTOMER -> rolePanel = new CustomerUi();
             default -> rolePanel = new JPanel(); // fallback
         }
+
         StyleUtils.styleFormPanel(rolePanel);
         contentPanel.add(rolePanel, BorderLayout.CENTER);
-
-        // Frame setup
-        setSize(800, 500);
-        setLocationRelativeTo(null);
-        setResizable(false);
     }
 
     private void handleLogout() {

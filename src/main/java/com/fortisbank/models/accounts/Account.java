@@ -115,6 +115,8 @@ public abstract class Account implements Serializable {
                 ", isActive=" + isActive +
                 '}';
     }
+    public abstract String displayAccountInfo();
 
     public abstract BigDecimal getCreditLimit();
+
 }
