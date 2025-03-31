@@ -1,6 +1,8 @@
 package com.fortisbank.ui.components;
 
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.collections.TransactionList;
+import com.fortisbank.ui.frames.subFrames.MonthlyStatementFrame;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -55,6 +57,16 @@ public class AccountInfo extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
 
         // TODO: Add statementBtn action with service integration later
+        statementBtn.addActionListener(e -> {
+            String selectedMonth = (String) monthCombo.getSelectedItem();
+            int selectedYear = (int) yearCombo.getSelectedItem();
+
+            // TODO: Replace with real filtered data
+            TransactionList filtered = new TransactionList(); // Fill this with filtered transactions
+
+            new MonthlyStatementFrame(account, filtered, selectedMonth, selectedYear);
+        });
+
     }
 
     private void populateMonthYear() {
