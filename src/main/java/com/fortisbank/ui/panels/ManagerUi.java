@@ -57,8 +57,26 @@ public class ManagerUi extends JPanel {
      */
     private void showContent(JComponent component) {
         contentPanel.removeAll();
-        contentPanel.add(component, BorderLayout.CENTER);
+
+        JLabel titleLabel = new JLabel("Customer Dashboard");
+        StyleUtils.styleFormTitle(titleLabel);
+        contentPanel.add(titleLabel, BorderLayout.NORTH);
+
+        JPanel wrapper = new JPanel();
+        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
+        wrapper.setOpaque(false);
+
+        if (component instanceof JLabel label) {
+            StyleUtils.styleLabel(label);
+        }
+
+        wrapper.add(Box.createVerticalStrut(15));
+        wrapper.add(component);
+
+        contentPanel.add(wrapper, BorderLayout.CENTER);
+
         contentPanel.revalidate();
         contentPanel.repaint();
     }
+
 }
