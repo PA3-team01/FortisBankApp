@@ -3,6 +3,8 @@ package com.fortisbank.models.accounts;
 import com.fortisbank.models.users.Customer;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.Date;
 
 public class CreditAccount extends Account {
@@ -26,10 +28,13 @@ public class CreditAccount extends Account {
 
     @Override
     public String displayAccountInfo() {
+        //pour .00 apres l'argent
+        DecimalFormat df = new DecimalFormat("#0.00", DecimalFormatSymbols.getInstance());
+
         return "Account Number: " + getAccountNumber() + "\n" +
                 "Account Type: " + getAccountType() + "\n" +
                 "Opened Date: " + getOpenedDate() + "\n" +
-                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Available Balance: " + df.format(getAvailableBalance()) + "$" + "\n" +
                 "Credit Limit: " + getCreditLimit() + "\n" +
                 "Interest Rate: " + getInterestRate() + "\n" +
                 "Customer Name: " + getCustomer().getFullName();
