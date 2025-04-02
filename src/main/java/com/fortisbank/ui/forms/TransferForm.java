@@ -142,7 +142,6 @@ public class TransferForm extends TransactionForm {
 
     private void showOtherCustomerOptions() {
         dynamicRecipientPanel.removeAll();
-        destinationSelector.removeAllItems();
 
         JLabel customerLabel = new JLabel("Select Customer:");
         StyleUtils.styleLabel(customerLabel);
@@ -157,10 +156,19 @@ public class TransferForm extends TransactionForm {
 
     @Override
     protected boolean handleConfirm() {
-        Account destination = (Account) destinationSelector.getSelectedItem();
+        Customer selectedCustomer = (Customer) customerSelector.getSelectedItem();
+        if (selectedCustomer == null) {
+            StyleUtils.showStyledErrorDialog(this, "Please select a customer.");
+            return false;
+        }
+
+        Account destination = selectedCustomer.getAccounts().stream()
+                .filter(Account::isActive)
+                .findFirst()
+                .orElse(null);
 
         if (destination == null) {
-            StyleUtils.showStyledErrorDialog(this, "Please select a destination account.");
+            StyleUtils.showStyledErrorDialog(this, "The selected customer has no active accounts.");
             return false;
         }
 

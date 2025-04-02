@@ -1,6 +1,7 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.file.FileRepository;
+import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.transactions.Transaction;
 
@@ -32,12 +33,17 @@ public class TransactionRepositoryFile extends FileRepository<Transaction> imple
                 .orElse(null);
     }
 
+    // File: src/main/java/com/fortisbank/data/repositories/TransactionRepositoryFile.java
+
     @Override
     public TransactionList getTransactionsByAccount(String accountId) {
         return readAll().stream()
-                .filter(t -> t.getSourceAccount().getAccountNumber().equals(accountId)
-                        || (t.getDestinationAccount() != null
-                        && t.getDestinationAccount().getAccountNumber().equals(accountId)))
+                .filter(t -> {
+                    Account sourceAccount = t.getSourceAccount();
+                    return (sourceAccount != null && sourceAccount.getAccountNumber().equals(accountId))
+                            || (t.getDestinationAccount() != null
+                            && t.getDestinationAccount().getAccountNumber().equals(accountId));
+                })
                 .collect(TransactionList::new, TransactionList::add, TransactionList::addAll);
     }
 

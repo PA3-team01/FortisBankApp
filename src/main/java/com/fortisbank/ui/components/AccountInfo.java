@@ -1,5 +1,6 @@
 package com.fortisbank.ui.components;
 
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.ui.frames.subFrames.MonthlyStatementFrame;
@@ -14,7 +15,7 @@ public class AccountInfo extends JPanel {
     private final JComboBox<String> monthCombo;
     private final JComboBox<Integer> yearCombo;
 
-    public AccountInfo(Account account) {
+    public AccountInfo(Account account , StorageMode storageMode) {
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
@@ -31,7 +32,7 @@ public class AccountInfo extends JPanel {
         centerPanel.setOpaque(false);
 
         // === Transaction summary ===
-        TransactionSummary summary = new TransactionSummary(account); // Optional: pass account
+        TransactionSummary summary = new TransactionSummary(account,storageMode); // Optional: pass account
         centerPanel.add(summary);
 
         // === Statement controls ===

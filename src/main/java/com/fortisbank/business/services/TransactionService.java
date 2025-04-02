@@ -50,6 +50,7 @@ public class TransactionService implements ITransactionService {
         switch (type) {
             case DEPOSIT -> {
                 validateNotNull(destination, "Destination account");
+                transaction.setSourceAccount(destination); // Set destination as source
                 adjustBalance(destination, amount);
                 destination.addTransaction(transaction);
                 accountRepository.updateAccount(destination);
@@ -61,6 +62,7 @@ public class TransactionService implements ITransactionService {
 
             case WITHDRAWAL -> {
                 validateNotNull(source, "Source account");
+                transaction.setDestinationAccount(source); // Set source as destination
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
 
@@ -106,6 +108,7 @@ public class TransactionService implements ITransactionService {
 
             case FEE -> {
                 validateNotNull(source, "Source account");
+                transaction.setDestinationAccount(source); // Set source as destination
                 validateSufficientFunds(source, amount);
 
                 adjustBalance(source, amount.negate());
@@ -166,6 +169,12 @@ public class TransactionService implements ITransactionService {
         }
 
         return transactions.filterByDateRange(startDate, endDate);
+    }
+
+    //helper method to get recent transaction by account
+    public TransactionList getRecentTransactionsByAccount(Account account, int days) {
+        TransactionList transactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
+        return filterRecentTransactions(transactions, days);
     }
 
     // ---------------------------------------------------------------------------------------

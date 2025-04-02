@@ -12,7 +12,6 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
-//TODO: implement request new account/loan
 public class AccountPanel extends JPanel {
 
     private final StorageMode storageMode;
@@ -38,7 +37,7 @@ public class AccountPanel extends JPanel {
             add(info);
         } else {
             for (Account account : accounts) {
-                AccountInfo infoCard = new AccountInfo(account);
+                AccountInfo infoCard = new AccountInfo(account, storageMode);
                 add(Box.createVerticalStrut(15));
                 add(infoCard);
             }

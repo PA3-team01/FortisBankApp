@@ -138,7 +138,7 @@ public class TransactionPanel extends JPanel {
 
         Account selected = (Account) accountSelector.getSelectedItem();
         if (selected != null) {
-            TransactionSummary summary = new TransactionSummary(selected);
+            TransactionSummary summary = new TransactionSummary(selected, storageMode);
             previewPanel.add(summary);
         } else {
             JLabel warning = new JLabel("No account selected.");
