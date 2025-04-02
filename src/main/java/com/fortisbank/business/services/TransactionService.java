@@ -1,5 +1,6 @@
 package com.fortisbank.business.services;
 
+import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
@@ -23,9 +24,12 @@ public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
     private final ITransactionRepository transactionRepository;
+    private final IAccountRepository accountRepository;
 
     private TransactionService(StorageMode storageMode) {
-        this.transactionRepository = RepositoryFactory.getInstance(storageMode).getTransactionRepository();
+        var factory = RepositoryFactory.getInstance(storageMode);
+        this.transactionRepository = factory.getTransactionRepository();
+        this.accountRepository = factory.getAccountRepository();
     }
 
     public static synchronized TransactionService getInstance(StorageMode storageMode) {
@@ -49,6 +53,7 @@ public class TransactionService implements ITransactionService {
                 validateNotNull(destination, "Destination account");
                 adjustBalance(destination, amount);
                 destination.addTransaction(transaction);
+                accountRepository.updateAccount(destination);
                 break;
 
             case WITHDRAWAL:
@@ -58,6 +63,7 @@ public class TransactionService implements ITransactionService {
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 applyTransactionFeeIfRequired(source);
+                accountRepository.updateAccount(source);
                 break;
 
             case TRANSFER:
@@ -70,6 +76,8 @@ public class TransactionService implements ITransactionService {
                 source.addTransaction(transaction);
                 destination.addTransaction(transaction);
                 applyTransactionFeeIfRequired(source);
+                accountRepository.updateAccount(source);
+                accountRepository.updateAccount(destination);
                 break;
 
             case FEE:
@@ -77,6 +85,7 @@ public class TransactionService implements ITransactionService {
                 validateSufficientFunds(source, amount);
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
+                accountRepository.updateAccount(source);
                 break;
 
             default:
@@ -118,6 +127,7 @@ public class TransactionService implements ITransactionService {
             adjustBalance(account, interest);
             account.addTransaction(tx);
             transactionRepository.insertTransaction(tx);
+            accountRepository.updateAccount(account);
         }
     }
 
@@ -232,5 +242,6 @@ public class TransactionService implements ITransactionService {
         adjustBalance(account, feeAmount.negate());
         account.addTransaction(feeTx);
         transactionRepository.insertTransaction(feeTx);
+        accountRepository.updateAccount(account);
     }
 }

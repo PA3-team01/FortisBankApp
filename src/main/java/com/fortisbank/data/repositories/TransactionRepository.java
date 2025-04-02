@@ -103,7 +103,7 @@ public class TransactionRepository implements ITransactionRepository {
             stmt.setString(1, transactionId);
             stmt.setString(2, transaction.getDescription());
             stmt.setDate(3, new java.sql.Date(transaction.getTransactionDate().getTime()));
-            stmt.setString(4, transaction.getTransactionType().name()); // Enum instead of String
+            stmt.setString(4, transaction.getTransactionType().name()); // return string representation of enum
             stmt.setBigDecimal(5, transaction.getAmount());
             stmt.setString(6, transaction.getSourceAccount().getAccountNumber());
             stmt.setString(7, (transaction.getDestinationAccount() != null) ? transaction.getDestinationAccount().getAccountNumber() : null);
