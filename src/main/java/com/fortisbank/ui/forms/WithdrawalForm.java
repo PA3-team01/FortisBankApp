@@ -36,7 +36,7 @@ public class WithdrawalForm extends TransactionForm {
                 new Date(),
                 amount,
                 sourceAccount,
-                null
+                sourceAccount
         );
 
         try {

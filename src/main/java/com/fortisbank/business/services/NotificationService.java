@@ -1,7 +1,9 @@
 package com.fortisbank.business.services;
 
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.users.User;
 import com.fortisbank.models.others.Notification;
@@ -17,12 +19,18 @@ import java.util.stream.Collectors;
  */
 public class NotificationService {
 
-    private static final NotificationService instance = new NotificationService();
+    private StorageMode storageMode;
 
-    private NotificationService() {
+    private static  NotificationService instance ;
+
+    private NotificationService(StorageMode storageMode) {
+        this.storageMode = storageMode;
     }
 
-    public static NotificationService getInstance() {
+    public static NotificationService getInstance(StorageMode storageMode) {
+        if (instance == null) {
+            instance = new NotificationService(storageMode);
+        }
         return instance;
     }
 
@@ -39,12 +47,31 @@ public class NotificationService {
         if (recipient == null) return;
         Notification notification = new Notification(type, title, message);
         recipient.getInbox().add(notification);
+
+        // update users in the database (Customer and BankManager)
+        if (recipient instanceof Customer) {
+            CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+        }
+
+        if (recipient instanceof BankManager) {
+            BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
+        }
+
     }
 
     public void sendNotification(User recipient, NotificationType type, String title, String message, Customer customer, Account account) {
         if (recipient == null) return;
         Notification notification = new Notification(type, title, message, customer, account);
         recipient.getInbox().add(notification);
+
+        // update users in the database (Customer and BankManager)
+        if (recipient instanceof Customer) {
+            CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+        }
+
+        if (recipient instanceof BankManager) {
+            BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
+        }
     }
 
     // === Predefined Notification Helpers ===
@@ -68,14 +95,25 @@ public class NotificationService {
      * @param requestedAccount Compte demander
      */
     public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
+        //debug check received parameters
+        System.out.println("[NotificationService]Account request submitted:");
+        System.out.println("Customer: " + customer);
+        System.out.println("Requested Account: " + requestedAccount);
+        System.out.println("Manager: " + manager);
+
+        if (manager == null || customer == null || requestedAccount == null) return;
         String title = "New Account Request";
         String message = String.format("Customer %s requested a new %s account.",
                 customer.getFullName(), requestedAccount.getAccountType());
         sendNotification(manager, NotificationType.ACCOUNT_OPENING_REQUEST, title, message, customer, requestedAccount);
+        //debug
+        System.out.println("[NotificationService]Account request passed notification to manager");
 
         // Confirmation to customer
         sendNotification(customer, NotificationType.INFO, "Request Sent",
                 "Your account request was sent to the manager.", customer, requestedAccount);
+        //debug
+        System.out.println("[NotificationService]Account request passed notification to customer");
     }
 
     /**

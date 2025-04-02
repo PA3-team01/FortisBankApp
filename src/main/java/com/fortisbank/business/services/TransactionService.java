@@ -18,15 +18,13 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
-/**
- * Service de gestion des transactions
- */
+//TODO : Extend to trigger Alerts (low balance, overdraft, etc.)
+
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
-    private final NotificationService notificationService = NotificationService.getInstance();
 
     private TransactionService(StorageMode storageMode) {
         var factory = RepositoryFactory.getInstance(storageMode);
@@ -41,12 +39,6 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // CORE BUSINESS METHOD
     // ---------------------------------------------------------------------------------------
-
-    /**
-     * Fait une transaction selon le type
-     * @param transaction Transaction
-     * throw InvalidTransactionException si la transaction est invalide
-     */
     public void executeTransaction(Transaction transaction) {
         ValidationUtils.validateNotNull(transaction, "Transaction");
         ValidationUtils.validateAmount(transaction.getAmount());
@@ -57,90 +49,57 @@ public class TransactionService implements ITransactionService {
         TransactionType type = transaction.getTransactionType();
 
         switch (type) {
-            case DEPOSIT -> {
+            case DEPOSIT:
                 validateNotNull(destination, "Destination account");
-                transaction.setSourceAccount(destination); // Set destination as source
                 adjustBalance(destination, amount);
                 destination.addTransaction(transaction);
                 accountRepository.updateAccount(destination);
+                break;
 
-                if (destination.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
-                }
-            }
-
-            case WITHDRAWAL -> {
+            case WITHDRAWAL:
                 validateNotNull(source, "Source account");
-                transaction.setDestinationAccount(source); // Set source as destination
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 applyTransactionFeeIfRequired(source);
                 accountRepository.updateAccount(source);
+                break;
 
-                if (source.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
-                }
-            }
-
-            case TRANSFER -> {
+            case TRANSFER:
                 validateNotNull(source, "Source account");
                 validateNotNull(destination, "Destination account");
-
-                if (source.getAccountNumber().equals(destination.getAccountNumber())) {
-                    throw new InvalidTransactionException("Cannot transfer to the same account.");
-                }
-
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 adjustBalance(destination, amount);
-
                 source.addTransaction(transaction);
                 destination.addTransaction(transaction);
-
                 applyTransactionFeeIfRequired(source);
-
                 accountRepository.updateAccount(source);
                 accountRepository.updateAccount(destination);
+                break;
 
-                if (source.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
-                }
-                if (destination.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
-                }
-            }
-
-            case FEE -> {
+            case FEE:
                 validateNotNull(source, "Source account");
-                transaction.setDestinationAccount(source); // Set source as destination
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 accountRepository.updateAccount(source);
-            }
+                break;
 
-            default -> throw new InvalidTransactionException("Unsupported transaction type.");
+            default:
+                throw new InvalidTransactionException("Unsupported transaction type.");
         }
 
         transactionRepository.insertTransaction(transaction);
     }
 
 
-
     // ---------------------------------------------------------------------------------------
     // INTEREST & CURRENCY OPERATIONS
     // ---------------------------------------------------------------------------------------
 
-    /**
-     * Applique les interets mensuels sur compte credit
-     * @param account Compte
-     */
     public void applyInterestToCreditAccount(CreditAccount account) {
         BigDecimal rate = account.getInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -151,10 +110,6 @@ public class TransactionService implements ITransactionService {
         }
     }
 
-    /**
-     * Applique les interets annuels sur saving account
-     * @param account Compte
-     */
     public void applyAnnualInterestToSavingsAccount(SavingsAccount account) {
         BigDecimal rate = account.getAnnualInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -177,12 +132,6 @@ public class TransactionService implements ITransactionService {
         }
     }
 
-    /**
-     * Filtre les transactions recentes
-     * @param transactions Transactions
-     * @param days Jours
-     * @return les transactions filtrees
-     */
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
         Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
         Date endDate = new Date();
@@ -192,18 +141,6 @@ public class TransactionService implements ITransactionService {
         }
 
         return transactions.filterByDateRange(startDate, endDate);
-    }
-
-    /**
-     * Recupere les transactions recentes du compte
-     * @param account Compte
-     * @param days Jours
-     * @return les transactions recentes
-     */
-    //helper method to get recent transaction by account
-    public TransactionList getRecentTransactionsByAccount(Account account, int days) {
-        TransactionList transactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
-        return filterRecentTransactions(transactions, days);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -247,34 +184,18 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // VALIDATION HELPERS
     // ---------------------------------------------------------------------------------------
-
-    /**
-     * Valide qu'un objet n'est pas null
-     * @param obj Objet
-     * @param fieldName
-     */
     private void validateNotNull(Object obj, String fieldName) {
         if (obj == null) {
             throw new InvalidTransactionException(fieldName + " cannot be null.");
         }
     }
 
-    /**
-     * Verifie si le compte a asser de fonds
-     * @param account Compte
-     * @param amount Montant
-     */
     private void validateSufficientFunds(Account account, BigDecimal amount) {
         if (!account.hasSufficientFunds(amount)) {
             throw new InvalidTransactionException("Insufficient funds in account: " + account.getAccountNumber());
         }
     }
 
-    /**
-     * Verifie si le withdraw amount respecte la limite de credit
-     * @param account Compte
-     * @param withdrawalAmount Montant a retirer
-     */
     private void validateCreditLimit(Account account, BigDecimal withdrawalAmount) {
         if (account instanceof CreditAccount creditAccount) {
             BigDecimal totalAvailable = creditAccount.getAvailableBalance().add(creditAccount.getCreditLimit());
@@ -287,21 +208,11 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // INTERNAL OPERATIONS
     // ---------------------------------------------------------------------------------------
-
-    /**
-     * Ajuste le solde du compte
-     * @param account Compte
-     * @param delta
-     */
     private void adjustBalance(Account account, BigDecimal delta) {
         BigDecimal updated = account.getAvailableBalance().add(delta);
         account.setAvailableBalance(updated);
     }
 
-    /**
-     * Applique les frais de transaction si necessaire
-     * @param account Compte
-     */
     private void applyTransactionFeeIfRequired(Account account) {
         if (account.getAccountType() != AccountType.CHECKING) return;
 
@@ -317,12 +228,6 @@ public class TransactionService implements ITransactionService {
         }
     }
 
-    /**
-     * Applique les frais au compte
-     * @param account Compte
-     * @param feeAmount Montant frais
-     * @param description
-     */
     private void applyFee(Account account, BigDecimal feeAmount, String description) {
         validateSufficientFunds(account, feeAmount);
 
@@ -340,4 +245,9 @@ public class TransactionService implements ITransactionService {
         transactionRepository.insertTransaction(feeTx);
         accountRepository.updateAccount(account);
     }
+
+    public TransactionList getRecentTransactionsByAccount(Account account) {
+        return transactionRepository.getTransactionsByAccount(account.getAccountNumber());
+    }
 }
+

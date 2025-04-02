@@ -83,7 +83,7 @@ public class SendMessageForm extends JPanel {
             if (validateFields()) {
                 // TODO: add notification sending logic here
                 // new instance of NotificationService
-                NotificationService.getInstance().notifyNewMessage(manager, currentUser.getFullName());
+                NotificationService.getInstance(storageMode).notifyNewMessage(manager, currentUser.getFullName());
                 StyleUtils.showStyledSuccessDialog(this, "Message sent successfully!");
                 clearFields();
             }

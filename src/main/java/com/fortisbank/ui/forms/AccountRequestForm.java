@@ -54,8 +54,8 @@ public class AccountRequestForm extends JFrame {
         // Manager Selection
         JLabel managerLabel = new JLabel("Select Manager:");
         StyleUtils.styleLabel(managerLabel);
+        StyleUtils.styleDropdown(managerSelector); // style the dropdown before populating
         populateManagerDropdown();
-        StyleUtils.styleDropdown(managerSelector);
 
         // Fields Panel
         dynamicFieldsPanel.setLayout(new BoxLayout(dynamicFieldsPanel, BoxLayout.Y_AXIS));
@@ -162,6 +162,8 @@ public class AccountRequestForm extends JFrame {
                 case CURRENCY -> new CurrencyAccount(accountNumber, customer, now, balance,
                         currencyCodeField.getText().trim());
             };
+
+            account.setActive(false); // Set to inactive until approved
 
             AccountLoanRequestService.getInstance(storageMode)
                     .submitAccountRequest(customer, account, selectedManager);
