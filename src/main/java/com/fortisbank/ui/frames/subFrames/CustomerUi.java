@@ -35,7 +35,7 @@ public class CustomerUi extends JPanel {
         add(contentPanel, BorderLayout.CENTER);
 
         // Show default welcome content
-        showContent(createWelcomePanel());
+        showContent(new AccountPanel(storageMode));
 
         // === Navigation Hooks ===
         navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
