@@ -18,13 +18,12 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
-//TODO : Extend to trigger Alerts (low balance, overdraft, etc.)
-
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
+    private final NotificationService notificationService = NotificationService.getInstance();
 
     private TransactionService(StorageMode storageMode) {
         var factory = RepositoryFactory.getInstance(storageMode);
@@ -49,51 +48,78 @@ public class TransactionService implements ITransactionService {
         TransactionType type = transaction.getTransactionType();
 
         switch (type) {
-            case DEPOSIT:
+            case DEPOSIT -> {
                 validateNotNull(destination, "Destination account");
                 adjustBalance(destination, amount);
                 destination.addTransaction(transaction);
                 accountRepository.updateAccount(destination);
-                break;
 
-            case WITHDRAWAL:
+                if (destination.getCustomer() != null) {
+                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
+                }
+            }
+
+            case WITHDRAWAL -> {
                 validateNotNull(source, "Source account");
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
+
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 applyTransactionFeeIfRequired(source);
                 accountRepository.updateAccount(source);
-                break;
 
-            case TRANSFER:
+                if (source.getCustomer() != null) {
+                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
+                }
+            }
+
+            case TRANSFER -> {
                 validateNotNull(source, "Source account");
                 validateNotNull(destination, "Destination account");
+
+                if (source.getAccountNumber().equals(destination.getAccountNumber())) {
+                    throw new InvalidTransactionException("Cannot transfer to the same account.");
+                }
+
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
+
                 adjustBalance(source, amount.negate());
                 adjustBalance(destination, amount);
+
                 source.addTransaction(transaction);
                 destination.addTransaction(transaction);
+
                 applyTransactionFeeIfRequired(source);
+
                 accountRepository.updateAccount(source);
                 accountRepository.updateAccount(destination);
-                break;
 
-            case FEE:
+                if (source.getCustomer() != null) {
+                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
+                }
+                if (destination.getCustomer() != null) {
+                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
+                }
+            }
+
+            case FEE -> {
                 validateNotNull(source, "Source account");
                 validateSufficientFunds(source, amount);
+
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 accountRepository.updateAccount(source);
-                break;
+            }
 
-            default:
-                throw new InvalidTransactionException("Unsupported transaction type.");
+            default -> throw new InvalidTransactionException("Unsupported transaction type.");
         }
 
         transactionRepository.insertTransaction(transaction);
     }
+
+
 
     // ---------------------------------------------------------------------------------------
     // INTEREST & CURRENCY OPERATIONS

@@ -1,11 +1,15 @@
 package com.fortisbank.ui.forms;
 
+import com.fortisbank.business.services.CustomerService;
 import com.fortisbank.business.services.TransactionService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
+import com.fortisbank.models.users.Customer;
+import com.fortisbank.models.collections.CustomerList;
 import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
@@ -17,37 +21,58 @@ import java.util.Date;
 public class TransferForm extends TransactionForm {
 
     private final Account sourceAccount;
+    private final JComboBox<Customer> customerSelector = new JComboBox<>();
     private final JComboBox<Account> destinationSelector = new JComboBox<>();
 
     public TransferForm(Account sourceAccount, StorageMode storageMode) {
         super("Transfer Funds", storageMode);
         this.sourceAccount = sourceAccount;
 
-        setupDestinationDropdown();
-        buildDestinationPanel();
+        setupCustomerDropdown();
+        buildTransferPanel();
     }
 
-    private void setupDestinationDropdown() {
-        for (Account acc : SessionManager.getCustomer().getAccounts()) {
-            if (!acc.getAccountNumber().equals(sourceAccount.getAccountNumber())) {
-                destinationSelector.addItem(acc);
-            }
+    private void setupCustomerDropdown() {
+        CustomerList customers = CustomerService.getInstance(storageMode).getAllCustomers();
+
+        for (Customer customer : customers) {
+            customerSelector.addItem(customer);
         }
 
+        customerSelector.addActionListener(e -> {
+            Customer selected = (Customer) customerSelector.getSelectedItem();
+            destinationSelector.removeAllItems();
+
+            if (selected != null) {
+                for (Account acc : selected.getAccounts()) {
+                    if (acc.getAccountType() == AccountType.CHECKING && acc.isActive()) {
+                        destinationSelector.addItem(acc);
+                    }
+                }
+            }
+        });
+
+        StyleUtils.styleDropdown(customerSelector);
         StyleUtils.styleDropdown(destinationSelector);
     }
 
-    private void buildDestinationPanel() {
-        JPanel destPanel = new JPanel(new BorderLayout());
-        destPanel.setOpaque(false);
+    private void buildTransferPanel() {
+        JPanel transferPanel = new JPanel();
+        transferPanel.setLayout(new BoxLayout(transferPanel, BoxLayout.Y_AXIS));
+        transferPanel.setOpaque(false);
 
-        JLabel destLabel = new JLabel("Destination Account:");
-        StyleUtils.styleLabel(destLabel);
+        JLabel customerLabel = new JLabel("Select Recipient:");
+        JLabel accountLabel = new JLabel("Select Account:");
+        StyleUtils.styleLabel(customerLabel);
+        StyleUtils.styleLabel(accountLabel);
 
-        destPanel.add(destLabel, BorderLayout.NORTH);
-        destPanel.add(destinationSelector, BorderLayout.CENTER);
+        transferPanel.add(customerLabel);
+        transferPanel.add(customerSelector);
+        transferPanel.add(Box.createVerticalStrut(10));
+        transferPanel.add(accountLabel);
+        transferPanel.add(destinationSelector);
 
-        getContentPane().add(destPanel, BorderLayout.WEST);
+        getContentPane().add(transferPanel, BorderLayout.WEST);
     }
 
     @Override
