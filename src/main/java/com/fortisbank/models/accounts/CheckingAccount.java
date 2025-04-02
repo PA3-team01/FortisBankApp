@@ -28,7 +28,7 @@ public class CheckingAccount extends Account {
         return "Account Number: " + getAccountNumber() + "\n" +
                 "Account Type: " + getAccountType() + "\n" +
                 "Opened Date: " + getOpenedDate() + "\n" +
-                "Available Balance: " + getAvailableBalance() + "\n" +
+                "Available Balance: " + getAvailableBalance() + "$"+ "\n" + // TODO: Format this to currency
                 "Customer Name: " + getCustomer().getFullName();
     }
 }

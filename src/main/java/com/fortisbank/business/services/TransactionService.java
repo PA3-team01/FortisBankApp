@@ -18,12 +18,13 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
+//TODO : Extend to trigger Alerts (low balance, overdraft, etc.)
+
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
-    private final NotificationService notificationService = NotificationService.getInstance();
 
     private TransactionService(StorageMode storageMode) {
         var factory = RepositoryFactory.getInstance(storageMode);
@@ -48,80 +49,51 @@ public class TransactionService implements ITransactionService {
         TransactionType type = transaction.getTransactionType();
 
         switch (type) {
-            case DEPOSIT -> {
+            case DEPOSIT:
                 validateNotNull(destination, "Destination account");
-                transaction.setSourceAccount(destination); // Set destination as source
                 adjustBalance(destination, amount);
                 destination.addTransaction(transaction);
                 accountRepository.updateAccount(destination);
+                break;
 
-                if (destination.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
-                }
-            }
-
-            case WITHDRAWAL -> {
+            case WITHDRAWAL:
                 validateNotNull(source, "Source account");
-                transaction.setDestinationAccount(source); // Set source as destination
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 applyTransactionFeeIfRequired(source);
                 accountRepository.updateAccount(source);
+                break;
 
-                if (source.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
-                }
-            }
-
-            case TRANSFER -> {
+            case TRANSFER:
                 validateNotNull(source, "Source account");
                 validateNotNull(destination, "Destination account");
-
-                if (source.getAccountNumber().equals(destination.getAccountNumber())) {
-                    throw new InvalidTransactionException("Cannot transfer to the same account.");
-                }
-
                 validateCreditLimit(source, amount);
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 adjustBalance(destination, amount);
-
                 source.addTransaction(transaction);
                 destination.addTransaction(transaction);
-
                 applyTransactionFeeIfRequired(source);
-
                 accountRepository.updateAccount(source);
                 accountRepository.updateAccount(destination);
+                break;
 
-                if (source.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(source.getCustomer(), transaction);
-                }
-                if (destination.getCustomer() != null) {
-                    notificationService.notifyTransactionReceipt(destination.getCustomer(), transaction);
-                }
-            }
-
-            case FEE -> {
+            case FEE:
                 validateNotNull(source, "Source account");
-                transaction.setDestinationAccount(source); // Set source as destination
                 validateSufficientFunds(source, amount);
-
                 adjustBalance(source, amount.negate());
                 source.addTransaction(transaction);
                 accountRepository.updateAccount(source);
-            }
+                break;
 
-            default -> throw new InvalidTransactionException("Unsupported transaction type.");
+            default:
+                throw new InvalidTransactionException("Unsupported transaction type.");
         }
 
         transactionRepository.insertTransaction(transaction);
     }
-
 
 
     // ---------------------------------------------------------------------------------------
@@ -169,12 +141,6 @@ public class TransactionService implements ITransactionService {
         }
 
         return transactions.filterByDateRange(startDate, endDate);
-    }
-
-    //helper method to get recent transaction by account
-    public TransactionList getRecentTransactionsByAccount(Account account, int days) {
-        TransactionList transactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
-        return filterRecentTransactions(transactions, days);
     }
 
     // ---------------------------------------------------------------------------------------
@@ -279,4 +245,9 @@ public class TransactionService implements ITransactionService {
         transactionRepository.insertTransaction(feeTx);
         accountRepository.updateAccount(account);
     }
+
+    public TransactionList getRecentTransactionsByAccount(Account account) {
+        return transactionRepository.getTransactionsByAccount(account.getAccountNumber());
+    }
 }
+

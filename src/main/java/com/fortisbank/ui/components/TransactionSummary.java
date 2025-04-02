@@ -19,7 +19,7 @@ public class TransactionSummary extends JPanel {
     public TransactionSummary(Account account, StorageMode storageMode) {
         this.storageMode = storageMode;
         this.transactionService = TransactionService.getInstance(storageMode);
-        this.transactionList = transactionService.getRecentTransactionsByAccount(account, 5);
+        this.transactionList = transactionService.getRecentTransactionsByAccount(account);
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setOpaque(false);
 

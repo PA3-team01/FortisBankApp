@@ -35,7 +35,7 @@ public class DepositForm extends TransactionForm {
                 description,
                 new Date(),
                 amount,
-                null,
+                targetAccount,
                 targetAccount
         );
 
