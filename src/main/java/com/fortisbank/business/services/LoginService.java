@@ -32,6 +32,13 @@ public class LoginService {
 
     // ---------------- LOGIN WITH PIN ----------------
 
+    /**
+     * verifier si le format du email et le pin est valide
+     * throw AuthenticationException si l'authentification n'est pas valide
+     * @param email
+     * @param rawPIN
+     * @return
+     */
     public User loginWithPIN(String email, char[] rawPIN) {
         try {
             if (!isValidEmail(email)) throw new AuthenticationException("Invalid email format.");
@@ -52,6 +59,13 @@ public class LoginService {
 
     // ---------------- LOGIN WITH PASSWORD ----------------
 
+    /**
+     * verifier si le format du email et le password est valide
+     * throw AuthenticationException si l'authentification n'est pas valide
+     * @param email
+     * @param rawPassword
+     * @return
+     */
     public User loginWithPassword(String email, char[] rawPassword) {
         try {
             if (!isValidEmail(email)) throw new AuthenticationException("Invalid email format.");
@@ -73,8 +87,17 @@ public class LoginService {
 
     // ---------------- COMMON AUTH ----------------
 
+    /**
+     * authentification qui check customers et managers
+     * @param email Email
+     * @param rawInput Input
+     * @param usePIN PIN
+     * @return
+     * @throws Exception
+     */
     private User authenticate(String email, char[] rawInput, boolean usePIN) throws Exception {
         // Try customers
+        //check les customers pour un email qui match
         for (Customer customer : customerService.getAllCustomers()) {
             if (email.equalsIgnoreCase(customer.getEmail())) {
                 return authenticateUser(customer, rawInput, usePIN);

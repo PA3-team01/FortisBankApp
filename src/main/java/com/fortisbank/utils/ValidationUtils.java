@@ -20,7 +20,7 @@ public class ValidationUtils {
     private static final Pattern PHONE_PATTERN = Pattern.compile(
             "^(\\+\\d{1,3}[- ]?)?\\(?\\d{3}\\)?[- .]?\\d{3}[- .]?\\d{4}$"
     );
-    /*
+    /**
     Supported phone Formats:
     4185200999
     418-520-0999

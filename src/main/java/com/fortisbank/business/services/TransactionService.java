@@ -18,6 +18,9 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Service de gestion des transactions
+ */
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
@@ -38,6 +41,12 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // CORE BUSINESS METHOD
     // ---------------------------------------------------------------------------------------
+
+    /**
+     * Fait une transaction selon le type
+     * @param transaction Transaction
+     * throw InvalidTransactionException si la transaction est invalide
+     */
     public void executeTransaction(Transaction transaction) {
         ValidationUtils.validateNotNull(transaction, "Transaction");
         ValidationUtils.validateAmount(transaction.getAmount());
@@ -128,6 +137,10 @@ public class TransactionService implements ITransactionService {
     // INTEREST & CURRENCY OPERATIONS
     // ---------------------------------------------------------------------------------------
 
+    /**
+     * Applique les interets mensuels sur compte credit
+     * @param account Compte
+     */
     public void applyInterestToCreditAccount(CreditAccount account) {
         BigDecimal rate = account.getInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -138,6 +151,10 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Applique les interets annuels sur saving account
+     * @param account Compte
+     */
     public void applyAnnualInterestToSavingsAccount(SavingsAccount account) {
         BigDecimal rate = account.getAnnualInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -160,6 +177,12 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Filtre les transactions recentes
+     * @param transactions Transactions
+     * @param days Jours
+     * @return les transactions filtrees
+     */
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
         Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
         Date endDate = new Date();
@@ -171,6 +194,12 @@ public class TransactionService implements ITransactionService {
         return transactions.filterByDateRange(startDate, endDate);
     }
 
+    /**
+     * Recupere les transactions recentes du compte
+     * @param account Compte
+     * @param days Jours
+     * @return les transactions recentes
+     */
     //helper method to get recent transaction by account
     public TransactionList getRecentTransactionsByAccount(Account account, int days) {
         TransactionList transactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
@@ -218,18 +247,34 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // VALIDATION HELPERS
     // ---------------------------------------------------------------------------------------
+
+    /**
+     * Valide qu'un objet n'est pas null
+     * @param obj Objet
+     * @param fieldName
+     */
     private void validateNotNull(Object obj, String fieldName) {
         if (obj == null) {
             throw new InvalidTransactionException(fieldName + " cannot be null.");
         }
     }
 
+    /**
+     * Verifie si le compte a asser de fonds
+     * @param account Compte
+     * @param amount Montant
+     */
     private void validateSufficientFunds(Account account, BigDecimal amount) {
         if (!account.hasSufficientFunds(amount)) {
             throw new InvalidTransactionException("Insufficient funds in account: " + account.getAccountNumber());
         }
     }
 
+    /**
+     * Verifie si le withdraw amount respecte la limite de credit
+     * @param account Compte
+     * @param withdrawalAmount Montant a retirer
+     */
     private void validateCreditLimit(Account account, BigDecimal withdrawalAmount) {
         if (account instanceof CreditAccount creditAccount) {
             BigDecimal totalAvailable = creditAccount.getAvailableBalance().add(creditAccount.getCreditLimit());
@@ -242,11 +287,21 @@ public class TransactionService implements ITransactionService {
     // ---------------------------------------------------------------------------------------
     // INTERNAL OPERATIONS
     // ---------------------------------------------------------------------------------------
+
+    /**
+     * Ajuste le solde du compte
+     * @param account Compte
+     * @param delta
+     */
     private void adjustBalance(Account account, BigDecimal delta) {
         BigDecimal updated = account.getAvailableBalance().add(delta);
         account.setAvailableBalance(updated);
     }
 
+    /**
+     * Applique les frais de transaction si necessaire
+     * @param account Compte
+     */
     private void applyTransactionFeeIfRequired(Account account) {
         if (account.getAccountType() != AccountType.CHECKING) return;
 
@@ -262,6 +317,12 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Applique les frais au compte
+     * @param account Compte
+     * @param feeAmount Montant frais
+     * @param description
+     */
     private void applyFee(Account account, BigDecimal feeAmount, String description) {
         validateSufficientFunds(account, feeAmount);
 

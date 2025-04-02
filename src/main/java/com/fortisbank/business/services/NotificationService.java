@@ -28,6 +28,13 @@ public class NotificationService {
 
     // === Notification Dispatching ===
 
+    /**
+     * Envoie une notification au user
+     * @param recipient Destinataire
+     * @param type Type
+     * @param title Titre
+     * @param message Message
+     */
     public void sendNotification(User recipient, NotificationType type, String title, String message) {
         if (recipient == null) return;
         Notification notification = new Notification(type, title, message);
@@ -42,6 +49,11 @@ public class NotificationService {
 
     // === Predefined Notification Helpers ===
 
+    /**
+     * Notification pour les transactions
+     * @param user User
+     * @param tx
+     */
     public void notifyTransactionReceipt(User user, Transaction tx) {
         String title = "Transaction Completed";
         String message = String.format("Your %s of $%.2f on %s was successful.",
@@ -49,6 +61,12 @@ public class NotificationService {
         sendNotification(user, NotificationType.TRANSACTION_RECEIPT, title, message);
     }
 
+    /**
+     * Notification pour la demande d'ouverture de compte envoyer au manager
+     * @param manager Manager
+     * @param customer Customer
+     * @param requestedAccount Compte demander
+     */
     public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
         String title = "New Account Request";
         String message = String.format("Customer %s requested a new %s account.",
@@ -60,47 +78,90 @@ public class NotificationService {
                 "Your account request was sent to the manager.", customer, requestedAccount);
     }
 
+    /**
+     * Notification envoyer au user apres l'approbation du compte
+     * @param customer Customer
+     * @param approvedAccount Compter Approuver
+     */
     public void notifyApproval(Customer customer, Account approvedAccount) {
         String title = "Account Approved";
         String message = String.format("Your account (%s) has been approved.", approvedAccount.getAccountNumber());
         sendNotification(customer, NotificationType.ACCOUNT_APPROVAL, title, message, customer, approvedAccount);
     }
 
+    /**
+     * Notification de rejet de demande de compte envoyer au user
+     * @param customer Customer
+     * @param reason Raison
+     * @param rejectedAccount Compte Rejeter
+     */
     public void notifyRejection(Customer customer, String reason, Account rejectedAccount) {
         String title = "Account Rejected";
         String message = "Your account request was declined: " + reason;
         sendNotification(customer, NotificationType.ACCOUNT_REJECTION, title, message, customer, rejectedAccount);
     }
 
+    /**
+     * Notification d'un nouveau message
+     * @param user User
+     * @param fromName de > x
+     */
     public void notifyNewMessage(User user, String fromName) {
         String title = "New Message";
         String message = String.format("You received a new message from %s.", fromName);
         sendNotification(user, NotificationType.NEW_MESSAGE, title, message);
     }
 
+    /**
+     * Notification d'alerte de securite
+     * @param user User
+     * @param details Details
+     */
     public void notifySecurityAlert(User user, String details) {
         String title = "Security Alert";
         String message = "Important security notice: " + details;
         sendNotification(user, NotificationType.SECURITY_ALERT, title, message);
     }
 
+    /**
+     * Notification de mise a jour du systeme
+     * @param user User
+     * @param updateDetails Details mise a jour
+     */
     public void notifySystemUpdate(User user, String updateDetails) {
         String title = "System Update";
         String message = "Recent changes: " + updateDetails;
         sendNotification(user, NotificationType.SYSTEM_UPDATE, title, message);
     }
 
+    /**
+     * Notification personnalisee
+     * @param user User
+     * @param title Titre
+     * @param message Message
+     */
     public void notifyCustom(User user, String title, String message) {
         sendNotification(user, NotificationType.CUSTOM, title, message);
     }
 
     // === Inbox Helpers ===
 
+    /**
+     * Recupere toutes les notifications du user
+     * tier du plus recent au plus ancien
+     * @param user User
+     * @return
+     */
     public List<Notification> getAllNotifications(User user) {
         if (user == null || user.getInbox() == null) return new ArrayList<>();
         return reverseCopy(user.getInbox());
     }
 
+    /**
+     * Recupere les notifications non lues du user
+     * @param user User
+     * @return
+     */
     public List<Notification> getUnreadNotifications(User user) {
         if (user == null || user.getInbox() == null) return new ArrayList<>();
         return user.getInbox().stream()
@@ -108,16 +169,30 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Marque toutes les notifications comme lues
+     * @param user User
+     */
     public void markAllAsRead(User user) {
         if (user == null || user.getInbox() == null) return;
         user.getInbox().forEach(Notification::markAsRead);
     }
 
+    /**
+     * Vide le inbox du user
+     * @param user User
+     */
     public void clearInbox(User user) {
         if (user == null || user.getInbox() == null) return;
         user.getInbox().clear();
     }
 
+    /**
+     * Copie inversee de la liste de notifications
+     * par date decroissante
+     * @param list
+     * @return
+     */
     private List<Notification> reverseCopy(List<Notification> list) {
         List<Notification> reversed = new ArrayList<>(list);
         reversed.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));

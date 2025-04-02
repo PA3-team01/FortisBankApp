@@ -11,6 +11,9 @@ import java.util.Arrays;
 
 import static com.fortisbank.utils.ValidationUtils.*;
 
+/**
+ * service de gestion des inscriptions client et manager
+ */
 public class RegisterService {
 
     private static final java.util.Map<StorageMode, RegisterService> instances = new java.util.EnumMap<>(StorageMode.class);
@@ -31,6 +34,18 @@ public class RegisterService {
 
     // ---------------- CUSTOMER REGISTRATION ----------------
 
+    /**
+     * Enregistre un nouveau client
+     * @param firstName Prenom
+     * @param lastName Nom
+     * @param email Email
+     * @param phoneNumber Numero de telephone
+     * @param rawPassword Mot de passe
+     * @param rawPIN PIN
+     * @return true si l'inscription du client est reussit
+     * @throw RegistrationFailedException si l'inscription fail (format email invalide, format PIN invalide
+     * format numero de telephone invalide, mot de passe faible)
+     */
     public boolean registerNewCustomer(String firstName, String lastName, String email, String phoneNumber,
                                        char[] rawPassword, char[] rawPIN) {
 
@@ -69,6 +84,16 @@ public class RegisterService {
 
     // ---------------- MANAGER REGISTRATION ----------------
 
+    /**
+     * Enregistre un nouveau manager
+     * @param firstName Prenom
+     * @param lastName Nom
+     * @param email Email
+     * @param rawPassword Mot de passe
+     * @param rawPIN PIN
+     * @return true si l'inscription du client est reussit
+     * @throw RegistrationFailedException si l'inscription fail (format email invalide, format PIN invalide, mot de passe faible)
+     */
     public boolean registerNewBankManager(String firstName, String lastName, String email,
                                           char[] rawPassword, char[] rawPIN) {
 
