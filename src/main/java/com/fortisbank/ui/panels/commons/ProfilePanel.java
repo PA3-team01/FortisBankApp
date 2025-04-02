@@ -1,5 +1,6 @@
 package com.fortisbank.ui.panels.commons;
 
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.users.User;
 import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
@@ -40,8 +41,20 @@ public class ProfilePanel extends JPanel {
         addValue(currentUser.getEmail(), gbc, 2);
 
 
-        addLabel("Role:", gbc, 4);
-        addValue(currentUser.getRole().toString(), gbc, 4);
+        addLabel("Role:", gbc, 3);
+        addValue(currentUser.getRole().toString(), gbc, 3);
+
+
+        addLabel("Phone Number:", gbc, 4);
+        if (currentUser instanceof Customer customer) {
+            addValue(customer.getPhoneNumber(), gbc, 4);
+        } else {
+            addValue("N/A", gbc, 4);
+        }
+
+
+
+
 
         // Padding
         gbc.gridy = 5;
