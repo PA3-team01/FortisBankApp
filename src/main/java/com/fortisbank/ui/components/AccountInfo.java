@@ -1,21 +1,26 @@
 package com.fortisbank.ui.components;
 
+import com.fortisbank.business.services.TransactionService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.TransactionList;
+import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.frames.subFrames.MonthlyStatementFrame;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.time.LocalDate;
 import java.util.Calendar;
 
 public class AccountInfo extends JPanel {
 
     private final JComboBox<String> monthCombo;
     private final JComboBox<Integer> yearCombo;
+    private TransactionService transactionService;
 
     public AccountInfo(Account account , StorageMode storageMode) {
+        transactionService = TransactionService.getInstance(storageMode);
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
@@ -63,9 +68,14 @@ public class AccountInfo extends JPanel {
         statementBtn.addActionListener(e -> {
             String selectedMonth = (String) monthCombo.getSelectedItem();
             int selectedYear = (int) yearCombo.getSelectedItem();
+            // current user
+            var userId = SessionManager.getCurrentUser().getUserId();
+            // start and end date
+            var startDate = LocalDate.of(selectedYear, Integer.parseInt(selectedMonth), 1);
+            var endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-            // TODO: Replace with real filtered data
-            TransactionList filtered = new TransactionList(); // Fill this with filtered transactions
+
+            TransactionList filtered = transactionService.getTransactionsByCustomerAndDateRange(userId,startDate,endDate);
 
             new MonthlyStatementFrame(account, filtered, selectedMonth, selectedYear);
         });
