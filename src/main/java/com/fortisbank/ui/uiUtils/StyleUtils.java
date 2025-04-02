@@ -48,6 +48,14 @@ public class StyleUtils {
         label.setFont(STATUS_FONT);
         label.setForeground(isValid ? SUCCESS_COLOR : ERROR_COLOR);
     }
+    public static void styleRadioButton(JRadioButton radioButton) {
+        radioButton.setFont(FIELD_FONT);
+        radioButton.setForeground(TEXT_COLOR);
+        radioButton.setBackground(BACKGROUND_COLOR);
+        radioButton.setFocusPainted(false);
+        radioButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
 
     public static void styleDropdown(JComboBox<?> comboBox) {
         comboBox.setFont(FIELD_FONT);
