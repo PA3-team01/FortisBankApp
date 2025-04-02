@@ -31,6 +31,7 @@ public class SettingPanel extends JPanel {
         gbc.gridy = 1;
         addLabel("Change Password:", gbc, 1);
         JButton changePasswordButton = new JButton("Change Password");
+        StyleUtils.styleButton(changePasswordButton, true);
         changePasswordButton.addActionListener(e -> openChangePasswordDialog());
         add(changePasswordButton, gbc);
 
@@ -38,6 +39,7 @@ public class SettingPanel extends JPanel {
         gbc.gridy = 2;
         addLabel("Update Email:", gbc, 2);
         JButton updateEmailButton = new JButton("Update Email");
+        StyleUtils.styleButton(updateEmailButton, true);
         updateEmailButton.addActionListener(e -> openUpdateEmailDialog());
         add(updateEmailButton, gbc);
 
@@ -45,6 +47,7 @@ public class SettingPanel extends JPanel {
         gbc.gridy = 3;
         addLabel("Update Phone:", gbc, 3);
         JButton updatePhoneButton = new JButton("Update Phone");
+        StyleUtils.styleButton(updatePhoneButton, true);
         updatePhoneButton.addActionListener(e -> openUpdatePhoneDialog());
         add(updatePhoneButton, gbc);
 
