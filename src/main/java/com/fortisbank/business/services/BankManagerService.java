@@ -33,6 +33,11 @@ public class BankManagerService implements IBankManagerService {
         managerRepository.insertManager(manager);
         return manager;
     }
+    // update
+    public BankManager updateBankManager(BankManager manager) {
+        managerRepository.updateManager(manager);
+        return manager;
+    }
 
     // ------------------- Core Business Methods -------------------
 
@@ -90,4 +95,6 @@ public class BankManagerService implements IBankManagerService {
     public boolean emailExists(String email) {
         return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
     }
+
+
 }

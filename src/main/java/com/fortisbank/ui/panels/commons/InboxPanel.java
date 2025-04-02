@@ -17,7 +17,7 @@ import java.util.List;
 
 public class InboxPanel extends JPanel {
 
-    private final NotificationService notificationService = NotificationService.getInstance();
+    private  NotificationService notificationService ;
     private  AccountLoanRequestService accountLoanService;
     private final JPanel messageListPanel = new JPanel();
     private final JComboBox<String> filterSelector = new JComboBox<>(new String[] {"All", "Unread", "Custom", "System", "Security"});
@@ -26,6 +26,7 @@ public class InboxPanel extends JPanel {
     public InboxPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         this.accountLoanService = AccountLoanRequestService.getInstance(storageMode);
+        this.notificationService = NotificationService.getInstance(storageMode);
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
