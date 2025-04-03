@@ -11,6 +11,9 @@ import com.fortisbank.models.users.Customer;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Service de gestion des manager
+ */
 public class BankManagerService implements IBankManagerService {
 
     private static final Map<StorageMode, BankManagerService> instances = new EnumMap<>(StorageMode.class);
@@ -29,6 +32,11 @@ public class BankManagerService implements IBankManagerService {
 
     // Create
 
+    /**
+     * Cree un nouveau manager
+     * @param manager manager
+     * @return le manager cree
+     */
     public BankManager createManager(BankManager manager) { // ** Do not call directly, use register service **
         managerRepository.insertManager(manager);
         return manager;
@@ -48,12 +56,22 @@ public class BankManagerService implements IBankManagerService {
         return null;
     }
 
+    /**
+     * Approbation d'un compte
+     * @param account Compte
+     * @return true si approuver
+     */
     @Override
     public boolean approveAccount(Account account) {
         account.setActive(true);
         return true;
     }
 
+    /**
+     * Fermer un compte
+     * @param account Compte
+     * @return true si la fermeture du compte reussit
+     */
     @Override
     public boolean closeAccount(Account account) {
         try {
@@ -65,12 +83,20 @@ public class BankManagerService implements IBankManagerService {
         }
     }
 
+    /**
+     * Suppression d'un client
+     * @param customer Client
+     * @return
+     */
     @Override
     public boolean deleteCustomer(Customer customer) {
         // You can delegate to CustomerService or remove via repository directly
         return false;
     }
 
+    /**
+     * Generer un rapport client
+     */
     @Override
     public void generateCustomerReport() {
         // Placeholder — would generate a report using available data (e.g., PDF, export)
@@ -78,10 +104,19 @@ public class BankManagerService implements IBankManagerService {
 
     // ------------------- Login Support -------------------
 
+    /**
+     * Recupere tout les managers
+     * @return la liste des managers
+     */
     public ManagerList getAllManagers() {
         return managerRepository.getAllManagers();
     }
 
+    /**
+     * Recherche un manager par email
+     * @param email Email
+     * @return le manager trouver ou null
+     */
     public BankManager getManagerByEmail(String email) {
         for (BankManager manager : getAllManagers()) {
             if (manager.getEmail().equalsIgnoreCase(email)) {
@@ -92,6 +127,12 @@ public class BankManagerService implements IBankManagerService {
     }
 
     // ------------------- Utility Methods -------------------
+
+    /**
+     * Verification pour voir si un email est deja utilise
+     * @param email Email
+     * @return si l'email existe deja
+     */
     public boolean emailExists(String email) {
         return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
     }
