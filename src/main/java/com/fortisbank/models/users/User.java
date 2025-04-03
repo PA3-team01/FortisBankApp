@@ -3,6 +3,7 @@ package com.fortisbank.models.users;
 import com.fortisbank.models.others.Notification;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class User implements Serializable {
@@ -29,7 +30,7 @@ public abstract class User implements Serializable {
         this.hashedPassword = hashedPassword;
         this.PINHash = pinHash;
         this.role = role;
-        this.inbox = List.of(); // Initialize inbox as an empty list
+        this.inbox = new ArrayList<>(); // Initialize inbox as an empty list
     }
 
     protected User() {

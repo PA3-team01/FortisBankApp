@@ -54,6 +54,8 @@ public class NotificationService {
 
     public void sendNotification(User recipient, NotificationType type, String title, String message, Customer customer, Account account) {
         if (recipient == null) return;
+
+
         Notification notification = new Notification(type, title, message, customer, account);
         recipient.getInbox().add(notification);
 
@@ -77,25 +79,18 @@ public class NotificationService {
     }
 
     public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
-        //debug check received parameters
-        System.out.println("[NotificationService]Account request submitted:");
-        System.out.println("Customer: " + customer);
-        System.out.println("Requested Account: " + requestedAccount);
-        System.out.println("Manager: " + manager);
+
 
         if (manager == null || customer == null || requestedAccount == null) return;
         String title = "New Account Request";
         String message = String.format("Customer %s requested a new %s account.",
                 customer.getFullName(), requestedAccount.getAccountType());
         sendNotification(manager, NotificationType.ACCOUNT_OPENING_REQUEST, title, message, customer, requestedAccount);
-        //debug
-        System.out.println("[NotificationService]Account request passed notification to manager");
 
         // Confirmation to customer
         sendNotification(customer, NotificationType.INFO, "Request Sent",
                 "Your account request was sent to the manager.", customer, requestedAccount);
-        //debug
-        System.out.println("[NotificationService]Account request passed notification to customer");
+
     }
 
     public void notifyApproval(Customer customer, Account approvedAccount) {
