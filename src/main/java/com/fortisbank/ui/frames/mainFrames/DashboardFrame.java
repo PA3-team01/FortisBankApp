@@ -9,6 +9,8 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class DashboardFrame extends JFrame {
 
@@ -23,6 +25,19 @@ public class DashboardFrame extends JFrame {
         setExtendedState(JFrame.MAXIMIZED_BOTH); // Fullscreen
         setMinimumSize(new Dimension(1000, 600)); // Prevent tiny shrinking
         setResizable(true); // Allow resizing
+
+        // === Add Window Listener to Close Open Forms ===
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                closeAllTransactionForms();
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                closeAllTransactionForms();
+            }
+        });
 
         // === Top-right Logout Button ===
         JButton logoutButton = new JButton("Logout");
@@ -72,5 +87,15 @@ public class DashboardFrame extends JFrame {
         SessionManager.clear();
         dispose();
         new LoginFrame(storageMode).setVisible(true);
+    }
+
+    private void closeAllTransactionForms() {
+        for (Window window : Window.getWindows()) {
+            if (window instanceof JDialog || window instanceof JFrame) {
+                if (window != this) { // Don't close Dashboard itself, it's already closing
+                    window.dispose();
+                }
+            }
+        }
     }
 }
