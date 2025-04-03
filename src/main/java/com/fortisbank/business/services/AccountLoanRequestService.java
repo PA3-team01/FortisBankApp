@@ -16,12 +16,12 @@ public class AccountLoanRequestService {
     private static final Map<StorageMode, AccountLoanRequestService> instances = new EnumMap<>(StorageMode.class);
     private  NotificationService notificationService;
     private final AccountService accountService;
+    private final StorageMode storageMode;
 
     private AccountLoanRequestService(StorageMode storageMode) {
+        this.storageMode = storageMode;
         this.accountService = AccountService.getInstance(storageMode);
         this.notificationService = NotificationService.getInstance(storageMode);
-        // debug
-        System.out.println("AccountLoanRequestService initialized with storage mode: " + storageMode);
     }
 
     public static synchronized AccountLoanRequestService getInstance(StorageMode storageMode) {
@@ -32,25 +32,16 @@ public class AccountLoanRequestService {
      * Customer submits a request for a new account.
      */
     public void submitAccountRequest(Customer customer, Account requestedAccount, BankManager manager) {
-        //debug check recieved parameters
-        System.out.println("[AccountLoanRequestService]Account request submitted:");
-        System.out.println("Customer: " + customer);
-        System.out.println("Requested Account: " + requestedAccount);
-        System.out.println("Manager: " + manager);
         if (customer == null || requestedAccount == null || manager == null) return;
-        //debug
-        System.out.println("[AccountLoanRequestService]Account request passed null check");
+        //TODO: check if the customer already has an account of this type
+
+
         // save the requested account to the database
         accountService.createAccount(requestedAccount);
-
-        //debug
-        System.out.println("[AccountLoanRequestService]Account request passed account creation");
-
         // Notify manager and customer with rich notification
         notificationService.notifyAccountRequest(manager, customer, requestedAccount);
 
-        //debug
-        System.out.println("[AccountLoanRequestService]Account request passed notification");
+
     }
 
     /**
@@ -71,6 +62,15 @@ public class AccountLoanRequestService {
     public void rejectAccountRequest(Customer customer, String reason, Account rejectedAccount) {
         if (customer == null) return;
 
+        // remove the account from the customer's accounts
+        if (customer.getAccounts().contains(rejectedAccount)) {
+            customer.getAccounts().remove(rejectedAccount);
+        }
+        //update the customer in the database
+        CustomerService.getInstance(storageMode).updateCustomer(customer);
+        // remove the account from the database
+        accountService.deleteAccount(rejectedAccount.getAccountNumber());
+        // Notify customer with rich notification
         notificationService.notifyRejection(customer, reason, rejectedAccount);
     }
 }

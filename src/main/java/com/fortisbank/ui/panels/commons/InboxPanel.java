@@ -127,9 +127,15 @@ public class InboxPanel extends JPanel {
             StyleUtils.styleButton(rejectBtn, false);
 
             acceptBtn.addActionListener(e -> {
-                //TODO: Implement the logic to accept the request
-                // Ideally would have a mapping from notification to the Account and Customer
-                JOptionPane.showMessageDialog(this, "Accepted request. Integration logic needed.");
+                // use account loan service to accept the request
+                User recipient = notification.getRelatedCustomer();
+                Account account = notification.getRelatedAccount();
+                if (recipient instanceof Customer customer) {
+                    accountLoanService.acceptAccountRequest(customer, account);
+                } else {
+                    JOptionPane.showMessageDialog(this, "Invalid recipient.");
+                    return;
+                }
                 notification.markAsRead();
                 refreshMessages();
             });
@@ -137,8 +143,15 @@ public class InboxPanel extends JPanel {
             rejectBtn.addActionListener(e -> {
                 String reason = JOptionPane.showInputDialog(this, "Reason for rejection:");
                 if (reason != null && !reason.isBlank()) {
-                    //TODO: Implement the logic to reject the request
-                    JOptionPane.showMessageDialog(this, "Rejected with reason: " + reason + ". Integration logic needed.");
+                    // use account loan service to reject the request
+                    User recipient = notification.getRelatedCustomer();
+                    Account account = notification.getRelatedAccount();
+                    if (recipient instanceof Customer customer) {
+                        accountLoanService.rejectAccountRequest(customer, reason, account);
+                    } else {
+                        JOptionPane.showMessageDialog(this, "Invalid recipient.");
+                        return;
+                    }
                     notification.markAsRead();
                     refreshMessages();
                 }

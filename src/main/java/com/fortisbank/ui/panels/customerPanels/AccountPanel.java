@@ -29,7 +29,12 @@ public class AccountPanel extends JPanel {
             return;
         }
 
+        // Get the customer's accounts
         AccountList accounts = customer.getAccounts();
+        //filter out inactive accounts
+        accounts = accounts.stream()
+                .filter(Account::isActive)
+                .collect(AccountList::new, AccountList::add, AccountList::addAll);
 
         if (accounts == null || accounts.isEmpty()) {
             JLabel info = new JLabel("You currently have no accounts.");
