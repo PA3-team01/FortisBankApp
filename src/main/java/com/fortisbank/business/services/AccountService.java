@@ -1,74 +1,76 @@
 package com.fortisbank.business.services;
 
-import com.fortisbank.data.repositories.IAccountRepository;
-import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.accounts.AccountFactory;
-import com.fortisbank.models.accounts.AccountType;
+import com.fortisbank.data.repositories.*;
+import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.users.Customer;
 
 import java.math.BigDecimal;
-
-
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
-
-// TODO: Add data verification and validation for each method and exception handling
 
 /**
  * AccountService manages account-related operations (CRUD) using the selected storage mode.
  * This service is now focused solely on accounts and no longer handles transactions.
  */
 public class AccountService implements IAccountService {
+
     private static final Map<StorageMode, AccountService> instances = new EnumMap<>(StorageMode.class);
     public final IAccountRepository accountRepository;
+    private final StorageMode storageMode;
 
     private AccountService(StorageMode storageMode) {
+        this.storageMode = storageMode;
         this.accountRepository = RepositoryFactory.getInstance(storageMode).getAccountRepository();
     }
 
     public static synchronized AccountService getInstance(StorageMode storageMode) {
         return instances.computeIfAbsent(storageMode, AccountService::new);
     }
+
     /**
      * DO NOT CALL THIS METHOD DIRECTLY FROM THE UI.
      *
-     * Account creation must follow a proper request-and-approval process:
-     *  - Customers should **not** create accounts directly.
-     *  - Instead, they must use the AccountLoanRequestService to submit an account request.
-     *  - This request will be sent as a notification to a manager.
-     *  - The manager can then **approve** or **reject** the request.
-     *  - If approved, the AccountLoanRequestService will call this method internally
-     *    to persist the account and mark it as active.
-     *
-     * This separation ensures that account approval workflows and permissions
-     * are properly enforced within the system.
+     * Account creation must follow a proper request-and-approval process via AccountLoanRequestService.
      */
     @Override
     public void createAccount(Account account) {
+        if (account == null) throw new IllegalArgumentException("Account cannot be null");
+        if (account.getCustomer() == null) throw new IllegalArgumentException("Account must be linked to a customer");
+        if (account.getAccountType() == null) throw new IllegalArgumentException("Account type must be specified");
         accountRepository.insertAccount(account);
     }
 
     @Override
     public void updateAccount(Account account) {
+        if (account == null || account.getAccountNumber() == null) {
+            throw new IllegalArgumentException("Invalid account provided for update.");
+        }
         accountRepository.updateAccount(account);
     }
 
     @Override
     public void deleteAccount(String accountId) {
+        if (accountId == null || accountId.isBlank()) {
+            throw new IllegalArgumentException("Account ID is required for deletion.");
+        }
         accountRepository.deleteAccount(accountId);
     }
 
     @Override
     public Account getAccount(String accountId) {
+        if (accountId == null || accountId.isBlank()) {
+            throw new IllegalArgumentException("Account ID is required.");
+        }
         return accountRepository.getAccountById(accountId);
     }
 
     @Override
     public AccountList getAccountsByCustomerId(String customerId) {
+        if (customerId == null || customerId.isBlank()) {
+            throw new IllegalArgumentException("Customer ID is required.");
+        }
         return accountRepository.getAccountsByCustomerId(customerId);
     }
 
@@ -76,6 +78,7 @@ public class AccountService implements IAccountService {
     public AccountList getAllAccounts() {
         return accountRepository.getAllAccounts();
     }
+
     /**
      * Creates and persists a default checking account for a new customer using the factory.
      * The account is initialized with zero balance and marked active by default.
@@ -84,16 +87,49 @@ public class AccountService implements IAccountService {
      * @return the created Account instance
      */
     public Account createDefaultCheckingAccountFor(Customer customer) {
+        if (customer == null || customer.getUserId() == null) {
+            throw new IllegalArgumentException("Customer is required to create a default checking account.");
+        }
+
         Account checkingAccount = AccountFactory.createAccount(
                 AccountType.CHECKING,
-                null, // let the factory assign ID via constructor if null
+                null, // auto-generate ID
                 customer,
                 new Date(),
                 BigDecimal.ZERO
         );
 
-        createAccount(checkingAccount); // persist
+        createAccount(checkingAccount); // persist it
         return checkingAccount;
+    }
+    /**
+     * Closes the given account if balance is zero. Otherwise, throws an exception.
+     *
+     * @param account Account to close.
+     */
+    public void closeAccount(Account account) {
+        if (account == null || account.getAccountNumber() == null) {
+            throw new IllegalArgumentException("Account is required to close.");
+        }
+
+        if (account.getAvailableBalance().compareTo(BigDecimal.ZERO) != 0) {
+            throw new IllegalStateException("Unable to close account: balance must be zero.");
+        }
+
+        account.setActive(false);
+        updateAccount(account); // persist status change
+        // update user accountList
+        Customer customer = account.getCustomer();
+        if (customer != null) {
+            AccountList accounts = customer.getAccounts();
+            if (accounts != null) {
+                accounts.remove(account);
+            }
+        }
+        // persist the change
+        RepositoryFactory.getInstance(storageMode).getCustomerRepository().updateCustomer(customer);
+
+        System.out.println("Account " + account.getAccountNumber() + " closed successfully.");
     }
 
 }

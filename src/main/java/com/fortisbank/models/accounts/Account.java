@@ -94,14 +94,7 @@ public abstract class Account implements Serializable {
         return availableBalance.compareTo(amount) >= 0;
     }
 
-    public void closeAccount() {
-        if (availableBalance.compareTo(BigDecimal.ZERO) == 0) {
-            isActive = false;
-            System.out.println("Account " + accountNumber + " has been closed.");
-        } else {
-            throw new IllegalStateException("Unable to close the account: balance is not zero.");
-        }
-    }
+
 
     @Override
     public String toString() {

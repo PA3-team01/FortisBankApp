@@ -7,6 +7,7 @@ import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.ManagerList;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -19,8 +20,10 @@ public class BankManagerService implements IBankManagerService {
     private static final Map<StorageMode, BankManagerService> instances = new EnumMap<>(StorageMode.class);
 
     private final IBankManagerRepository managerRepository;
+    private StorageMode storageMode;
 
     private BankManagerService(StorageMode storageMode) {
+        this.storageMode = storageMode;
         this.managerRepository = RepositoryFactory.getInstance(storageMode).getBankManagerRepository();
     }
 
@@ -75,7 +78,14 @@ public class BankManagerService implements IBankManagerService {
     @Override
     public boolean closeAccount(Account account) {
         try {
-            account.closeAccount();
+            if (account == null) {
+                throw new IllegalStateException("Account cannot be null");
+            }
+            if (!account.isActive()) {
+                throw new IllegalStateException("Account is already closed");
+            }
+            AccountService.getInstance(storageMode).closeAccount(account);
+
             return true;
         } catch (IllegalStateException e) {
             System.err.println("Failed to close account: " + e.getMessage());
