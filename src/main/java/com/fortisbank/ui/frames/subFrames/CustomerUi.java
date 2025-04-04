@@ -5,10 +5,7 @@ import com.fortisbank.ui.components.NavigationBar;
 import com.fortisbank.ui.panels.commons.InboxPanel;
 import com.fortisbank.ui.panels.commons.ProfilePanel;
 import com.fortisbank.ui.panels.commons.SettingPanel;
-import com.fortisbank.ui.panels.customerPanels.AccountPanel;
-import com.fortisbank.ui.panels.customerPanels.SupportContactPanel;
-import com.fortisbank.ui.panels.customerPanels.TransactionPanel;
-import com.fortisbank.ui.panels.customerPanels.CurrencyExchangePanel;  // Import CurrencyExchangePanel
+import com.fortisbank.ui.panels.customerPanels.*;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -46,7 +43,7 @@ public class CustomerUi extends JPanel {
         navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
         navPanel.setButtonAction("Currency Exchange", () -> showContent(new CurrencyExchangePanel(storageMode)));
         // Pass storageMode
-        navPanel.setButtonAction("Help", () -> showContent(new JLabel("Help & Support")));
+        navPanel.setButtonAction("Help", () -> showContent(new HelpPanel(storageMode)));
         navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
 
     }
