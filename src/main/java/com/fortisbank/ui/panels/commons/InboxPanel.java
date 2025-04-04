@@ -3,12 +3,9 @@ package com.fortisbank.ui.panels.commons;
 import com.fortisbank.business.services.AccountLoanRequestService;
 import com.fortisbank.business.services.NotificationService;
 import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.others.Notification;
-import com.fortisbank.models.others.NotificationType;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.users.User;
 import com.fortisbank.session.SessionManager;
+import com.fortisbank.ui.components.NotificationCard;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -17,16 +14,16 @@ import java.util.List;
 
 public class InboxPanel extends JPanel {
 
-    private  NotificationService notificationService ;
-    private  AccountLoanRequestService accountLoanService;
+    private final NotificationService notificationService;
+    private final AccountLoanRequestService accountLoanService;
     private final JPanel messageListPanel = new JPanel();
-    private final JComboBox<String> filterSelector = new JComboBox<>(new String[] {"All", "Unread", "Custom", "System", "Security"});
-    private StorageMode storageMode;
+    private final JComboBox<String> filterSelector = new JComboBox<>(new String[]{"All", "Unread", "Custom", "System", "Security"});
+    private final StorageMode storageMode;
 
     public InboxPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
-        this.accountLoanService = AccountLoanRequestService.getInstance(storageMode);
         this.notificationService = NotificationService.getInstance(storageMode);
+        this.accountLoanService = AccountLoanRequestService.getInstance(storageMode);
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
 
@@ -90,7 +87,7 @@ public class InboxPanel extends JPanel {
             messageListPanel.add(emptyLabel);
         } else {
             for (Notification notification : notifications) {
-                JPanel card = buildNotificationCard(notification);
+                NotificationCard card = new NotificationCard(notification, storageMode);
                 messageListPanel.add(card);
                 messageListPanel.add(Box.createVerticalStrut(10));
             }
@@ -98,106 +95,5 @@ public class InboxPanel extends JPanel {
 
         messageListPanel.revalidate();
         messageListPanel.repaint();
-    }
-
-    private JPanel buildNotificationCard(Notification notification) { //TODO extract to NotificationCard class (component)
-        JPanel card = new JPanel();
-        card.setLayout(new BorderLayout());
-        StyleUtils.styleFormPanel(card);
-
-        String typeText = notification.getType().name();
-        JLabel title = new JLabel("[" + typeText + "] " + notification.getTitle());
-        StyleUtils.styleLabel(title);
-
-        JLabel body = new JLabel("<html><p style='width: 300px;'>" + notification.getMessage() + "</p></html>");
-        StyleUtils.styleLabel(body);
-
-        JLabel timestamp = new JLabel(notification.getTimestamp().toString());
-        StyleUtils.styleLabel(timestamp);
-        timestamp.setFont(timestamp.getFont().deriveFont(Font.ITALIC, 10));
-
-        JPanel footer = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        footer.setOpaque(false);
-        footer.add(timestamp);
-
-        /*
-            Logic for accepting or rejecting account opening requests (Admin)
-         */
-        if (notification.getType() == NotificationType.ACCOUNT_OPENING_REQUEST) {
-            JButton acceptBtn = new JButton("Accept");
-            JButton rejectBtn = new JButton("Reject");
-            StyleUtils.styleButton(acceptBtn, true);
-            StyleUtils.styleButton(rejectBtn, false);
-
-            acceptBtn.addActionListener(e -> {
-                // use account loan service to accept the request
-                User recipient = notification.getRelatedCustomer();
-                Account account = notification.getRelatedAccount();
-                if (recipient instanceof Customer customer) {
-                    accountLoanService.acceptAccountRequest(customer, account);
-                    StyleUtils.showStyledSuccessDialog(this,"Account opened successfully.");
-                } else {
-                    JOptionPane.showMessageDialog(this, "Invalid recipient.");
-                    return;
-                }
-                notification.markAsRead();
-                refreshMessages();// TODO: fix -> find a better way to disable buttons avoiding recreating them on refresh
-
-                disableButtons(acceptBtn, rejectBtn);
-            });
-
-
-            rejectBtn.addActionListener(e -> {
-                String reason = JOptionPane.showInputDialog(this, "Reason for rejection:");
-                if (reason != null && !reason.isBlank()) {
-                    // use account loan service to reject the request
-                    User recipient = notification.getRelatedCustomer();
-                    Account account = notification.getRelatedAccount();
-                    if (recipient instanceof Customer customer) {
-                        accountLoanService.rejectAccountRequest(customer, reason, account);
-                        StyleUtils.showStyledSuccessDialog(this,"Account request rejected.");
-                    } else {
-                        JOptionPane.showMessageDialog(this, "Invalid recipient.");
-                        return;
-                    }
-                    notification.markAsRead();
-                    refreshMessages();
-                    disableButtons(acceptBtn, rejectBtn);
-                }
-            });
-
-            footer.add(acceptBtn);
-            footer.add(rejectBtn);
-        }
-
-        JButton markReadBtn = new JButton(notification.isRead() ? "✔ Read" : "Mark as Read");
-        StyleUtils.styleButton(markReadBtn, !notification.isRead());
-        markReadBtn.addActionListener(e -> {
-            notification.markAsRead();
-            refreshMessages();
-        });
-
-        JButton deleteBtn = new JButton("Delete");
-        StyleUtils.styleButton(deleteBtn, false);
-        deleteBtn.addActionListener(e -> {
-            SessionManager.getCurrentUser().getInbox().remove(notification);
-            refreshMessages();
-        });
-
-        footer.add(markReadBtn);
-        footer.add(deleteBtn);
-
-        card.add(title, BorderLayout.NORTH);
-        card.add(body, BorderLayout.CENTER);
-        card.add(footer, BorderLayout.SOUTH);
-
-        return card;
-    }
-    // helper method to disable button(s) with args
-    private void disableButtons(JButton... buttons) {
-        for (JButton button : buttons) {
-            button.setEnabled(false);
-            button.setVisible(false);
-        }
     }
 }
