@@ -10,6 +10,7 @@ import java.awt.*;
 public class SupportContactPanel extends JPanel {
 
     private StorageMode storageMode;
+
     public SupportContactPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());
@@ -45,7 +46,7 @@ public class SupportContactPanel extends JPanel {
         messageFormWrapper.setLayout(new BorderLayout());
         messageFormWrapper.setOpaque(false);
         messageFormWrapper.add(Box.createVerticalStrut(20), BorderLayout.NORTH);
-        messageFormWrapper.add(new SendMessageForm(storageMode), BorderLayout.CENTER);
+        messageFormWrapper.add(new SendMessageForm(storageMode), BorderLayout.CENTER);  // Use the existing SendMessageForm class here
 
         // === Combine Layout ===
         JPanel centerPanel = new JPanel();
