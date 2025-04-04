@@ -119,4 +119,18 @@ public abstract class Account implements Serializable {
 
     public abstract BigDecimal getCreditLimit();
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Account other = (Account) obj;
+        return accountNumber != null && accountNumber.equals(other.accountNumber);
+    }
+
+    @Override
+    public int hashCode() {
+        return accountNumber != null ? accountNumber.hashCode() : 0;
+    }
+
+
 }

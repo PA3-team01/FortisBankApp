@@ -100,7 +100,7 @@ public class InboxPanel extends JPanel {
         messageListPanel.repaint();
     }
 
-    private JPanel buildNotificationCard(Notification notification) {
+    private JPanel buildNotificationCard(Notification notification) { //TODO extract to NotificationCard class (component)
         JPanel card = new JPanel();
         card.setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(card);
@@ -120,6 +120,9 @@ public class InboxPanel extends JPanel {
         footer.setOpaque(false);
         footer.add(timestamp);
 
+        /*
+            Logic for accepting or rejecting account opening requests (Admin)
+         */
         if (notification.getType() == NotificationType.ACCOUNT_OPENING_REQUEST) {
             JButton acceptBtn = new JButton("Accept");
             JButton rejectBtn = new JButton("Reject");
@@ -132,13 +135,17 @@ public class InboxPanel extends JPanel {
                 Account account = notification.getRelatedAccount();
                 if (recipient instanceof Customer customer) {
                     accountLoanService.acceptAccountRequest(customer, account);
+                    StyleUtils.showStyledSuccessDialog(this,"Account opened successfully.");
                 } else {
                     JOptionPane.showMessageDialog(this, "Invalid recipient.");
                     return;
                 }
                 notification.markAsRead();
-                refreshMessages();
+                refreshMessages();// TODO: fix -> find a better way to disable buttons avoiding recreating them on refresh
+
+                disableButtons(acceptBtn, rejectBtn);
             });
+
 
             rejectBtn.addActionListener(e -> {
                 String reason = JOptionPane.showInputDialog(this, "Reason for rejection:");
@@ -148,12 +155,14 @@ public class InboxPanel extends JPanel {
                     Account account = notification.getRelatedAccount();
                     if (recipient instanceof Customer customer) {
                         accountLoanService.rejectAccountRequest(customer, reason, account);
+                        StyleUtils.showStyledSuccessDialog(this,"Account request rejected.");
                     } else {
                         JOptionPane.showMessageDialog(this, "Invalid recipient.");
                         return;
                     }
                     notification.markAsRead();
                     refreshMessages();
+                    disableButtons(acceptBtn, rejectBtn);
                 }
             });
 
@@ -183,5 +192,12 @@ public class InboxPanel extends JPanel {
         card.add(footer, BorderLayout.SOUTH);
 
         return card;
+    }
+    // helper method to disable button(s) with args
+    private void disableButtons(JButton... buttons) {
+        for (JButton button : buttons) {
+            button.setEnabled(false);
+            button.setVisible(false);
+        }
     }
 }

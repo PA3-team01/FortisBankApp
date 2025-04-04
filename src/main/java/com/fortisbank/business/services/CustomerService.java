@@ -14,7 +14,7 @@ import java.util.Map;
  * Service class responsible for managing customer-related operations
  * with support for multiple storage modes (FILE or DATABASE).
  *
- * This version enriches customer objects with their accounts from AccountService.
+ * This version enriches customer objects with their accounts from AccountService. ***
  */
 public class CustomerService implements ICustomerService {
 
@@ -54,15 +54,17 @@ public class CustomerService implements ICustomerService {
 
     @Override
     public Customer getCustomer(String id) {
-        Customer customer = customerRepository.getCustomerById(id);
-        AccountList accounts = accountService.getAccountsByCustomerId(id);
-        customer.setAccounts(accounts);
+        Customer customer = customerRepository.getCustomerById(id); // fetch customer by ID (account list is empty at this point
+        AccountList accounts = accountService.getAccountsByCustomerId(id);// fetch accounts by customer ID
+        customer.setAccounts(accounts); // set accounts to customer
         return customer;
     }
 
     @Override
     public CustomerList getAllCustomers() {
         CustomerList customers = customerRepository.getAllCustomers();
+        // as accounts are stored in a different repository, we need to fetch them separately
+        // and set them to each customer
         for (Customer customer : customers) {
             AccountList accounts = accountService.getAccountsByCustomerId(customer.getUserId());
             customer.setAccounts(accounts);
