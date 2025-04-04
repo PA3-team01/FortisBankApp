@@ -115,17 +115,10 @@ public class LoginService {
     }
 
     private User authenticateUser(User user, char[] rawInput, boolean usePIN) throws Exception {
-        System.out.println("Trying login for: " + user.getEmail());
-        System.out.println("User type: " + user.getClass().getSimpleName());
-        System.out.println("Expected " + (usePIN ? "PIN hash: " : "Password hash: ") +
-                (usePIN ? user.getPINHash() : user.getHashedPassword()));
-        System.out.println("Raw input: " + Arrays.toString(rawInput));
 
         boolean verified = usePIN
                 ? SecurityUtils.verifyPIN(rawInput, user.getPINHash())
                 : SecurityUtils.verifyPassword(rawInput, user.getHashedPassword());
-
-        System.out.println("Verification result: " + verified);
 
         if (!verified) {
             throw new AuthenticationException("Incorrect " + (usePIN ? "PIN." : "password."));

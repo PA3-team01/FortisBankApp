@@ -85,16 +85,20 @@ public class DashboardFrame extends JFrame {
 
     private void handleLogout() {
         SessionManager.clear();
+
+        // Open login frame AFTER dashboard is disposed to avoid conflicts
+        SwingUtilities.invokeLater(() -> new LoginFrame(storageMode).setVisible(true));
+
+        // Dispose of dashboard after scheduling login
         dispose();
-        new LoginFrame(storageMode).setVisible(true);
     }
 
     private void closeAllTransactionForms() {
         for (Window window : Window.getWindows()) {
-            if (window instanceof JDialog || window instanceof JFrame) {
-                if (window != this) { // Don't close Dashboard itself, it's already closing
-                    window.dispose();
-                }
+            if ((window instanceof JDialog || window instanceof JFrame)
+                    && window != this
+                    && !(window instanceof LoginFrame)) { // Don't close the new LoginFrame
+                window.dispose();
             }
         }
     }
