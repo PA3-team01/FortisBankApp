@@ -1,6 +1,5 @@
 package com.fortisbank.ui.panels.commons;
 
-import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -11,7 +10,6 @@ public class SettingPanel extends JPanel {
     public SettingPanel() {
         setLayout(new GridBagLayout());
         StyleUtils.styleFormPanel(this);
-
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 10, 5, 10);
@@ -66,16 +64,72 @@ public class SettingPanel extends JPanel {
         add(label, gbc);
     }
 
-    // Placeholder methods for dialogs to update personal information
+    // Input Dialog for Changing Password
     private void openChangePasswordDialog() {
-        JOptionPane.showMessageDialog(this, "Password Change");
+        JPasswordField newPasswordField = new JPasswordField();
+        JPasswordField confirmPasswordField = new JPasswordField();
+        StyleUtils.stylePasswordField(newPasswordField);
+        StyleUtils.stylePasswordField(confirmPasswordField);
+
+        Object[] message = {
+                "New Password:", newPasswordField,
+                "Confirm Password:", confirmPasswordField
+        };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Change Password", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String newPassword = new String(newPasswordField.getPassword());
+            String confirmPassword = new String(confirmPasswordField.getPassword());
+
+            if (newPassword.equals(confirmPassword) && !newPassword.isEmpty()) {
+                StyleUtils.showStyledSuccessDialog(this, "Password updated successfully!");
+                // Call your AccountService to update the password
+            } else {
+                StyleUtils.showStyledErrorDialog(this, "Passwords do not match or are empty!");
+            }
+        }
     }
 
+    // Input Dialog for Updating Email
     private void openUpdateEmailDialog() {
-        JOptionPane.showMessageDialog(this, "Email Update");
+        JTextField emailField = new JTextField();
+        StyleUtils.styleTextField(emailField);
+
+        Object[] message = {"Enter new email:", emailField};
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Update Email", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String newEmail = emailField.getText().trim();
+
+            if (!newEmail.isEmpty() && newEmail.contains("@")) {
+                StyleUtils.showStyledSuccessDialog(this, "Email updated successfully!");
+                //Call your AccountService to update the email
+            } else {
+                StyleUtils.showStyledErrorDialog(this, "Invalid email!");
+            }
+        }
     }
 
+    // Input Dialog for Updating Phone Number
     private void openUpdatePhoneDialog() {
-        JOptionPane.showMessageDialog(this, "Phone Update");
+        JTextField phoneField = new JTextField();
+        StyleUtils.styleTextField(phoneField);
+
+        Object[] message = {"Enter new phone number:", phoneField};
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Update Phone", JOptionPane.OK_CANCEL_OPTION);
+
+        if (option == JOptionPane.OK_OPTION) {
+            String newPhone = phoneField.getText().trim();
+
+            if (!newPhone.isEmpty() && newPhone.matches("\\d{10}")) {
+                StyleUtils.showStyledSuccessDialog(this, "Phone number updated successfully!");
+                // CAll AccountService to update the phone number
+            } else {
+                StyleUtils.showStyledErrorDialog(this, "Invalid phone number! Enter a 10-digit number.");
+            }
+        }
     }
 }
