@@ -23,14 +23,32 @@ public class Main {
                 //Define the storage mode for the application
                 StorageMode storageMode = StorageMode.FILE;
                 // Initialize the data for testing purposes
-                // This is just for testing, in a real application this would be done in a setup or migration phase
                 initData(storageMode);
                 // LoginFrame is the entry point of the application
                 new LoginFrame(storageMode).setVisible(true);
+
+                // -------------------DAEMON THREAD TASKS------------------- (not blocking the UI and set to only run in the background while the application is running)
+                // Create a daemon thread to perform periodic tasks (TEST)//TODO: implement the tasks (e.g. check for account inactivity, send notifications, etc.)
+                DaemonThread daemonThread = new DaemonThread(() -> {
+                    // Perform periodic tasks here
+                    System.out.println("DaemonThread: " + Thread.currentThread().getName());
+                }, 60000); // 60 seconds delay
+                daemonThread.setDaemon(true);
+                daemonThread.start();
+
             }
         });
     }
 
+
+
+    /**
+     * This method is used to create initial data for testing purposes.
+     * In a real application, this would be done in a setup or migration phase.
+     * It creates a test manager and a test customer with predefined credentials.
+     *
+     * @param storageMode The storage mode to be used for the application.
+     */
     // method to create initial data to allow login testing
     private static void initData(StorageMode storageMode) {
         // Register Service
