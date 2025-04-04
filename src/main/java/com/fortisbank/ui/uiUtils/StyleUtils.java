@@ -4,35 +4,47 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
+/**
+ * Centralized styling utility for FortisBank dark-themed UI.
+ * Includes color palette, font definitions, and styling helpers.
+ * Modular design for reuse across panels, forms, dialogs, and buttons.
+ */
 public class StyleUtils {
 
-    // ========== COLOR PALETTE (Dark Theme) ==========
+    // ========== [PALETTE - DARK THEME] ==========
     public static final Color PRIMARY_COLOR = new Color(103, 58, 183); // Deep Purple
     public static final Color ACCENT_COLOR = new Color(255, 64, 129);  // Pink Accent
-    public static final Color BACKGROUND_COLOR = new Color(48, 48, 48); // Dark background
-    public static final Color TEXT_COLOR = new Color(240, 240, 240);    // Light text
-    public static final Color ERROR_COLOR = new Color(244, 67, 54);     // Red
-    public static final Color SUCCESS_COLOR = new Color(76, 175, 80);   // Green
-    public static final Color NAVBAR_BG = new Color(33, 33, 33);        // Darker nav bar
+    public static final Color BACKGROUND_COLOR = new Color(48, 48, 48);
+    public static final Color TEXT_COLOR = new Color(240, 240, 240);
+    public static final Color ERROR_COLOR = new Color(244, 67, 54);
+    public static final Color SUCCESS_COLOR = new Color(76, 175, 80);
+    public static final Color NAVBAR_BG = new Color(33, 33, 33);
     public static final Color NAVBAR_BUTTON_COLOR = new Color(66, 66, 66);
 
-    // ========== FONTS ==========
+    // ========== [FONTS] ==========
     public static final Font LABEL_FONT = new Font("Segoe UI", Font.PLAIN, 13);
     public static final Font FIELD_FONT = new Font("Segoe UI", Font.PLAIN, 14);
     public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 14);
     public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 12);
 
-    // ========== COMPONENT STYLING METHODS ==========
 
+    // ========== [TEXT + LABELS] ==========
     public static void styleLabel(JLabel label) {
         label.setFont(LABEL_FONT);
         label.setForeground(TEXT_COLOR);
     }
 
+    public static void styleStatusLabel(JLabel label, boolean isValid) {
+        label.setFont(STATUS_FONT);
+        label.setForeground(isValid ? SUCCESS_COLOR : ERROR_COLOR);
+    }
+
+
+    // ========== [TEXT INPUTS] ==========
     public static void styleTextField(JTextField field) {
         field.setFont(FIELD_FONT);
         field.setForeground(TEXT_COLOR);
-        field.setBackground(new Color(66, 66, 66));
+        field.setBackground(NAVBAR_BUTTON_COLOR);
         field.setCaretColor(TEXT_COLOR);
         field.setPreferredSize(new Dimension(250, 28));
         field.setBorder(BorderFactory.createCompoundBorder(
@@ -44,10 +56,6 @@ public class StyleUtils {
         styleTextField(field);
     }
 
-    public static void styleStatusLabel(JLabel label, boolean isValid) {
-        label.setFont(STATUS_FONT);
-        label.setForeground(isValid ? SUCCESS_COLOR : ERROR_COLOR);
-    }
     public static void styleRadioButton(JRadioButton radioButton) {
         radioButton.setFont(FIELD_FONT);
         radioButton.setForeground(TEXT_COLOR);
@@ -56,11 +64,10 @@ public class StyleUtils {
         radioButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-
     public static void styleDropdown(JComboBox<?> comboBox) {
         comboBox.setFont(FIELD_FONT);
         comboBox.setForeground(TEXT_COLOR);
-        comboBox.setBackground(new Color(66, 66, 66));
+        comboBox.setBackground(NAVBAR_BUTTON_COLOR);
         comboBox.setFocusable(false);
         comboBox.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -71,13 +78,14 @@ public class StyleUtils {
                 JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 label.setFont(FIELD_FONT);
                 label.setForeground(TEXT_COLOR);
-                label.setBackground(isSelected ? new Color(97, 97, 97) : new Color(66, 66, 66));
+                label.setBackground(isSelected ? new Color(97, 97, 97) : NAVBAR_BUTTON_COLOR);
                 return label;
             }
         });
     }
 
 
+    // ========== [BUTTONS] ==========
     public static void styleButton(JButton button, boolean isPrimary) {
         button.setFont(BUTTON_FONT);
         button.setFocusPainted(false);
@@ -98,36 +106,44 @@ public class StyleUtils {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
     }
 
+
+    // ========== [PANELS + FORMS] ==========
+    public static void styleFormPanel(JPanel panel) {
+        panel.setBackground(BACKGROUND_COLOR);
+        panel.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(NAVBAR_BG, 1),
+                BorderFactory.createEmptyBorder(10, 10, 10, 10)));
+    }
+
     public static void styleNavbar(JPanel navbar) {
         navbar.setBackground(NAVBAR_BG);
         navbar.setLayout(new BoxLayout(navbar, BoxLayout.Y_AXIS));
         navbar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
+
+    // ========== [FRAMES + DIALOGS] ==========
     public static void applyGlobalFrameStyle(JFrame frame) {
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
+        frame.getRootPane().setBorder(BorderFactory.createLineBorder(NAVBAR_BG, 2));
     }
 
     public static void applyGlobalDialogStyle(JDialog dialog) {
         dialog.getContentPane().setBackground(BACKGROUND_COLOR);
         dialog.setUndecorated(true);
         dialog.setModal(true);
+        dialog.getRootPane().setBorder(BorderFactory.createLineBorder(NAVBAR_BG, 2));
     }
 
+
+    // ========== [TITLES + HEADER BAR] ==========
     public static void styleFormTitle(JLabel titleLabel) {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(PRIMARY_COLOR);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    public static void styleFormPanel(JPanel panel) {
-        panel.setBackground(BACKGROUND_COLOR);
-        panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-    }
-
-
-
-    // TODO: Migrate this to a more reusable component
+    // TODO: Migrate to component: CustomTitleBar
     public static JPanel createCustomTitleBar(JFrame frame, String titleText, JComponent rightControls) {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setBackground(PRIMARY_COLOR);
@@ -137,14 +153,10 @@ public class StyleUtils {
         title.setForeground(Color.WHITE);
         title.setFont(new Font("Segoe UI", Font.BOLD, 14));
 
-        // Right-side button group
         JPanel buttonGroup = new JPanel(new FlowLayout(FlowLayout.RIGHT, 5, 0));
         buttonGroup.setOpaque(false);
 
-        // Optional right controls (like Logout)
-        if (rightControls != null) {
-            buttonGroup.add(rightControls);
-        }
+        if (rightControls != null) buttonGroup.add(rightControls);
 
         JButton closeButton = new JButton("X");
         closeButton.setFocusPainted(false);
@@ -157,11 +169,10 @@ public class StyleUtils {
         closeButton.addActionListener(e -> frame.dispose());
 
         buttonGroup.add(closeButton);
-
         titleBar.add(title, BorderLayout.WEST);
         titleBar.add(buttonGroup, BorderLayout.EAST);
 
-        // Drag logic
+        // Drag support
         final Point[] initialClick = {null};
         titleBar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent e) {
@@ -180,7 +191,9 @@ public class StyleUtils {
 
         return titleBar;
     }
-    // TODO: Migrate this to a more reusable component
+
+
+    // TODO: Migrate to reusable StyledDialog
     public static void showStyledDialog(Component parent, String title, String message, boolean success) {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setUndecorated(true);
@@ -199,7 +212,6 @@ public class StyleUtils {
         messagePanel.setBackground(BACKGROUND_COLOR);
         messagePanel.add(icon, BorderLayout.WEST);
         messagePanel.add(messageLabel, BorderLayout.CENTER);
-        panel.add(messagePanel, BorderLayout.CENTER);
 
         JButton okButton = new JButton("OK");
         styleButton(okButton, success);
@@ -209,6 +221,7 @@ public class StyleUtils {
         buttonPanel.setBackground(BACKGROUND_COLOR);
         buttonPanel.add(okButton);
 
+        panel.add(messagePanel, BorderLayout.CENTER);
         panel.add(buttonPanel, BorderLayout.SOUTH);
         dialog.add(panel);
         dialog.pack();
