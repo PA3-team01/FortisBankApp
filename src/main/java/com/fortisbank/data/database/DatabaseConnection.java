@@ -4,6 +4,9 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+/**
+ * gere la connexion/ deconnexion
+ */
 public class DatabaseConnection implements IDatabaseConnection {
     private static DatabaseConnection instance; // Singleton instance
     private Connection connection;
@@ -23,6 +26,9 @@ public class DatabaseConnection implements IDatabaseConnection {
         return instance;
     }
 
+    /**
+     * Etablit la connexion a la base de donnees Oracle
+     */
     // Connect to Oracle Database
     @Override
     public void Connect() {
@@ -47,6 +53,9 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     }
 
+    /**
+     * Ferme la connexion
+     */
     // Disconnect from Database
     @Override
     public void Disconnect() {
@@ -62,6 +71,10 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     }
 
+    /**
+     * Teste la connexion a la database
+     * @return true su la connexion est reussi
+     */
     // Test Database Connection
     public boolean TestConnection() {
         try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
