@@ -50,7 +50,7 @@ public class TransactionRepositoryFile extends FileRepository<Transaction> imple
 
     @Override
     public TransactionList getAllTransactions() {
-        return (TransactionList) readAll();
+        return new TransactionList (readAll());
     }
 
     @Override

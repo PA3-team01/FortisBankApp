@@ -1,11 +1,13 @@
 package com.fortisbank.ui.frames.subFrames;
 
+import com.fortisbank.business.services.customer.CustomerService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.components.NavigationBar;
 import com.fortisbank.ui.panels.commons.InboxPanel;
 import com.fortisbank.ui.panels.commons.ProfilePanel;
 import com.fortisbank.ui.panels.commons.SettingPanel;
 import com.fortisbank.ui.panels.managerPanels.InterestRateManager;
+import com.fortisbank.ui.panels.managerPanels.ReportsPanel;
 import com.fortisbank.ui.panels.managerPanels.UserManagementPanel;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
@@ -39,9 +41,9 @@ public class ManagerUi extends JPanel {
         // === Button Actions ===
         navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
         navPanel.setButtonAction("Users", () -> showContent(new UserManagementPanel(storageMode)));
-        navPanel.setButtonAction("Reports", () -> showContent(new JLabel("Financial Reports")));
+        navPanel.setButtonAction("Reports", () -> showContent(new ReportsPanel(storageMode,
+                CustomerService.getInstance(storageMode).getAllCustomers())));
         navPanel.setButtonAction("Interest Rates", () -> showContent(new InterestRateManager()));
-        //navPanel.setButtonAction("Settings", () -> showContent(new JLabel("System Settings")));
         navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
 
         navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
