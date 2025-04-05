@@ -3,9 +3,9 @@ package com.fortisbank.ui.panels.customerPanels;
 import com.fortisbank.data.repositories.StorageMode;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +13,7 @@ public class CurrencyExchangePanel extends JPanel {
 
     private final StorageMode storageMode;
 
-    // Hardcoded example rates (from currency → to currency → rate)
+    // Hardcoded example rates
     private final Map<String, Double> exchangeRates = new HashMap<String, Double>() {{
         put("USD_TO_EUR", 0.85);
         put("USD_TO_CAD", 1.47);
@@ -62,7 +62,7 @@ public class CurrencyExchangePanel extends JPanel {
 
         leftRatePanel.add(Box.createVerticalStrut(10));
 
-        // Example Rates (no flags)
+        // Example Rates
         String[] exampleRates = {
                 "USD to EUR: 1 USD = 0.85 EUR",
                 "USD to CAD: 1 USD = 1.47 CAD",
@@ -95,7 +95,6 @@ public class CurrencyExchangePanel extends JPanel {
         fromLabel.setForeground(Color.WHITE);
         fromLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-
         JComboBox<String> fromCurrencyComboBox = new JComboBox<>(new String[]{
                 "$ USD", "€ EUR", "£ GBP", "₣ CAD", "¥ JPY"
         });
@@ -110,50 +109,37 @@ public class CurrencyExchangePanel extends JPanel {
         amountField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         amountField.setPreferredSize(new Dimension(200, 40));
 
-        // Restrict input to numbers only (including decimals)
-        amountField.getDocument().addDocumentListener(new DocumentListener() {
+        // Restrict input to numbers only (including decimals) using KeyListener
+        amountField.addKeyListener(new KeyAdapter() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
-                validateInput();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                validateInput();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                validateInput();
-            }
-
-            private void validateInput() {
-                String text = amountField.getText();
-                if (!text.matches("^[0-9]*\\.?[0-9]*$")) { // Allow numbers and a single decimal point
-                    amountField.setText(text.substring(0, text.length() - 1));
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                // Allow only digits and the decimal point
+                if (!(Character.isDigit(c) || c == '.')) {
+                    e.consume(); // Consume the event to block non-numeric input
                 }
             }
         });
 
         JLabel toLabel = new JLabel("To:");
         toLabel.setForeground(Color.WHITE);
-        toLabel.setFont(new Font("Arial", Font.BOLD, 18)); // Bigger font for To label
+        toLabel.setFont(new Font("Arial", Font.BOLD, 18));
 
-        // JComboBox with currency symbols and names, with larger font and dimensions
+
         JComboBox<String> toCurrencyComboBox = new JComboBox<>(new String[]{
                 "$ USD", "€ EUR", "£ GBP", "₣ CAD", "¥ JPY"
         });
-        toCurrencyComboBox.setFont(new Font("Arial", Font.PLAIN, 16)); // Larger font for combo box
-        toCurrencyComboBox.setPreferredSize(new Dimension(200, 40)); // Larger combo box size
+        toCurrencyComboBox.setFont(new Font("Arial", Font.PLAIN, 16));
+        toCurrencyComboBox.setPreferredSize(new Dimension(200, 40));
 
         JLabel rateLabel = new JLabel("Rate:");
         rateLabel.setForeground(Color.WHITE);
-        rateLabel.setFont(new Font("Arial", Font.BOLD, 18)); // Bigger font for Rate label
+        rateLabel.setFont(new Font("Arial", Font.BOLD, 18));
         JTextField conversionRateField = new JTextField();
-        conversionRateField.setFont(new Font("Arial", Font.PLAIN, 16)); // Larger font for text field
+        conversionRateField.setFont(new Font("Arial", Font.PLAIN, 16));
         conversionRateField.setEditable(false);
         conversionRateField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
-        conversionRateField.setPreferredSize(new Dimension(200, 40)); // Larger text field size
+        conversionRateField.setPreferredSize(new Dimension(200, 40));
 
         inputGridPanel.add(fromLabel);
         inputGridPanel.add(fromCurrencyComboBox);
@@ -172,10 +158,10 @@ public class CurrencyExchangePanel extends JPanel {
         buttonPanel.setOpaque(false);
 
         JButton convertButton = new JButton("Convert");
-        convertButton.setFont(new Font("Arial", Font.BOLD, 16)); // Larger font for button
+        convertButton.setFont(new Font("Arial", Font.BOLD, 16));
         convertButton.setBackground(new Color(66, 133, 244));
         convertButton.setForeground(Color.WHITE);
-        convertButton.setPreferredSize(new Dimension(200, 40)); // Larger button size
+        convertButton.setPreferredSize(new Dimension(200, 40));
 
         convertButton.addActionListener(e -> {
             try {
@@ -183,7 +169,7 @@ public class CurrencyExchangePanel extends JPanel {
                 String toCurrency = (String) toCurrencyComboBox.getSelectedItem();
                 double amount = Double.parseDouble(amountField.getText());
 
-                // Extract the currency code from the selected value (remove the symbol)
+                // Extract the currency code from the selected value
                 String fromCurrencyCode = fromCurrency.split(" ")[1];
                 String toCurrencyCode = toCurrency.split(" ")[1];
 
