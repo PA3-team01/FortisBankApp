@@ -309,6 +309,56 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    public void scanForSuspiciousActivity() {
+        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+        var notificationService = NotificationService.getInstance(storageMode);
+        BigDecimal suspiciousAmount = new BigDecimal("5000");
+
+        for (var customer : customers) {
+            for (var account : customer.getAccounts()) {
+                var recentTransactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
+
+                // High-Value Withdrawals or Transfers
+                for (Transaction tx : recentTransactions) {
+                    if ((tx.getTransactionType() == TransactionType.WITHDRAWAL ||
+                            tx.getTransactionType() == TransactionType.TRANSFER)
+                            && tx.getAmount().compareTo(suspiciousAmount) >= 0) {
+
+                        notificationService.sendNotification(
+                                customer,
+                                NotificationType.SECURITY_ALERT,
+                                "Unusual Transaction Detected",
+                                "A high-value " + tx.getTransactionType().name().toLowerCase()
+                                        + " of $" + tx.getAmount() + " occurred on account " + account.getAccountNumber(),
+                                customer,
+                                account
+                        );
+
+                        break; // one alert per account for now
+                    }
+                }
+
+                // High Transaction Frequency (within 1 min)
+                var recent = recentTransactions.stream()
+                        .filter(t -> t.getTransactionDate().after(new Date(System.currentTimeMillis() - 60000))) // last 60s
+                        .count();
+
+                if (recent > 10) {
+                    notificationService.sendNotification(
+                            customer,
+                            NotificationType.SECURITY_ALERT,
+                            "Suspicious Activity",
+                            "More than 10 transactions were made on account " + account.getAccountNumber()
+                                    + " within a minute.",
+                            customer,
+                            account
+                    );
+                }
+            }
+        }
+    }
+
+
 
 }
 

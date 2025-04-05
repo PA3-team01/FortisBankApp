@@ -124,4 +124,16 @@ public class TransactionList extends ArrayList<Transaction> {
         }
         return builder.toString();
     }
+
+    /**
+     * Renvoie la date de la dernière transaction enregistrée.
+     * @return Date de la dernière activité ou null si aucune transaction.
+     */
+    public Date getLastActivityDate() {
+        return this.stream()
+                .map(Transaction::getTransactionDate)
+                .max(Date::compareTo)
+                .orElse(null);
+    }
+
 }

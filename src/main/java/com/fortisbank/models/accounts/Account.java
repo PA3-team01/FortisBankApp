@@ -25,6 +25,7 @@ public abstract class Account implements Serializable {
     protected transient TransactionList transactions;
 
     protected boolean isActive;
+    private boolean lowBalanceAlertSent = false;
 
     // Constructors
     public Account() {
@@ -72,7 +73,7 @@ public abstract class Account implements Serializable {
         return availableBalance;
     }
 
-    public List<Transaction> getTransactions() {
+    public TransactionList getTransactions() {
         return transactions;
     }
 
@@ -94,6 +95,13 @@ public abstract class Account implements Serializable {
         return availableBalance.compareTo(amount) >= 0;
     }
 
+    public boolean isLowBalanceAlertSent() {
+        return lowBalanceAlertSent;
+    }
+
+    public void setLowBalanceAlertSent(boolean lowBalanceAlertSent) {
+        this.lowBalanceAlertSent = lowBalanceAlertSent;
+    }
 
 
     @Override

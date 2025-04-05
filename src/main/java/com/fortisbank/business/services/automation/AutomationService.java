@@ -1,6 +1,7 @@
 package com.fortisbank.business.services.automation;
 
 import com.fortisbank.business.services.transaction.TransactionService;
+import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.business.utils.DaemonThread;
 import com.fortisbank.data.repositories.StorageMode;
 
@@ -22,23 +23,29 @@ public class AutomationService {
                 TimeUnit.DAYS.toMillis(365)).start();
 
 
-        // 2. Inactive Currency Account Auto-Closure (Daily)
-        // new DaemonThread(() -> AccountService.closeInactiveCurrencyAccounts(), TimeUnit.DAYS.toMillis(1)).start();
+        // 2. Auto-close inactive currency accounts (Daily)
+        new DaemonThread(() -> AccountService
+                .getInstance(storageMode)
+                .autoCloseInactiveCurrencyAccounts(),
+                TimeUnit.DAYS.toMillis(1)).start();
 
-        // 3. Checking Account Monthly Fees (Monthly)
-        // new DaemonThread(() -> FeeService.applyCheckingFees(), TimeUnit.DAYS.toMillis(30)).start();
+
+        // 3. Low Balance Alerts (Every 15 minutes)
+        new DaemonThread(() -> AccountService
+                .getInstance(storageMode)
+                .checkLowBalanceAndNotify(),
+                TimeUnit.MINUTES.toMillis(15)).start();
+
+
+        // 15. Fraud Detection (Hourly)
+        new DaemonThread(() -> TransactionService
+                .getInstance(storageMode)
+                .scanForSuspiciousActivity(),
+                TimeUnit.HOURS.toMillis(1)).start();
 
         // 4. Monthly Statement Generation (Monthly)
         // new DaemonThread(() -> StatementService.generateMonthlyStatements(), TimeUnit.DAYS.toMillis(30)).start();
 
-        // 5. Low Balance Alerts (Every 15 minutes)
-        // new DaemonThread(() -> AlertService.checkLowBalances(), TimeUnit.MINUTES.toMillis(15)).start();
-
-        // 6. Notification Dispatcher (Every 10 seconds)
-        // new DaemonThread(() -> NotificationService.dispatchPendingNotifications(), TimeUnit.SECONDS.toMillis(10)).start();
-
-        // 7. Fraud Detection Task (Hourly)
-        // new DaemonThread(() -> FraudDetectionService.scanForSuspiciousActivity(), TimeUnit.HOURS.toMillis(1)).start();
 
         // 8. Archive Old Transactions (Monthly)
         // new DaemonThread(() -> ArchiveService.archiveOldTransactions(), TimeUnit.DAYS.toMillis(30)).start();
@@ -48,9 +55,6 @@ public class AutomationService {
 
         // 10. Exchange Rate Updates (Hourly)
         // new DaemonThread(() -> CurrencyService.updateExchangeRates(), TimeUnit.HOURS.toMillis(1)).start();
-
-        // 11. Account Deletion Eligibility Scan (Daily)
-        // new DaemonThread(() -> ClientService.checkAccountClosureEligibility(), TimeUnit.DAYS.toMillis(1)).start();
 
         // 12. Cleanup Expired/Orphaned Data (Daily)
         // new DaemonThread(() -> CleanupService.removeExpiredOrphanedData(), TimeUnit.DAYS.toMillis(1)).start();

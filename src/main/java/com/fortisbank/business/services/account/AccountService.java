@@ -1,5 +1,6 @@
 package com.fortisbank.business.services.account;
 
+import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
@@ -7,9 +8,12 @@ import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.accounts.AccountFactory;
 import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.models.others.NotificationType;
 import com.fortisbank.models.users.Customer;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
@@ -135,5 +139,84 @@ public class AccountService implements IAccountService {
 
         System.out.println("Account " + account.getAccountNumber() + " closed successfully.");
     }
+
+    public void autoCloseInactiveCurrencyAccounts() {
+        var allAccounts = getAllAccounts();
+
+        NotificationService notificationService = NotificationService.getInstance(storageMode);
+
+        for (Account account : allAccounts) {
+            if (account.getAccountType() != AccountType.CURRENCY || !account.isActive()) continue;
+
+            // Get last transaction date or fallback to openedDate
+            Date lastActivity = account.getTransactions().getLastActivityDate(); // method from TransactionList
+            if (lastActivity == null) {
+                lastActivity = account.getOpenedDate();
+            }
+
+            LocalDate lastActivityDate = lastActivity.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate oneYearAgo = LocalDate.now().minusYears(1);
+
+            if (lastActivityDate.isBefore(oneYearAgo)) {
+                // Conditions met: close account
+                account.setActive(false);
+                updateAccount(account);
+
+                // Remove from customer's list
+                Customer customer = account.getCustomer();
+                if (customer != null && customer.getAccounts() != null) {
+                    customer.getAccounts().remove(account);
+                    RepositoryFactory.getInstance(storageMode).getCustomerRepository().updateCustomer(customer);
+                }
+
+                // Optional: notify customer
+                notificationService.sendNotification(
+                        customer,
+                        NotificationType.INFO,
+                        "Currency Account Closed",
+                        "Your currency account (" + account.getAccountNumber() + ") was automatically closed due to inactivity over 1 year.",
+                        customer,
+                        account
+                );
+
+                System.out.println("Closed inactive currency account: " + account.getAccountNumber());
+            }
+        }
+    }
+
+    public void checkLowBalanceAndNotify() {
+        BigDecimal THRESHOLD = new BigDecimal("100.00");
+        var allAccounts = getAllAccounts();
+        var notificationService = NotificationService.getInstance(storageMode);
+
+        for (Account account : allAccounts) {
+            if (!account.isActive()) continue;
+
+            BigDecimal balance = account.getAvailableBalance();
+            boolean belowThreshold = balance.compareTo(THRESHOLD) < 0;
+
+            if (belowThreshold && !account.isLowBalanceAlertSent()) {
+                // Send notification
+                notificationService.sendNotification(
+                        account.getCustomer(),
+                        NotificationType.INFO,
+                        "Low Balance Warning",
+                        String.format("Your account (%s) balance has dropped below $%.2f. Current balance: $%.2f",
+                                account.getAccountNumber(), THRESHOLD, balance),
+                        account.getCustomer(),
+                        account
+                );
+                account.setLowBalanceAlertSent(true);
+                updateAccount(account);
+            }
+
+            // Reset flag if balance is restored
+            if (!belowThreshold && account.isLowBalanceAlertSent()) {
+                account.setLowBalanceAlertSent(false);
+                updateAccount(account);
+            }
+        }
+    }
+
 
 }
