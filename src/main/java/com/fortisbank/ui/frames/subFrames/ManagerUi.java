@@ -50,18 +50,7 @@ public class ManagerUi extends JPanel {
 
     }
 
-    private JPanel createWelcomePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setOpaque(false);
 
-        JLabel info = new JLabel("Welcome to the Manager Panel.");
-        StyleUtils.styleLabel(info);
-        panel.add(Box.createVerticalStrut(15));
-        panel.add(info);
-
-        return panel;
-    }
 
     /**
      * Dynamically swap content panel contents.
@@ -94,4 +83,59 @@ public class ManagerUi extends JPanel {
         contentPanel.revalidate();
         contentPanel.repaint();
     }
+
+    // placeholder for the welcome panel
+    private JPanel createWelcomePanel() {
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setOpaque(false);
+        panel.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40)); // spacing
+
+        // Title
+        JLabel title = new JLabel("Welcome, Bank Manager!");
+        title.setFont(new Font("Segoe UI", Font.BOLD, 24));
+        title.setForeground(StyleUtils.PRIMARY_COLOR);
+        title.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Subheading
+        JLabel subtitle = new JLabel("FortisBank Manager Dashboard");
+        subtitle.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+        subtitle.setForeground(StyleUtils.TEXT_COLOR);
+        subtitle.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        // Description
+        JTextArea desc = new JTextArea(
+                """
+                This panel gives you access to all essential managerial tools:
+                
+                - View and manage registered customers
+                - Generate detailed financial reports
+                - Review customer account activities
+                - Monitor system-wide metrics and summaries
+                - Configure interest rates and security settings
+                
+                Use the sidebar to navigate between functionalities.
+                """);
+        desc.setFont(StyleUtils.FIELD_FONT);
+        desc.setForeground(StyleUtils.TEXT_COLOR);
+        desc.setBackground(StyleUtils.BACKGROUND_COLOR);
+        desc.setWrapStyleWord(true);
+        desc.setLineWrap(true);
+        desc.setEditable(false);
+        desc.setFocusable(false);
+        desc.setOpaque(false);
+        desc.setAlignmentX(Component.CENTER_ALIGNMENT);
+        desc.setMaximumSize(new Dimension(600, 250));
+
+        panel.add(Box.createVerticalGlue());
+        panel.add(title);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(subtitle);
+        panel.add(Box.createVerticalStrut(25));
+        panel.add(desc);
+        panel.add(Box.createVerticalGlue());
+
+        return panel;
+    }
+
 }
