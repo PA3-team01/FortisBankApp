@@ -23,6 +23,11 @@ public class ManagerList extends ArrayList<BankManager> {
 
     // ------------------- Filtering -------------------
 
+    /**
+     *  Filtre les Manager qui contient x
+     * @param substring x a rechercher
+     * @return Manager List filtrer
+     */
     public ManagerList filterByNameContains(String substring) {
         return this.stream()
                 .filter(m -> m.getFullName().toLowerCase().contains(substring.toLowerCase()))
