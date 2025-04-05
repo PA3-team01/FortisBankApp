@@ -1,7 +1,7 @@
 package com.fortisbank.data.repositories;
 
-import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.collections.ManagerList;
+import com.fortisbank.models.users.BankManager;
 
 public interface IBankManagerRepository {
 

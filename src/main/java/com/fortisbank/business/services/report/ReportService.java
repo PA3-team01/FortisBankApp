@@ -1,10 +1,9 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.report;
 
 import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ICustomerRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.collections.AccountList;
@@ -12,6 +11,7 @@ import com.fortisbank.models.collections.TransactionList;
 import com.fortisbank.models.reports.BankSummaryReport;
 import com.fortisbank.models.reports.CustomerStatementReport;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.utils.ReportExporter;
 
 import java.io.IOException;

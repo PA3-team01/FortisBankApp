@@ -1,4 +1,4 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.transaction;
 
 import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
@@ -131,7 +131,7 @@ public class TransactionService implements ITransactionService {
             accountRepository.updateAccount(account);
         }
     }
-
+    // TODO: not used -> remove or implement ( would be used in ui/components/transactionSummary.java and parent(s) )
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
         Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
         Date endDate = new Date();

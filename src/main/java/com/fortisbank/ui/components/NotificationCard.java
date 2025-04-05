@@ -1,14 +1,14 @@
 package com.fortisbank.ui.components;
 
-import com.fortisbank.business.services.AccountLoanRequestService;
+import com.fortisbank.business.services.account.AccountLoanRequestService;
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.others.Notification;
 import com.fortisbank.models.others.NotificationType;
 import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.users.User;
-import com.fortisbank.ui.uiUtils.StyleUtils;
-import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.session.SessionManager;
+import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

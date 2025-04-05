@@ -1,7 +1,11 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.account;
 
-import com.fortisbank.data.repositories.*;
-import com.fortisbank.models.accounts.*;
+import com.fortisbank.data.repositories.IAccountRepository;
+import com.fortisbank.data.repositories.RepositoryFactory;
+import com.fortisbank.data.repositories.StorageMode;
+import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.accounts.AccountFactory;
+import com.fortisbank.models.accounts.AccountType;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.users.Customer;
 

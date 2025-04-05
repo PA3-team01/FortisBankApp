@@ -1,7 +1,7 @@
 package com.fortisbank.ui.forms;
 
-import com.fortisbank.business.services.BankManagerService;
-import com.fortisbank.business.services.NotificationService;
+import com.fortisbank.business.services.manager.BankManagerService;
+import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.users.User;
 import com.fortisbank.session.SessionManager;

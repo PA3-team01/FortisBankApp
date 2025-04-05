@@ -1,4 +1,4 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.account;
 
 /**
  * InactivityMonitorService periodically checks for inactive currency accounts

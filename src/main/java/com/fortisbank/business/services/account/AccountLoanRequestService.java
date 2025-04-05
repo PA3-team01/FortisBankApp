@@ -1,5 +1,7 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.account;
 
+import com.fortisbank.business.services.customer.CustomerService;
+import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;

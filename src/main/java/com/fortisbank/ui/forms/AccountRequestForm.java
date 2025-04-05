@@ -1,7 +1,7 @@
 package com.fortisbank.ui.forms;
 
-import com.fortisbank.business.services.AccountLoanRequestService;
-import com.fortisbank.business.services.BankManagerService;
+import com.fortisbank.business.services.account.AccountLoanRequestService;
+import com.fortisbank.business.services.manager.BankManagerService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.users.BankManager;

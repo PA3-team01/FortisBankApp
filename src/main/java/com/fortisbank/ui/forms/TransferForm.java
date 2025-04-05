@@ -1,14 +1,14 @@
 package com.fortisbank.ui.forms;
 
-import com.fortisbank.business.services.CustomerService;
-import com.fortisbank.business.services.TransactionService;
+import com.fortisbank.business.services.customer.CustomerService;
+import com.fortisbank.business.services.transaction.TransactionService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.collections.CustomerList;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.collections.CustomerList;
 import com.fortisbank.session.SessionManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 

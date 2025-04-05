@@ -1,10 +1,10 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.users.Customer;
+import com.fortisbank.exceptions.AccountNotFoundException;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.AccountList;
-import com.fortisbank.exceptions.AccountNotFoundException;
+import com.fortisbank.models.users.Customer;
 import com.fortisbank.utils.CurrencyType;
 
 import java.math.BigDecimal;

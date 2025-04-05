@@ -1,7 +1,7 @@
 package com.fortisbank.models.reports;
 
-import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.models.users.Customer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,4 +1,4 @@
-package com.fortisbank.ui;
+package com.fortisbank.business.utils;
 
 import java.util.Date;
 
@@ -28,4 +28,5 @@ public class DaemonThread extends Thread {
             }
         }
     }
+
 }

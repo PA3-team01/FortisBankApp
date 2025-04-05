@@ -1,4 +1,4 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.manager;
 
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.users.Customer;

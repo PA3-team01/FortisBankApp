@@ -1,4 +1,4 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.account;
 
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.AccountList;

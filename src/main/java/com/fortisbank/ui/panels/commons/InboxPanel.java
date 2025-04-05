@@ -1,7 +1,7 @@
 package com.fortisbank.ui.panels.commons;
 
-import com.fortisbank.business.services.AccountLoanRequestService;
-import com.fortisbank.business.services.NotificationService;
+import com.fortisbank.business.services.account.AccountLoanRequestService;
+import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.others.Notification;
 import com.fortisbank.session.SessionManager;

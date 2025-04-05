@@ -1,8 +1,8 @@
 package com.fortisbank.ui.frames.subFrames;
 
 import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.collections.TransactionList;
+import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;

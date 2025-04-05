@@ -1,18 +1,16 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.database.DatabaseConnection;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.collections.CustomerList;
-import org.jetbrains.annotations.NotNull;
 import com.fortisbank.exceptions.CustomerNotFoundException;
+import com.fortisbank.models.collections.CustomerList;
+import com.fortisbank.models.users.Customer;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
-
-
 
 import static com.fortisbank.data.repositories.AccountRepository.LOGGER;
 

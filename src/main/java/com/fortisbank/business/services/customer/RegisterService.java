@@ -1,13 +1,15 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.customer;
 
+import com.fortisbank.business.services.account.AccountService;
+import com.fortisbank.business.services.manager.BankManagerService;
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.exceptions.RegistrationFailedException;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
-import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.utils.SecurityUtils;
 
-import java.util.UUID;
 import java.util.Arrays;
+import java.util.UUID;
 
 import static com.fortisbank.utils.ValidationUtils.*;
 

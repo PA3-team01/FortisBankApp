@@ -4,10 +4,9 @@ import com.fortisbank.models.users.Customer;
 import com.fortisbank.utils.IdGenerator;
 
 import java.math.BigDecimal;
-import java.util.Date;
-
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Date;
 
 public class CheckingAccount extends Account {
     public static final int FREE_TRANSACTION_LIMIT = 2;

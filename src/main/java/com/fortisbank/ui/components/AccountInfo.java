@@ -1,7 +1,7 @@
 package com.fortisbank.ui.components;
 
-import com.fortisbank.business.services.AccountService;
-import com.fortisbank.business.services.TransactionService;
+import com.fortisbank.business.services.account.AccountService;
+import com.fortisbank.business.services.transaction.TransactionService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.TransactionList;

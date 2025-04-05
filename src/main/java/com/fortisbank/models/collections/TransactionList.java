@@ -5,12 +5,12 @@ import com.fortisbank.models.transactions.TransactionType;
 import com.fortisbank.utils.TransactionComparators;
 
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TransactionList extends ArrayList<Transaction> {
 

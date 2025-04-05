@@ -1,11 +1,11 @@
 package com.fortisbank.ui.forms;
 
+import com.fortisbank.business.services.transaction.TransactionService;
+import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
-import com.fortisbank.business.services.TransactionService;
-import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import java.math.BigDecimal;

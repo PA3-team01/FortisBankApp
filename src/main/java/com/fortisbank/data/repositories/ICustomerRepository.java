@@ -1,7 +1,7 @@
 package com.fortisbank.data.repositories;
 
-import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.CustomerList;
+import com.fortisbank.models.users.Customer;
 
 public interface ICustomerRepository {
     Customer getCustomerById(String customerId);

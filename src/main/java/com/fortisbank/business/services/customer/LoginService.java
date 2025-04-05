@@ -1,5 +1,6 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.customer;
 
+import com.fortisbank.business.services.manager.BankManagerService;
 import com.fortisbank.exceptions.AuthenticationException;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
@@ -9,7 +10,8 @@ import com.fortisbank.utils.SecurityUtils;
 
 import java.util.Arrays;
 
-import static com.fortisbank.utils.ValidationUtils.*;
+import static com.fortisbank.utils.ValidationUtils.isValidEmail;
+import static com.fortisbank.utils.ValidationUtils.isValidPIN;
 
 public class LoginService {
 

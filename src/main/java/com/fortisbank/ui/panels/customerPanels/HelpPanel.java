@@ -4,7 +4,6 @@ import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
-import javax.swing.text.Style;
 import java.awt.*;
 
 public class HelpPanel extends JPanel {

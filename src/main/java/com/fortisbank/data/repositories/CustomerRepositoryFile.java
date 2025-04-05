@@ -1,8 +1,8 @@
 package com.fortisbank.data.repositories;
 
 import com.fortisbank.data.file.FileRepository;
-import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.CustomerList;
+import com.fortisbank.models.users.Customer;
 
 import java.io.File;
 import java.util.List;

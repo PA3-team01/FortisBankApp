@@ -1,6 +1,6 @@
 package com.fortisbank.ui.frames.mainFrames;
 
-import com.fortisbank.business.services.RegisterService;
+import com.fortisbank.business.services.customer.RegisterService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 import com.fortisbank.utils.ValidationUtils;

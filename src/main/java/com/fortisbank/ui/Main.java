@@ -1,6 +1,7 @@
 package com.fortisbank.ui;
 
-import com.fortisbank.business.services.RegisterService;
+import com.fortisbank.business.services.automation.AutomationService;
+import com.fortisbank.business.services.customer.RegisterService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.ui.frames.mainFrames.LoginFrame;
 
@@ -26,15 +27,8 @@ public class Main {
                 initData(storageMode);
                 // LoginFrame is the entry point of the application
                 new LoginFrame(storageMode).setVisible(true);
-
-                // -------------------DAEMON THREAD TASKS------------------- (not blocking the UI and set to only run in the background while the application is running)
-                // Create a daemon thread to perform periodic tasks (TEST)//TODO: implement the tasks (e.g. check for account inactivity, send notifications, etc.)
-                DaemonThread daemonThread = new DaemonThread(() -> {
-                    // Perform periodic tasks here
-                    System.out.println("DaemonThread: " + Thread.currentThread().getName());
-                }, 60000); // 60 seconds delay
-                daemonThread.setDaemon(true);
-                daemonThread.start();
+                // Start background tasks
+                AutomationService.startAllDaemonTasks();
 
             }
         });

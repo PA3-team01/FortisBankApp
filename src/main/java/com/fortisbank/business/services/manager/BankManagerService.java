@@ -1,5 +1,6 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.manager;
 
+import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.data.repositories.IBankManagerRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
@@ -7,7 +8,6 @@ import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.ManagerList;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
-import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import java.util.EnumMap;
 import java.util.Map;

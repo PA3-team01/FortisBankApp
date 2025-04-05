@@ -1,13 +1,15 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.notification;
 
+import com.fortisbank.business.services.customer.CustomerService;
+import com.fortisbank.business.services.manager.BankManagerService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.Account;
+import com.fortisbank.models.others.Notification;
+import com.fortisbank.models.others.NotificationType;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.users.User;
-import com.fortisbank.models.others.Notification;
-import com.fortisbank.models.others.NotificationType;
 
 import java.util.ArrayList;
 import java.util.List;

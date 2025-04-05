@@ -1,11 +1,12 @@
-package com.fortisbank.business.services;
+package com.fortisbank.business.services.customer;
 
+import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.data.repositories.ICustomerRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
 import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.users.Customer;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.collections.CustomerList;
+import com.fortisbank.models.users.Customer;
 
 import java.util.EnumMap;
 import java.util.Map;
