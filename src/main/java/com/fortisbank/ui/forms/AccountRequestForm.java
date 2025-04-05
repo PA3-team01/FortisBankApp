@@ -101,15 +101,19 @@ public class AccountRequestForm extends JFrame {
     private void renderDynamicFields(AccountType type) {
         dynamicFieldsPanel.removeAll();
 
-        JLabel balanceLabel = new JLabel("Initial Balance:");
-        StyleUtils.styleLabel(balanceLabel);
-        StyleUtils.styleTextField(balanceField);
-        dynamicFieldsPanel.add(balanceLabel);
-        dynamicFieldsPanel.add(balanceField);
-
         InterestRateConfigService rateService = InterestRateConfigService.getInstance();
         BigDecimal savingsRate = rateService.getRate(AccountType.SAVINGS).multiply(BigDecimal.valueOf(100));
         BigDecimal creditRate = rateService.getRate(AccountType.CREDIT).multiply(BigDecimal.valueOf(100));
+
+        switch (type) {
+            case CHECKING, SAVINGS, CURRENCY -> {
+                JLabel balanceLabel = new JLabel("Initial Balance:");
+                StyleUtils.styleLabel(balanceLabel);
+                StyleUtils.styleTextField(balanceField);
+                dynamicFieldsPanel.add(balanceLabel);
+                dynamicFieldsPanel.add(balanceField);
+            }
+        }
 
         switch (type) {
             case SAVINGS -> {
@@ -122,15 +126,15 @@ public class AccountRequestForm extends JFrame {
                 dynamicFieldsPanel.add(interestRateLabel);
             }
             case CREDIT -> {
-                JLabel creditLimitLabel = new JLabel("Credit Limit:");
+                JLabel creditLabel = new JLabel("Requested Credit Amount:");
                 JLabel rateLabel = new JLabel("Interest Rate (%):");
                 interestRateLabel.setText(creditRate + " %");
                 interestRateLabel.setForeground(Color.GRAY);
-                StyleUtils.styleLabel(creditLimitLabel);
+                StyleUtils.styleLabel(creditLabel);
                 StyleUtils.styleLabel(rateLabel);
                 StyleUtils.styleLabel(interestRateLabel);
                 StyleUtils.styleTextField(creditLimitField);
-                dynamicFieldsPanel.add(creditLimitLabel);
+                dynamicFieldsPanel.add(creditLabel);
                 dynamicFieldsPanel.add(creditLimitField);
                 dynamicFieldsPanel.add(rateLabel);
                 dynamicFieldsPanel.add(interestRateLabel);
@@ -148,6 +152,7 @@ public class AccountRequestForm extends JFrame {
         dynamicFieldsPanel.repaint();
     }
 
+
     private void handleRequest() {
         try {
             AccountType selectedType = (AccountType) typeSelector.getSelectedItem();
@@ -161,9 +166,14 @@ public class AccountRequestForm extends JFrame {
                 case CHECKING -> new CheckingAccount(accountNumber, customer, now, balance);
                 case SAVINGS -> new SavingsAccount(accountNumber, customer, now, balance,
                         InterestRateConfigService.getInstance().getRate(AccountType.SAVINGS));
-                case CREDIT -> new CreditAccount(accountNumber, customer, now,
-                        new BigDecimal(creditLimitField.getText().trim()),
-                        InterestRateConfigService.getInstance().getRate(AccountType.CREDIT));
+                case CREDIT -> {
+                    BigDecimal creditAmount = new BigDecimal(creditLimitField.getText().trim());
+                    CreditAccount credit = new CreditAccount(accountNumber, customer, now, creditAmount,
+                            InterestRateConfigService.getInstance().getRate(AccountType.CREDIT));
+                    credit.setAvailableBalance(creditAmount); // Ensure balance is initialized to requested amount
+                    yield credit;
+                }
+
                 case CURRENCY -> new CurrencyAccount(accountNumber, customer, now, balance,
                         currencyCodeField.getText().trim());
             };
