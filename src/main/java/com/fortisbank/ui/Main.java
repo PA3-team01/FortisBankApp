@@ -28,7 +28,7 @@ public class Main {
                 // LoginFrame is the entry point of the application
                 new LoginFrame(storageMode).setVisible(true);
                 // Start background tasks
-                AutomationService.startAllDaemonTasks();
+                AutomationService.startAllDaemonTasks(storageMode);
 
             }
         });

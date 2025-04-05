@@ -1,17 +1,32 @@
 package com.fortisbank.business.services.automation;
 
+import com.fortisbank.business.services.transaction.TransactionService;
+import com.fortisbank.business.utils.DaemonThread;
+import com.fortisbank.data.repositories.StorageMode;
+
+import java.util.concurrent.TimeUnit;
+
 public class AutomationService {
 
-    public static void startAllDaemonTasks() {
+    public static void startAllDaemonTasks(StorageMode storageMode) {
 
         // 1. Interest Application (Daily)
-        // new DaemonThread(() -> InterestService.applyMonthlyInterest(), TimeUnit.DAYS.toMillis(1)).start();
+        new DaemonThread(() -> TransactionService
+                .getInstance(storageMode)
+                .applyMonthlyInterestToAllCreditAccounts(),
+                TimeUnit.DAYS.toMillis(30)).start();
+
+        new DaemonThread(() -> TransactionService
+                .getInstance(storageMode)
+                .applyAnnualInterestToAllSavingsAccounts(),
+                TimeUnit.DAYS.toMillis(365)).start();
+
 
         // 2. Inactive Currency Account Auto-Closure (Daily)
         // new DaemonThread(() -> AccountService.closeInactiveCurrencyAccounts(), TimeUnit.DAYS.toMillis(1)).start();
 
-        // 3. Chequing Account Monthly Fees (Monthly)
-        // new DaemonThread(() -> FeeService.applyChequingFees(), TimeUnit.DAYS.toMillis(30)).start();
+        // 3. Checking Account Monthly Fees (Monthly)
+        // new DaemonThread(() -> FeeService.applyCheckingFees(), TimeUnit.DAYS.toMillis(30)).start();
 
         // 4. Monthly Statement Generation (Monthly)
         // new DaemonThread(() -> StatementService.generateMonthlyStatements(), TimeUnit.DAYS.toMillis(30)).start();

@@ -25,8 +25,10 @@ public class TransactionService implements ITransactionService {
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
+    private final StorageMode storageMode;
 
     private TransactionService(StorageMode storageMode) {
+        this.storageMode = storageMode;
         var factory = RepositoryFactory.getInstance(storageMode);
         this.transactionRepository = factory.getTransactionRepository();
         this.accountRepository = factory.getAccountRepository();
@@ -249,5 +251,40 @@ public class TransactionService implements ITransactionService {
     public TransactionList getRecentTransactionsByAccount(Account account) {
         return transactionRepository.getTransactionsByAccount(account.getAccountNumber());
     }
+
+
+    // ---------------------------------------------------------------------------------------
+    // AUTOMATED TASKS
+    // ---------------------------------------------------------------------------------------
+
+    public void applyMonthlyInterestToAllCreditAccounts() {
+        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+
+        for (var customer : customers) {
+            for (var account : customer.getAccounts()) {
+                if (account instanceof CreditAccount creditAccount && creditAccount.isEligibleForInterestCalculation()) {
+                    applyInterestToCreditAccount(creditAccount);
+                    creditAccount.setLastInterestApplied(LocalDate.now());
+                    accountRepository.updateAccount(creditAccount);
+                }
+            }
+        }
+    }
+
+    public void applyAnnualInterestToAllSavingsAccounts() {
+        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+
+        for (var customer : customers) {
+            for (var account : customer.getAccounts()) {
+                if (account instanceof SavingsAccount savingsAccount && savingsAccount.isEligibleForInterestCalculation()) {
+                    applyAnnualInterestToSavingsAccount(savingsAccount);
+                    savingsAccount.setLastInterestApplied(LocalDate.now());
+                    accountRepository.updateAccount(savingsAccount);
+                }
+            }
+        }
+    }
+
+
 }
 
