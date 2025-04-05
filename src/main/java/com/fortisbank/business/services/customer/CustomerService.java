@@ -7,6 +7,7 @@ import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.collections.AccountList;
 import com.fortisbank.models.collections.CustomerList;
 import com.fortisbank.models.users.Customer;
+import com.fortisbank.utils.SecurityUtils;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -106,5 +107,23 @@ public class CustomerService implements ICustomerService {
         return false;
     }
 
+
+    public void updateCustomerWithSecurity(Customer customer, char[] newPassword, char[] newPin) {
+        try {
+            if (newPassword != null && newPassword.length > 0) {
+                String hashedPassword = SecurityUtils.hashPassword(newPassword);
+                customer.setHashedPassword(hashedPassword);
+            }
+
+            if (newPin != null && newPin.length > 0) {
+                String hashedPin = SecurityUtils.hashPIN(newPin);
+                customer.setPINHash(hashedPin);
+            }
+
+            updateCustomer(customer);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update customer credentials: " + e.getMessage(), e);
+        }
+    }
 
 }

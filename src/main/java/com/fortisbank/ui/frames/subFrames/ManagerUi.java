@@ -6,6 +6,7 @@ import com.fortisbank.ui.panels.commons.InboxPanel;
 import com.fortisbank.ui.panels.commons.ProfilePanel;
 import com.fortisbank.ui.panels.commons.SettingPanel;
 import com.fortisbank.ui.panels.managerPanels.InterestRateManager;
+import com.fortisbank.ui.panels.managerPanels.UserManagementPanel;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -37,7 +38,7 @@ public class ManagerUi extends JPanel {
 
         // === Button Actions ===
         navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
-        navPanel.setButtonAction("Users", () -> showContent(new JLabel("Manage Users Section")));
+        navPanel.setButtonAction("Users", () -> showContent(new UserManagementPanel(storageMode)));
         navPanel.setButtonAction("Reports", () -> showContent(new JLabel("Financial Reports")));
         navPanel.setButtonAction("Interest Rates", () -> showContent(new InterestRateManager()));
         //navPanel.setButtonAction("Settings", () -> showContent(new JLabel("System Settings")));

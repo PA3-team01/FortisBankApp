@@ -8,6 +8,7 @@ import com.fortisbank.models.accounts.Account;
 import com.fortisbank.models.collections.ManagerList;
 import com.fortisbank.models.users.BankManager;
 import com.fortisbank.models.users.Customer;
+import com.fortisbank.utils.SecurityUtils;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -147,5 +148,20 @@ public class BankManagerService implements IBankManagerService {
         return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
     }
 
+
+    public void updateManagerWithSecurity(BankManager manager, char[] newPassword, char[] newPin) {
+        try {
+            if (newPassword != null && newPassword.length > 0) {
+                manager.setHashedPassword(SecurityUtils.hashPassword(newPassword));
+            }
+            if (newPin != null && newPin.length > 0) {
+                manager.setPINHash(SecurityUtils.hashPIN(newPin));
+            }
+            // Standard info update
+            updateBankManager(manager);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to update manager security fields", e);
+        }
+    }
 
 }
