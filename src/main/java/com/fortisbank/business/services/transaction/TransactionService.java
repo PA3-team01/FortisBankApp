@@ -1,5 +1,6 @@
 package com.fortisbank.business.services.transaction;
 
+import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
 import com.fortisbank.data.repositories.RepositoryFactory;
@@ -7,6 +8,7 @@ import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.exceptions.InvalidTransactionException;
 import com.fortisbank.models.accounts.*;
 import com.fortisbank.models.collections.TransactionList;
+import com.fortisbank.models.others.NotificationType;
 import com.fortisbank.models.transactions.Transaction;
 import com.fortisbank.models.transactions.TransactionFactory;
 import com.fortisbank.models.transactions.TransactionType;
@@ -26,9 +28,12 @@ public class TransactionService implements ITransactionService {
     private final ITransactionRepository transactionRepository;
     private final IAccountRepository accountRepository;
     private final StorageMode storageMode;
+    private final NotificationService notificationService;
+
 
     private TransactionService(StorageMode storageMode) {
         this.storageMode = storageMode;
+        this.notificationService = NotificationService.getInstance(storageMode);
         var factory = RepositoryFactory.getInstance(storageMode);
         this.transactionRepository = factory.getTransactionRepository();
         this.accountRepository = factory.getAccountRepository();
@@ -110,6 +115,15 @@ public class TransactionService implements ITransactionService {
         if (interest.compareTo(BigDecimal.ZERO) > 0) {
             applyFee(account, interest, "Monthly interest applied.");
         }
+        notificationService.sendNotification(
+                account.getCustomer(),
+                NotificationType.INFO,
+                "Monthly Interest Charged",
+                String.format("An interest charge of $%.2f has been applied to your credit account (%s).",
+                        interest, account.getAccountNumber()),
+                account.getCustomer(),
+                account
+        );
     }
 
     public void applyAnnualInterestToSavingsAccount(SavingsAccount account) {
@@ -132,6 +146,16 @@ public class TransactionService implements ITransactionService {
             transactionRepository.insertTransaction(tx);
             accountRepository.updateAccount(account);
         }
+        notificationService.sendNotification(
+                account.getCustomer(),
+                NotificationType.INFO,
+                "Annual Interest Credited",
+                String.format("An interest of $%.2f has been credited to your savings account (%s).",
+                        interest, account.getAccountNumber()),
+                account.getCustomer(),
+                account
+        );
+
     }
     // TODO: not used -> remove or implement ( would be used in ui/components/transactionSummary.java and parent(s) )
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
