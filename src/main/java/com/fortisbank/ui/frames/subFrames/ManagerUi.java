@@ -5,6 +5,7 @@ import com.fortisbank.ui.components.NavigationBar;
 import com.fortisbank.ui.panels.commons.InboxPanel;
 import com.fortisbank.ui.panels.commons.ProfilePanel;
 import com.fortisbank.ui.panels.commons.SettingPanel;
+import com.fortisbank.ui.panels.managerPanels.InterestRateManager;
 import com.fortisbank.ui.uiUtils.StyleUtils;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class ManagerUi extends JPanel {
         StyleUtils.styleFormPanel(this);
 
         // === LEFT: Navigation Panel ===
-        navPanel = new NavigationBar("Inbox", "Users", "Reports", "Approvals", "Settings");
+        navPanel = new NavigationBar("Inbox", "Users", "Reports", "Interest Rates", "Settings");
         StyleUtils.styleNavbar(navPanel);
         add(navPanel, BorderLayout.WEST);
 
@@ -38,7 +39,7 @@ public class ManagerUi extends JPanel {
         navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
         navPanel.setButtonAction("Users", () -> showContent(new JLabel("Manage Users Section")));
         navPanel.setButtonAction("Reports", () -> showContent(new JLabel("Financial Reports")));
-        navPanel.setButtonAction("Approvals", () -> showContent(new JLabel("Pending Approvals")));
+        navPanel.setButtonAction("Interest Rates", () -> showContent(new InterestRateManager()));
         //navPanel.setButtonAction("Settings", () -> showContent(new JLabel("System Settings")));
         navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
 

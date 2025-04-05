@@ -59,8 +59,7 @@ public class SavingsAccount extends Account implements InterestBearingAccount {
      */
     public boolean isEligibleForInterestCalculation() {
         if (lastInterestApplied == null) return true;
-        LocalDate now = LocalDate.now();
-        return lastInterestApplied.getYear() < now.getYear();
+        return lastInterestApplied.getYear() < LocalDate.now().getYear();
     }
 
     // -------------------------------------------------------------------------------------
@@ -75,7 +74,7 @@ public class SavingsAccount extends Account implements InterestBearingAccount {
                 "Account Type: " + getAccountType() + "\n" +
                 "Opened Date: " + getOpenedDate() + "\n" +
                 "Available Balance: " + df.format(getAvailableBalance()) + "$\n" +
-                "Annual Interest Rate: " + df.format(annualInterestRate.multiply(BigDecimal.valueOf(100))) + "%\n" +
+                "Annual Interest Rate: " + df.format(getAnnualInterestRate().multiply(BigDecimal.valueOf(100))) + "%\n" +
                 "Last Interest Applied: " + (lastInterestApplied != null ? lastInterestApplied : "Never") + "\n" +
                 "Customer Name: " + getCustomer().getFullName();
     }

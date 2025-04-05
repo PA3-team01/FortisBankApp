@@ -37,26 +37,25 @@ public class AutomationService {
                 TimeUnit.MINUTES.toMillis(15)).start();
 
 
-        // 15. Fraud Detection (Hourly)
+        // 4. Fraud Detection (Hourly)
         new DaemonThread(() -> TransactionService
                 .getInstance(storageMode)
                 .scanForSuspiciousActivity(),
                 TimeUnit.HOURS.toMillis(1)).start();
 
-        // 4. Monthly Statement Generation (Monthly)
+        // 5. Monthly Statement Generation (Monthly)
         // new DaemonThread(() -> StatementService.generateMonthlyStatements(), TimeUnit.DAYS.toMillis(30)).start();
 
-
-        // 8. Archive Old Transactions (Monthly)
+        // 6. Archive Old Transactions (Monthly)
         // new DaemonThread(() -> ArchiveService.archiveOldTransactions(), TimeUnit.DAYS.toMillis(30)).start();
 
-        // 9. Auto-Approval for Low-Risk Account Requests (Every 5 minutes)
+        // 7. Auto-Approval for Low-Risk Account Requests (Every 5 minutes)
         // new DaemonThread(() -> AccountApprovalService.autoApproveLowRiskRequests(), TimeUnit.MINUTES.toMillis(5)).start();
 
-        // 10. Exchange Rate Updates (Hourly)
+        // 8. Exchange Rate Updates (Hourly)
         // new DaemonThread(() -> CurrencyService.updateExchangeRates(), TimeUnit.HOURS.toMillis(1)).start();
 
-        // 12. Cleanup Expired/Orphaned Data (Daily)
+        // 9. Cleanup Expired/Orphaned Data (Daily)
         // new DaemonThread(() -> CleanupService.removeExpiredOrphanedData(), TimeUnit.DAYS.toMillis(1)).start();
 
     }

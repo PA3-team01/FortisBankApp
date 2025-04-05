@@ -1,5 +1,6 @@
 package com.fortisbank.business.services.transaction;
 
+import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.business.services.notification.NotificationService;
 import com.fortisbank.data.repositories.IAccountRepository;
 import com.fortisbank.data.repositories.ITransactionRepository;
@@ -20,8 +21,6 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
-//TODO : Extend to trigger Alerts (low balance, overdraft, etc.) (send notifications)
-
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
@@ -29,7 +28,6 @@ public class TransactionService implements ITransactionService {
     private final IAccountRepository accountRepository;
     private final StorageMode storageMode;
     private final NotificationService notificationService;
-
 
     private TransactionService(StorageMode storageMode) {
         this.storageMode = storageMode;
@@ -43,9 +41,6 @@ public class TransactionService implements ITransactionService {
         return instances.computeIfAbsent(storageMode, TransactionService::new);
     }
 
-    // ---------------------------------------------------------------------------------------
-    // CORE BUSINESS METHOD
-    // ---------------------------------------------------------------------------------------
     public void executeTransaction(Transaction transaction) {
         ValidationUtils.validateNotNull(transaction, "Transaction");
         ValidationUtils.validateAmount(transaction.getAmount());
@@ -102,11 +97,6 @@ public class TransactionService implements ITransactionService {
         transactionRepository.insertTransaction(transaction);
     }
 
-
-    // ---------------------------------------------------------------------------------------
-    // INTEREST & CURRENCY OPERATIONS
-    // ---------------------------------------------------------------------------------------
-
     public void applyInterestToCreditAccount(CreditAccount account) {
         BigDecimal rate = account.getInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -155,9 +145,8 @@ public class TransactionService implements ITransactionService {
                 account.getCustomer(),
                 account
         );
-
     }
-    // TODO: not used -> remove or implement ( would be used in ui/components/transactionSummary.java and parent(s) )
+
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
         Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
         Date endDate = new Date();
@@ -169,9 +158,6 @@ public class TransactionService implements ITransactionService {
         return transactions.filterByDateRange(startDate, endDate);
     }
 
-    // ---------------------------------------------------------------------------------------
-    // REPOSITORY WRAPPERS
-    // ---------------------------------------------------------------------------------------
     @Override
     public void createTransaction(Transaction transaction) {
         transactionRepository.insertTransaction(transaction);
@@ -207,9 +193,6 @@ public class TransactionService implements ITransactionService {
         return transactionRepository.getBalanceBeforeDate(customerID, start);
     }
 
-    // ---------------------------------------------------------------------------------------
-    // VALIDATION HELPERS
-    // ---------------------------------------------------------------------------------------
     private void validateNotNull(Object obj, String fieldName) {
         if (obj == null) {
             throw new InvalidTransactionException(fieldName + " cannot be null.");
@@ -231,9 +214,6 @@ public class TransactionService implements ITransactionService {
         }
     }
 
-    // ---------------------------------------------------------------------------------------
-    // INTERNAL OPERATIONS
-    // ---------------------------------------------------------------------------------------
     private void adjustBalance(Account account, BigDecimal delta) {
         BigDecimal updated = account.getAvailableBalance().add(delta);
         account.setAvailableBalance(updated);
@@ -276,16 +256,13 @@ public class TransactionService implements ITransactionService {
         return transactionRepository.getTransactionsByAccount(account.getAccountNumber());
     }
 
-
-    // ---------------------------------------------------------------------------------------
-    // AUTOMATED TASKS
-    // ---------------------------------------------------------------------------------------
-
     public void applyMonthlyInterestToAllCreditAccounts() {
-        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+        var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
+        var accountService = AccountService.getInstance(storageMode);
 
-        for (var customer : customers) {
-            for (var account : customer.getAccounts()) {
+        for (var customer : customerRepo.getAllCustomers()) {
+            var accounts = accountService.getAccountsByCustomerId(customer.getUserId());
+            for (var account : accounts) {
                 if (account instanceof CreditAccount creditAccount && creditAccount.isEligibleForInterestCalculation()) {
                     applyInterestToCreditAccount(creditAccount);
                     creditAccount.setLastInterestApplied(LocalDate.now());
@@ -296,10 +273,12 @@ public class TransactionService implements ITransactionService {
     }
 
     public void applyAnnualInterestToAllSavingsAccounts() {
-        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+        var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
+        var accountService = AccountService.getInstance(storageMode);
 
-        for (var customer : customers) {
-            for (var account : customer.getAccounts()) {
+        for (var customer : customerRepo.getAllCustomers()) {
+            var accounts = accountService.getAccountsByCustomerId(customer.getUserId());
+            for (var account : accounts) {
                 if (account instanceof SavingsAccount savingsAccount && savingsAccount.isEligibleForInterestCalculation()) {
                     applyAnnualInterestToSavingsAccount(savingsAccount);
                     savingsAccount.setLastInterestApplied(LocalDate.now());
@@ -310,15 +289,16 @@ public class TransactionService implements ITransactionService {
     }
 
     public void scanForSuspiciousActivity() {
-        var customers = RepositoryFactory.getInstance(storageMode).getCustomerRepository().getAllCustomers();
+        var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
+        var accountService = AccountService.getInstance(storageMode);
         var notificationService = NotificationService.getInstance(storageMode);
         BigDecimal suspiciousAmount = new BigDecimal("5000");
 
-        for (var customer : customers) {
-            for (var account : customer.getAccounts()) {
+        for (var customer : customerRepo.getAllCustomers()) {
+            var accounts = accountService.getAccountsByCustomerId(customer.getUserId());
+            for (var account : accounts) {
                 var recentTransactions = transactionRepository.getTransactionsByAccount(account.getAccountNumber());
 
-                // High-Value Withdrawals or Transfers
                 for (Transaction tx : recentTransactions) {
                     if ((tx.getTransactionType() == TransactionType.WITHDRAWAL ||
                             tx.getTransactionType() == TransactionType.TRANSFER)
@@ -334,13 +314,12 @@ public class TransactionService implements ITransactionService {
                                 account
                         );
 
-                        break; // one alert per account for now
+                        break;
                     }
                 }
 
-                // High Transaction Frequency (within 1 min)
                 var recent = recentTransactions.stream()
-                        .filter(t -> t.getTransactionDate().after(new Date(System.currentTimeMillis() - 60000))) // last 60s
+                        .filter(t -> t.getTransactionDate().after(new Date(System.currentTimeMillis() - 60000)))
                         .count();
 
                 if (recent > 10) {
@@ -357,8 +336,4 @@ public class TransactionService implements ITransactionService {
             }
         }
     }
-
-
-
 }
-

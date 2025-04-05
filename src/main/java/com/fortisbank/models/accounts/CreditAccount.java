@@ -19,7 +19,7 @@ public class CreditAccount extends Account implements InterestBearingAccount {
         super(accountNumber, customer, AccountType.CREDIT, openedDate, BigDecimal.ZERO);
         this.creditLimit = creditLimit;
         this.interestRate = interestRate;
-        this.lastInterestApplied = null; // Default: never applied
+        this.lastInterestApplied = null;
     }
 
     // -------------------------------------------------------------------------------------
@@ -34,6 +34,7 @@ public class CreditAccount extends Account implements InterestBearingAccount {
         this.creditLimit = creditLimit;
     }
 
+    @Override
     public BigDecimal getInterestRate() {
         return interestRate;
     }
@@ -56,7 +57,6 @@ public class CreditAccount extends Account implements InterestBearingAccount {
 
     /**
      * Monthly interest should only be applied once per calendar month.
-     * This method ensures we apply interest only if it hasn't been applied yet this month.
      */
     public boolean isEligibleForInterestCalculation() {
         if (lastInterestApplied == null) return true;

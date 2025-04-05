@@ -1,0 +1,9 @@
+[ {
+  "accountType" : "SAVINGS",
+  "rate" : 0.026,
+  "lastUpdated" : [ 2025, 4, 5, 14, 24, 23, 76131000 ]
+}, {
+  "accountType" : "CREDIT",
+  "rate" : 0.019,
+  "lastUpdated" : [ 2025, 4, 5, 0, 0 ]
+} ]

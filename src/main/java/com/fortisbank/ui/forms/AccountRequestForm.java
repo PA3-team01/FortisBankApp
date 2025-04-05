@@ -1,6 +1,7 @@
 package com.fortisbank.ui.forms;
 
 import com.fortisbank.business.services.account.AccountLoanRequestService;
+import com.fortisbank.business.services.account.InterestRateConfigService;
 import com.fortisbank.business.services.manager.BankManagerService;
 import com.fortisbank.data.repositories.StorageMode;
 import com.fortisbank.models.accounts.*;
@@ -22,7 +23,7 @@ public class AccountRequestForm extends JFrame {
     private final JComboBox<BankManager> managerSelector = new JComboBox<>();
     private final JPanel dynamicFieldsPanel = new JPanel();
     private final JTextField balanceField = new JTextField();
-    private final JTextField interestRateField = new JTextField();
+    private final JLabel interestRateLabel = new JLabel();
     private final JTextField creditLimitField = new JTextField();
     private final JTextField currencyCodeField = new JTextField();
 
@@ -44,20 +45,17 @@ public class AccountRequestForm extends JFrame {
         formPanel.setLayout(new BoxLayout(formPanel, BoxLayout.Y_AXIS));
         StyleUtils.styleFormPanel(formPanel);
 
-        // Account Type
         JLabel typeLabel = new JLabel("Account Type:");
         StyleUtils.styleLabel(typeLabel);
         for (AccountType type : AccountType.values()) typeSelector.addItem(type);
         StyleUtils.styleDropdown(typeSelector);
         typeSelector.addActionListener(e -> renderDynamicFields((AccountType) typeSelector.getSelectedItem()));
 
-        // Manager Selection
         JLabel managerLabel = new JLabel("Select Manager:");
         StyleUtils.styleLabel(managerLabel);
-        StyleUtils.styleDropdown(managerSelector); // style the dropdown before populating
+        StyleUtils.styleDropdown(managerSelector);
         populateManagerDropdown();
 
-        // Fields Panel
         dynamicFieldsPanel.setLayout(new BoxLayout(dynamicFieldsPanel, BoxLayout.Y_AXIS));
         dynamicFieldsPanel.setOpaque(false);
 
@@ -69,9 +67,8 @@ public class AccountRequestForm extends JFrame {
         formPanel.add(Box.createVerticalStrut(10));
         formPanel.add(dynamicFieldsPanel);
 
-        renderDynamicFields(AccountType.CHECKING); // default
+        renderDynamicFields(AccountType.CHECKING);
 
-        // Buttons
         JButton requestBtn = new JButton("Submit Request");
         StyleUtils.styleButton(requestBtn, true);
         requestBtn.addActionListener(e -> handleRequest());
@@ -110,25 +107,33 @@ public class AccountRequestForm extends JFrame {
         dynamicFieldsPanel.add(balanceLabel);
         dynamicFieldsPanel.add(balanceField);
 
+        InterestRateConfigService rateService = InterestRateConfigService.getInstance();
+        BigDecimal savingsRate = rateService.getRate(AccountType.SAVINGS).multiply(BigDecimal.valueOf(100));
+        BigDecimal creditRate = rateService.getRate(AccountType.CREDIT).multiply(BigDecimal.valueOf(100));
+
         switch (type) {
             case SAVINGS -> {
                 JLabel rateLabel = new JLabel("Interest Rate (%):");
+                interestRateLabel.setText(savingsRate + " %");
+                interestRateLabel.setForeground(Color.GRAY);
                 StyleUtils.styleLabel(rateLabel);
-                StyleUtils.styleTextField(interestRateField);
+                StyleUtils.styleLabel(interestRateLabel);
                 dynamicFieldsPanel.add(rateLabel);
-                dynamicFieldsPanel.add(interestRateField);
+                dynamicFieldsPanel.add(interestRateLabel);
             }
             case CREDIT -> {
                 JLabel creditLimitLabel = new JLabel("Credit Limit:");
                 JLabel rateLabel = new JLabel("Interest Rate (%):");
+                interestRateLabel.setText(creditRate + " %");
+                interestRateLabel.setForeground(Color.GRAY);
                 StyleUtils.styleLabel(creditLimitLabel);
                 StyleUtils.styleLabel(rateLabel);
+                StyleUtils.styleLabel(interestRateLabel);
                 StyleUtils.styleTextField(creditLimitField);
-                StyleUtils.styleTextField(interestRateField);
                 dynamicFieldsPanel.add(creditLimitLabel);
                 dynamicFieldsPanel.add(creditLimitField);
                 dynamicFieldsPanel.add(rateLabel);
-                dynamicFieldsPanel.add(interestRateField);
+                dynamicFieldsPanel.add(interestRateLabel);
             }
             case CURRENCY -> {
                 JLabel codeLabel = new JLabel("Currency Code (e.g., USD):");
@@ -155,15 +160,15 @@ public class AccountRequestForm extends JFrame {
             Account account = switch (selectedType) {
                 case CHECKING -> new CheckingAccount(accountNumber, customer, now, balance);
                 case SAVINGS -> new SavingsAccount(accountNumber, customer, now, balance,
-                        new BigDecimal(interestRateField.getText().trim()));
+                        InterestRateConfigService.getInstance().getRate(AccountType.SAVINGS));
                 case CREDIT -> new CreditAccount(accountNumber, customer, now,
                         new BigDecimal(creditLimitField.getText().trim()),
-                        new BigDecimal(interestRateField.getText().trim()));
+                        InterestRateConfigService.getInstance().getRate(AccountType.CREDIT));
                 case CURRENCY -> new CurrencyAccount(accountNumber, customer, now, balance,
                         currencyCodeField.getText().trim());
             };
 
-            account.setActive(false); // Set to inactive until approved
+            account.setActive(false);
 
             AccountLoanRequestService.getInstance(storageMode)
                     .submitAccountRequest(customer, account, selectedManager);
