@@ -1,35 +1,22 @@
 package com.fortisbank.ui.panels.customerPanels;
 
 import com.fortisbank.data.repositories.StorageMode;
+import com.fortisbank.utils.CurrencyType;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.util.HashMap;
+import java.math.BigDecimal;
 import java.util.Map;
 
 public class CurrencyExchangePanel extends JPanel {
 
     private final StorageMode storageMode;
 
-    // Hardcoded example rates
-    private final Map<String, Double> exchangeRates = new HashMap<String, Double>() {{
-        put("USD_TO_EUR", 0.85);
-        put("USD_TO_CAD", 1.47);
-        put("EUR_TO_USD", 1.18);
-        put("EUR_TO_CAD", 1.73);
-        put("GBP_TO_USD", 1.25);
-        put("GBP_TO_EUR", 1.12);
-        put("CAD_TO_USD", 0.68);
-        put("CAD_TO_EUR", 0.49);
-        put("JPY_TO_EUR", 0.0068);
-    }};
-
     public CurrencyExchangePanel(StorageMode storageMode) {
         this.storageMode = storageMode;
 
-        // Panel setup
         setLayout(new BorderLayout());
         setBackground(new Color(40, 44, 52));
         setOpaque(true);
@@ -42,41 +29,36 @@ public class CurrencyExchangePanel extends JPanel {
         titleLabel.setForeground(Color.WHITE);
         add(titleLabel, BorderLayout.NORTH);
 
-        // === Left: Hardcoded Exchange Rate Panel ===
+        // === Left Panel (Dynamic Rates) ===
         JPanel leftRatePanel = new JPanel();
         leftRatePanel.setLayout(new BoxLayout(leftRatePanel, BoxLayout.Y_AXIS));
         leftRatePanel.setOpaque(false);
 
-        JLabel ratesTitle = new JLabel("Rates:");
+        JLabel ratesTitle = new JLabel("Rates (Base: USD):");
         ratesTitle.setFont(new Font("Arial", Font.BOLD, 22));
         ratesTitle.setForeground(Color.WHITE);
         leftRatePanel.add(ratesTitle);
 
-        // Timestamp
         String timestamp = java.time.LocalDateTime.now()
                 .format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
         JLabel timeLabel = new JLabel("Last updated: " + timestamp);
         timeLabel.setFont(new Font("Arial", Font.ITALIC, 14));
         timeLabel.setForeground(Color.LIGHT_GRAY);
         leftRatePanel.add(timeLabel);
-
         leftRatePanel.add(Box.createVerticalStrut(10));
 
-        // Example Rates
-        String[] exampleRates = {
-                "USD to EUR: 1 USD = 0.85 EUR",
-                "USD to CAD: 1 USD = 1.47 CAD",
-                "EUR to USD: 1 EUR = 1.18 USD",
-                "GBP to USD: 1 GBP = 1.25 USD",
-                "CAD to USD: 1 CAD = 0.68 USD"
-        };
+        // Load rates from CurrencyType
+        CurrencyType currencyType = CurrencyType.getInstance();
+        Map<String, BigDecimal> rates = currencyType.getAllExchangeRates();
 
-        for (String rate : exampleRates) {
-            JLabel rateLabel = new JLabel(rate);
-            rateLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-            rateLabel.setForeground(Color.LIGHT_GRAY);
-            leftRatePanel.add(rateLabel);
-            leftRatePanel.add(Box.createVerticalStrut(5));
+        for (Map.Entry<String, BigDecimal> entry : rates.entrySet()) {
+            if (!entry.getKey().equalsIgnoreCase("USD")) {
+                JLabel rateLabel = new JLabel("1 USD = " + entry.getValue() + " " + entry.getKey());
+                rateLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+                rateLabel.setForeground(Color.LIGHT_GRAY);
+                leftRatePanel.add(rateLabel);
+                leftRatePanel.add(Box.createVerticalStrut(5));
+            }
         }
 
         add(leftRatePanel, BorderLayout.WEST);
@@ -87,7 +69,6 @@ public class CurrencyExchangePanel extends JPanel {
         centerPanel.setOpaque(false);
         centerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // === Combined Input Grid ===
         JPanel inputGridPanel = new JPanel(new GridLayout(2, 4, 15, 15));
         inputGridPanel.setOpaque(false);
 
@@ -109,14 +90,12 @@ public class CurrencyExchangePanel extends JPanel {
         amountField.setBorder(BorderFactory.createLineBorder(Color.GRAY));
         amountField.setPreferredSize(new Dimension(200, 40));
 
-        // Restrict input to numbers only (including decimals) using KeyListener
         amountField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyTyped(KeyEvent e) {
                 char c = e.getKeyChar();
-                // Allow only digits and the decimal point
                 if (!(Character.isDigit(c) || c == '.')) {
-                    e.consume(); // Consume the event to block non-numeric input
+                    e.consume();
                 }
             }
         });
@@ -124,7 +103,6 @@ public class CurrencyExchangePanel extends JPanel {
         JLabel toLabel = new JLabel("To:");
         toLabel.setForeground(Color.WHITE);
         toLabel.setFont(new Font("Arial", Font.BOLD, 18));
-
 
         JComboBox<String> toCurrencyComboBox = new JComboBox<>(new String[]{
                 "$ USD", "€ EUR", "£ GBP", "₣ CAD", "¥ JPY"
@@ -169,22 +147,27 @@ public class CurrencyExchangePanel extends JPanel {
                 String toCurrency = (String) toCurrencyComboBox.getSelectedItem();
                 double amount = Double.parseDouble(amountField.getText());
 
-                // Extract the currency code from the selected value
-                String fromCurrencyCode = fromCurrency.split(" ")[1];
-                String toCurrencyCode = toCurrency.split(" ")[1];
+                String fromCode = fromCurrency.split(" ")[1];
+                String toCode = toCurrency.split(" ")[1];
 
-                // Using the proper currency codes for the key
-                String rateKey = fromCurrencyCode + "_TO_" + toCurrencyCode;
-                double conversionRate = exchangeRates.getOrDefault(rateKey, 1.0);
-                double convertedAmount = amount * conversionRate;
+                BigDecimal fromRate = currencyType.getExchangeRate(fromCode);
+                BigDecimal toRate = currencyType.getExchangeRate(toCode);
 
-                conversionRateField.setText(String.valueOf(conversionRate));
+                if (fromRate.compareTo(BigDecimal.ZERO) == 0 || toRate.compareTo(BigDecimal.ZERO) == 0) {
+                    JOptionPane.showMessageDialog(this,
+                            "Unsupported currency conversion.",
+                            "Conversion Error",
+                            JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
 
-                // Round result to 2 decimal places
-                String formattedAmount = String.format("%.2f", convertedAmount);
+                BigDecimal usdAmount = BigDecimal.valueOf(amount).divide(fromRate, 6, BigDecimal.ROUND_HALF_UP);
+                BigDecimal targetAmount = usdAmount.multiply(toRate);
+                BigDecimal conversionRate = toRate.divide(fromRate, 6, BigDecimal.ROUND_HALF_UP);
 
+                conversionRateField.setText(String.format("%.4f", conversionRate));
                 JOptionPane.showMessageDialog(this,
-                        "Converted Amount: " + formattedAmount,
+                        "Converted Amount: " + targetAmount.setScale(2, BigDecimal.ROUND_HALF_UP),
                         "Conversion Result",
                         JOptionPane.INFORMATION_MESSAGE
                 );
@@ -200,7 +183,6 @@ public class CurrencyExchangePanel extends JPanel {
         buttonPanel.add(convertButton);
         centerPanel.add(buttonPanel);
 
-        // === Wrapper to center centerPanel ===
         JPanel wrapperPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 0, 30));
         wrapperPanel.setOpaque(false);
         wrapperPanel.add(centerPanel);
