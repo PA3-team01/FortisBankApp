@@ -10,54 +10,63 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Liste pour la gestion des comptes (sorting, filtering)
+ * List for managing accounts (sorting, filtering).
  */
 public class AccountList extends ArrayList<Account> {
 
+    /**
+     * Default constructor initializing an empty account list.
+     */
     public AccountList() {
         super();
     }
 
+    /**
+     * Constructor initializing the account list with a collection of accounts.
+     *
+     * @param accounts an iterable collection of accounts to add to the list
+     */
     public AccountList(Iterable<Account> accounts) {
         accounts.forEach(this::add);
     }
 
-    //Sorting
+    // Sorting
 
     /**
-     * Trie les comptes par solde
+     * Sorts the accounts by balance.
      */
     public void sortByBalance() {
         this.sort(AccountComparators.BY_BALANCE);
     }
 
     /**
-     * Trie les comptes par type (Checking, Savings, etc.)
+     * Sorts the accounts by type (Checking, Savings, etc.).
      */
     public void sortByType() {
         this.sort(AccountComparators.BY_TYPE);
     }
 
     /**
-     * Trie les comptes par date de creation
+     * Sorts the accounts by creation date.
      */
     public void sortByCreatedDate() {
         this.sort(AccountComparators.BY_CREATED_DATE);
     }
 
     /**
-     * Trie les compte par date de creation decroissante
+     * Sorts the accounts by creation date in descending order.
      */
     public void sortByCreatedDateDescending() {
         this.sort(AccountComparators.BY_CREATED_DATE.reversed());
     }
 
-    //Filtering
+    // Filtering
 
     /**
-     * Filtre les comptes par minimum balance
-     * @param minBalance Solde minimum
-     * @return Account List filtrer
+     * Filters the accounts by minimum balance.
+     *
+     * @param minBalance the minimum balance to filter by
+     * @return a filtered account list
      */
     public AccountList filterByMinBalance(BigDecimal minBalance) {
         return this.stream()
@@ -66,9 +75,10 @@ public class AccountList extends ArrayList<Account> {
     }
 
     /**
-     * Filtre les comptes par type
-     * @param type Type de compte
-     * @return Account List filtrer
+     * Filters the accounts by type.
+     *
+     * @param type the type of account to filter by
+     * @return a filtered account list
      */
     public AccountList filterByType(String type) {
         return this.stream()
@@ -78,8 +88,9 @@ public class AccountList extends ArrayList<Account> {
     }
 
     /**
-     * Filtre les comptes actifs
-     * @return Account List avec les comptes actifs
+     * Filters the active accounts.
+     *
+     * @return an account list with active accounts
      */
     public AccountList filterByActive() {
         return this.stream()
@@ -88,10 +99,10 @@ public class AccountList extends ArrayList<Account> {
     }
 
     /**
-     * Recupere toutes les transaction de les comptes
-     * @return Liste des transactions
+     * Retrieves all transactions from the accounts.
+     *
+     * @return a list of transactions
      */
-    //All transactions from accounts
     public List<Transaction> getTransactions() {
         List<Transaction> transactions = new ArrayList<>();
         for (Account account : this) {
@@ -100,6 +111,11 @@ public class AccountList extends ArrayList<Account> {
         return transactions;
     }
 
+    /**
+     * Returns a string representation of the account list.
+     *
+     * @return a string containing account list information
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();

@@ -6,10 +6,19 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The HelpPanel class represents the help and support panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to display help and support information.
+ */
 public class HelpPanel extends JPanel {
 
     private StorageMode storageMode;
 
+    /**
+     * Constructs a HelpPanel with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public HelpPanel(StorageMode storageMode){
         this.storageMode = storageMode;
 

@@ -14,12 +14,21 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The ManagerUi class represents the user interface for managers.
+ * It extends JPanel and provides navigation and content display functionality.
+ */
 public class ManagerUi extends JPanel {
 
     private final NavigationBar navPanel;
     private final JPanel contentPanel;
     private StorageMode storageMode;
 
+    /**
+     * Constructs a ManagerUi with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public ManagerUi(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());
@@ -47,13 +56,12 @@ public class ManagerUi extends JPanel {
         navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
 
         navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
-
     }
-
-
 
     /**
      * Dynamically swap content panel contents.
+     *
+     * @param component the component to display in the content area
      */
     private void showContent(JComponent component) {
         contentPanel.removeAll();
@@ -84,7 +92,11 @@ public class ManagerUi extends JPanel {
         contentPanel.repaint();
     }
 
-    // placeholder for the welcome panel
+    /**
+     * Creates a welcome panel with a welcome message.
+     *
+     * @return the welcome panel
+     */
     private JPanel createWelcomePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));

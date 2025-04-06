@@ -17,6 +17,11 @@ import java.awt.*;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * The TransferForm class is a form for handling fund transfers between accounts.
+ * It extends the TransactionForm class and provides functionality to transfer funds
+ * from a source account to a destination account.
+ */
 public class TransferForm extends TransactionForm {
 
     private final Account sourceAccount;
@@ -28,6 +33,12 @@ public class TransferForm extends TransactionForm {
     private final JTextField amountField = new JTextField();
     private final JTextField descriptionField = new JTextField();
 
+    /**
+     * Constructs a TransferForm with the specified source account and storage mode.
+     *
+     * @param sourceAccount the account to transfer funds from
+     * @param storageMode the storage mode to use for services
+     */
     public TransferForm(Account sourceAccount, StorageMode storageMode) {
         super("Transfer Funds", storageMode);
         this.sourceAccount = sourceAccount;
@@ -38,6 +49,9 @@ public class TransferForm extends TransactionForm {
         buildTransferPanel();
     }
 
+    /**
+     * Sets up the transfer type selector with options for self-transfer and transfer to another customer.
+     */
     private void setupTransferTypeSelector() {
         ButtonGroup group = new ButtonGroup();
         group.add(selfTransferBtn);
@@ -51,6 +65,9 @@ public class TransferForm extends TransactionForm {
         StyleUtils.styleRadioButton(otherTransferBtn);
     }
 
+    /**
+     * Sets up the customer dropdown with a list of all customers.
+     */
     private void setupCustomerDropdown() {
         CustomerList customers = CustomerService.getInstance(storageMode).getAllCustomers();
 
@@ -70,12 +87,11 @@ public class TransferForm extends TransactionForm {
                 return this;
             }
         });
-
-
     }
 
-
-
+    /**
+     * Builds the transfer panel with options for selecting the transfer type and recipient.
+     */
     private void buildTransferPanel() {
         JPanel topPanel = new JPanel();
         topPanel.setLayout(new BoxLayout(topPanel, BoxLayout.Y_AXIS));
@@ -97,6 +113,11 @@ public class TransferForm extends TransactionForm {
         showSelfTransferOptions(); // default
     }
 
+    /**
+     * Returns a panel with fields for entering the transfer amount and description.
+     *
+     * @return the panel with amount and description fields
+     */
     private JPanel getAmountAndDescriptionPanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -118,6 +139,9 @@ public class TransferForm extends TransactionForm {
         return panel;
     }
 
+    /**
+     * Displays options for transferring funds to the user's own accounts.
+     */
     private void showSelfTransferOptions() {
         dynamicRecipientPanel.removeAll();
         destinationSelector.removeAllItems();
@@ -140,6 +164,9 @@ public class TransferForm extends TransactionForm {
         dynamicRecipientPanel.repaint();
     }
 
+    /**
+     * Displays options for transferring funds to another customer's account.
+     */
     private void showOtherCustomerOptions() {
         dynamicRecipientPanel.removeAll();
 
@@ -154,6 +181,11 @@ public class TransferForm extends TransactionForm {
         dynamicRecipientPanel.repaint();
     }
 
+    /**
+     * Handles the confirmation of the transfer transaction.
+     *
+     * @return true if the transaction was successful, false otherwise
+     */
     @Override
     protected boolean handleConfirm() {
         Customer selectedCustomer = (Customer) customerSelector.getSelectedItem();

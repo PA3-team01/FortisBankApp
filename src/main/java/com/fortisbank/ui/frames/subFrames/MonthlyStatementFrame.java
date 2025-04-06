@@ -8,8 +8,20 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The MonthlyStatementFrame class represents the monthly statement window of the Fortis Bank application.
+ * It extends JFrame and provides a user interface to display account transactions for a specific month and year.
+ */
 public class MonthlyStatementFrame extends JFrame {
 
+    /**
+     * Constructs a MonthlyStatementFrame with the specified account, transactions, month, and year.
+     *
+     * @param account the account for which the statement is generated
+     * @param transactions the list of transactions for the specified period
+     * @param month the month of the statement period
+     * @param year the year of the statement period
+     */
     public MonthlyStatementFrame(Account account, TransactionList transactions, String month, int year) {
         // === Frame Setup ===
         setUndecorated(true);

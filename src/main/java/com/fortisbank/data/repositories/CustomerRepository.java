@@ -14,21 +14,42 @@ import java.util.logging.Level;
 
 import static com.fortisbank.data.repositories.AccountRepository.LOGGER;
 
+/**
+ * Repository class for managing customer data in the database.
+ * Implements the ICustomerRepository interface.
+ */
 public class CustomerRepository implements ICustomerRepository {
     private final DatabaseConnection dbConnection;
     private static CustomerRepository instance;
 
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the database connection.
+     */
     private CustomerRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
-    public static CustomerRepository getInstance() {
+    /**
+     * Returns the singleton instance of CustomerRepository.
+     * Synchronized to prevent multiple threads from creating multiple instances.
+     *
+     * @return the singleton instance of CustomerRepository
+     */
+    public static synchronized CustomerRepository getInstance() {
         if(instance == null){
             instance = new CustomerRepository();
         }
         return instance;
     }
 
+    /**
+     * Retrieves a customer by their ID.
+     *
+     * @param customerId the ID of the customer to retrieve
+     * @return the customer with the specified ID
+     * @throws CustomerNotFoundException if the customer is not found
+     */
     @Override
     public Customer getCustomerById(String customerId) {
         String query = "SELECT * FROM customers WHERE CustomerID = ?";
@@ -50,7 +71,11 @@ public class CustomerRepository implements ICustomerRepository {
         }
     }
 
-
+    /**
+     * Retrieves all customers from the database.
+     *
+     * @return a list of all customers
+     */
     @Override
     public CustomerList getAllCustomers() {
         var customers = new CustomerList();
@@ -69,6 +94,11 @@ public class CustomerRepository implements ICustomerRepository {
         return customers;
     }
 
+    /**
+     * Inserts a new customer into the database.
+     *
+     * @param customer the customer to insert
+     */
     @Override
     public void insertCustomer(Customer customer) {
         String query = "INSERT INTO customers (CustomerID, FirstName, LastName, Email, PhoneNumber, PINHash) VALUES (?, ?, ?, ?, ?, ?)";
@@ -89,6 +119,11 @@ public class CustomerRepository implements ICustomerRepository {
         }
     }
 
+    /**
+     * Updates an existing customer in the database.
+     *
+     * @param customer the customer to update
+     */
     @Override
     public void updateCustomer(Customer customer) {
         String query = "UPDATE customers SET FirstName = ?, LastName = ?, Email = ?, PhoneNumber = ?, PINHash = ? WHERE CustomerID = ?";
@@ -109,6 +144,11 @@ public class CustomerRepository implements ICustomerRepository {
         }
     }
 
+    /**
+     * Deletes a customer from the database.
+     *
+     * @param customerId the ID of the customer to delete
+     */
     @Override
     public void deleteCustomer(String customerId) {
         String query = "DELETE FROM customers WHERE CustomerID = ?";
@@ -123,6 +163,13 @@ public class CustomerRepository implements ICustomerRepository {
         }
     }
 
+    /**
+     * Maps a ResultSet object to a Customer instance.
+     *
+     * @param rs the ResultSet object containing customer data retrieved from the database
+     * @return a Customer object representing the mapped customer data
+     * @throws SQLException if a database access error occurs or if the ResultSet cannot be read
+     */
     private Customer mapResultSetToCustomer(@NotNull ResultSet rs) throws SQLException {
         return new Customer(
                 rs.getString(rs.findColumn("CustomerID")),

@@ -13,12 +13,21 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The UserManagementPanel class represents the user management panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to manage and filter users by role.
+ */
 public class UserManagementPanel extends JPanel {
 
     private final StorageMode storageMode;
     private final JPanel userListPanel = new JPanel();
     private final JComboBox<String> roleFilter = new JComboBox<>(new String[]{"All", "Customer", "Manager"});
 
+    /**
+     * Constructs a UserManagementPanel with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public UserManagementPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());
@@ -52,6 +61,9 @@ public class UserManagementPanel extends JPanel {
         refreshUsers();
     }
 
+    /**
+     * Refreshes the user list based on the selected role filter.
+     */
     private void refreshUsers() {
         userListPanel.removeAll();
         String selectedRole = roleFilter.getSelectedItem().toString();

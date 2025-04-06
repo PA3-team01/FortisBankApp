@@ -5,10 +5,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Singleton class representing currency types and their exchange rates.
+ */
 public class CurrencyType {
     private static CurrencyType instance;
     private final Map<String, BigDecimal> exchangeRates;
 
+    /**
+     * Private constructor to initialize the exchange rates map with default values.
+     */
     private CurrencyType() {
         exchangeRates = new HashMap<>();
 
@@ -20,6 +26,11 @@ public class CurrencyType {
         exchangeRates.put("JPY", new BigDecimal("150.25"));
     }
 
+    /**
+     * Returns the singleton instance of CurrencyType.
+     *
+     * @return the singleton instance
+     */
     public static CurrencyType getInstance() {
         if (instance == null) {
             instance = new CurrencyType();
@@ -27,10 +38,23 @@ public class CurrencyType {
         return instance;
     }
 
+    /**
+     * Returns the exchange rate for the specified currency code.
+     *
+     * @param currencyCode the currency code
+     * @return the exchange rate
+     */
     public BigDecimal getExchangeRate(String currencyCode) {
         return exchangeRates.getOrDefault(currencyCode.toUpperCase(), BigDecimal.ZERO);
     }
 
+    /**
+     * Updates the exchange rate for the specified currency code.
+     *
+     * @param currencyCode the currency code
+     * @param newRate the new exchange rate
+     * @throws IllegalArgumentException if the currency code is not found
+     */
     public void updateExchangeRate(String currencyCode, BigDecimal newRate) {
         if (exchangeRates.containsKey(currencyCode.toUpperCase())) {
             exchangeRates.put(currencyCode.toUpperCase(), newRate);
@@ -39,14 +63,30 @@ public class CurrencyType {
         }
     }
 
+    /**
+     * Adds a new currency with the specified exchange rate.
+     *
+     * @param currencyCode the currency code
+     * @param rate the exchange rate
+     */
     public void addCurrency(String currencyCode, BigDecimal rate) {
         exchangeRates.put(currencyCode.toUpperCase(), rate);
     }
 
+    /**
+     * Removes the specified currency from the exchange rates map.
+     *
+     * @param currencyCode the currency code
+     */
     public void removeCurrency(String currencyCode) {
         exchangeRates.remove(currencyCode.toUpperCase());
     }
 
+    /**
+     * Returns an unmodifiable map of all exchange rates.
+     *
+     * @return the map of all exchange rates
+     */
     public Map<String, BigDecimal> getAllExchangeRates() {
         return Collections.unmodifiableMap(exchangeRates);
     }

@@ -14,6 +14,11 @@ import java.awt.*;
 import java.time.LocalDate;
 import java.util.Calendar;
 
+/**
+ * The AccountInfo class is a JPanel component that displays account information,
+ * transaction summary, and provides controls for generating monthly statements
+ * and closing the account.
+ */
 public class AccountInfo extends JPanel {
 
     private final JComboBox<String> monthCombo;
@@ -21,6 +26,12 @@ public class AccountInfo extends JPanel {
     private final TransactionService transactionService;
     private final StorageMode storageMode;
 
+    /**
+     * Constructs an AccountInfo panel for the given account and storage mode.
+     *
+     * @param account the account to display information for
+     * @param storageMode the storage mode to use for transaction services
+     */
     public AccountInfo(Account account, StorageMode storageMode) {
         this.storageMode = storageMode;
         this.transactionService = TransactionService.getInstance(storageMode);
@@ -94,6 +105,9 @@ public class AccountInfo extends JPanel {
         add(centerPanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Populates the month and year combo boxes with values.
+     */
     private void populateMonthYear() {
         for (int i = 1; i <= 12; i++) {
             monthCombo.addItem(String.format("%02d", i)); // "01" to "12"
@@ -104,6 +118,11 @@ public class AccountInfo extends JPanel {
         }
     }
 
+    /**
+     * Generates a monthly statement for the selected month and year.
+     *
+     * @param account the account to generate the statement for
+     */
     private void generateStatement(Account account) {
         String selectedMonth = (String) monthCombo.getSelectedItem();
         int selectedYear = (int) yearCombo.getSelectedItem();

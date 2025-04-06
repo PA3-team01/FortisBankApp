@@ -14,6 +14,10 @@ import java.time.LocalDate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Repository class for managing transactions in the database.
+ * Implements the ITransactionRepository interface.
+ */
 public class TransactionRepository implements ITransactionRepository {
     private static final Logger LOGGER = Logger.getLogger(TransactionRepository.class.getName());
     private static TransactionRepository instance;
@@ -21,11 +25,20 @@ public class TransactionRepository implements ITransactionRepository {
     private final DatabaseConnection dbConnection;
     private final AccountRepository accountRepository;
 
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the database connection and account repository.
+     */
     private TransactionRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
         this.accountRepository = AccountRepository.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of TransactionRepository.
+     *
+     * @return the singleton instance
+     */
     public static TransactionRepository getInstance() {
         if(instance == null){
             instance = new TransactionRepository();
@@ -33,6 +46,12 @@ public class TransactionRepository implements ITransactionRepository {
         return instance;
     }
 
+    /**
+     * Retrieves a transaction by its number.
+     *
+     * @param transactionNumber the number of the transaction to retrieve
+     * @return the transaction with the specified number, or null if not found
+     */
     @Override
     public Transaction getTransactionByNumber(String transactionNumber) {
         String query = "SELECT * FROM transactions WHERE TransactionNumber = ?";
@@ -52,6 +71,12 @@ public class TransactionRepository implements ITransactionRepository {
         return null;
     }
 
+    /**
+     * Retrieves all transactions associated with a specific account ID.
+     *
+     * @param accountId the ID of the account whose transactions to retrieve
+     * @return a list of transactions associated with the specified account ID
+     */
     @Override
     public TransactionList getTransactionsByAccount(String accountId) {
         var transactions = new TransactionList();
@@ -73,6 +98,11 @@ public class TransactionRepository implements ITransactionRepository {
         return transactions;
     }
 
+    /**
+     * Retrieves all transactions.
+     *
+     * @return a list of all transactions
+     */
     @Override
     public TransactionList getAllTransactions() {
         var transactions = new TransactionList();
@@ -91,6 +121,11 @@ public class TransactionRepository implements ITransactionRepository {
         return transactions;
     }
 
+    /**
+     * Inserts a new transaction into the database.
+     *
+     * @param transaction the transaction to insert
+     */
     @Override
     public void insertTransaction(Transaction transaction) {
         String query = "INSERT INTO transactions (TransactionNumber, Description, TransactionDate, TransactionType, Amount, SourceAccount, DestinationAccount) " +
@@ -115,6 +150,11 @@ public class TransactionRepository implements ITransactionRepository {
         }
     }
 
+    /**
+     * Deletes a transaction by its number.
+     *
+     * @param transactionNumber the number of the transaction to delete
+     */
     @Override
     public void deleteTransaction(String transactionNumber) {
         String query = "DELETE FROM transactions WHERE TransactionNumber = ?";
@@ -130,6 +170,14 @@ public class TransactionRepository implements ITransactionRepository {
         }
     }
 
+    /**
+     * Retrieves transactions for a specific customer within a date range.
+     *
+     * @param customerID the ID of the customer whose transactions to retrieve
+     * @param start the start date of the date range
+     * @param end the end date of the date range
+     * @return a list of transactions for the specified customer within the date range
+     */
     @Override
     public TransactionList getTransactionsByCustomerAndDateRange(String customerID, LocalDate start, LocalDate end) {
         var transactions = new TransactionList();
@@ -154,6 +202,13 @@ public class TransactionRepository implements ITransactionRepository {
         return transactions;
     }
 
+    /**
+     * Retrieves the balance for a specific customer before a given date.
+     *
+     * @param customerID the ID of the customer whose balance to retrieve
+     * @param start the date before which to calculate the balance
+     * @return the balance for the specified customer before the given date
+     */
     @Override
     public BigDecimal getBalanceBeforeDate(String customerID, LocalDate start) {
 
@@ -177,7 +232,13 @@ public class TransactionRepository implements ITransactionRepository {
         return BigDecimal.ZERO;
     }
 
-    // Helper method to map ResultSet to Transaction Object
+    /**
+     * Helper method to map a ResultSet to a Transaction object.
+     *
+     * @param rs the ResultSet to map
+     * @return the mapped Transaction object
+     * @throws SQLException if an SQL error occurs
+     */
     private Transaction mapResultSetToTransaction(ResultSet rs) throws SQLException {
         Account sourceAccount = accountRepository.getAccountById(rs.getString("SourceAccount"));
         Account destinationAccount = null;

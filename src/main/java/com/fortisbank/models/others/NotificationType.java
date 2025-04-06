@@ -1,15 +1,61 @@
 package com.fortisbank.models.others;
 
+/**
+ * Enum representing different types of notifications.
+ */
 public enum NotificationType {
-    ACCOUNT_OPENING_REQUEST, // For manager inbox: approve/reject new account requests
-    TRANSACTION_RECEIPT,     // Confirmation of a completed transaction
-    ACCOUNT_APPROVAL,        // Notification sent to customer after approval
-    ACCOUNT_REJECTION,       // Notification sent to customer after rejection
-    NEW_MESSAGE,             // Received internal message (manager ↔ customer)
-    SECURITY_ALERT,          // Suspicious login, password reset, etc.
-    SYSTEM_UPDATE,           // App update or maintenance announcement
-    CUSTOM,                  // Free-form event
-    INFO,                    // Generic information
-    WARNING,                 // Non-critical alert
-    ERROR                    // Critical issue or operation failure
+    /**
+     * For manager inbox: approve/reject new account requests.
+     */
+    ACCOUNT_OPENING_REQUEST,
+
+    /**
+     * Confirmation of a completed transaction.
+     */
+    TRANSACTION_RECEIPT,
+
+    /**
+     * Notification sent to customer after approval.
+     */
+    ACCOUNT_APPROVAL,
+
+    /**
+     * Notification sent to customer after rejection.
+     */
+    ACCOUNT_REJECTION,
+
+    /**
+     * Received internal message (manager ↔ customer).
+     */
+    NEW_MESSAGE,
+
+    /**
+     * Suspicious login, password reset, etc.
+     */
+    SECURITY_ALERT,
+
+    /**
+     * App update or maintenance announcement.
+     */
+    SYSTEM_UPDATE,
+
+    /**
+     * Free-form event.
+     */
+    CUSTOM,
+
+    /**
+     * Generic information.
+     */
+    INFO,
+
+    /**
+     * Non-critical alert.
+     */
+    WARNING,
+
+    /**
+     * Critical issue or operation failure.
+     */
+    ERROR
 }

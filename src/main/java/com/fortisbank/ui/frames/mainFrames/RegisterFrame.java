@@ -10,6 +10,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The RegisterFrame class represents the registration window of the Fortis Bank application.
+ * It extends JFrame and provides a user interface for new customers to register.
+ */
 public class RegisterFrame extends JFrame {
 
     private final JTextField firstNameField = new JTextField(15);
@@ -31,6 +35,11 @@ public class RegisterFrame extends JFrame {
 
     private final RegisterService registerService;
 
+    /**
+     * Constructs a RegisterFrame with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public RegisterFrame(StorageMode storageMode) {
         this.registerService = RegisterService.getInstance(storageMode);
 
@@ -140,6 +149,9 @@ public class RegisterFrame extends JFrame {
         ValidationUtils.attachRealTimeValidation(pinField, pinStatus, ValidationUtils::isValidPIN, "Valid PIN", "4-digit PIN required");
     }
 
+    /**
+     * The RegisterAction class handles the register button action.
+     */
     private class RegisterAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

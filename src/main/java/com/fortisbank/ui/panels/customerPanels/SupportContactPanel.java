@@ -7,10 +7,19 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The SupportContactPanel class represents the support contact panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to display contact information and a form to send messages to support.
+ */
 public class SupportContactPanel extends JPanel {
 
     private StorageMode storageMode;
 
+    /**
+     * Constructs a SupportContactPanel with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public SupportContactPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());

@@ -12,12 +12,24 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * A typed list for managing Transaction objects.
+ * Provides sorting and filtering methods for transactions.
+ */
 public class TransactionList extends ArrayList<Transaction> {
 
+    /**
+     * Default constructor initializing an empty transaction list.
+     */
     public TransactionList() {
         super();
     }
 
+    /**
+     * Constructor initializing the transaction list with a collection of transactions.
+     *
+     * @param transactions an iterable collection of transactions to add to the list
+     */
     public TransactionList(Iterable<Transaction> transactions) {
         transactions.forEach(this::add);
     }
@@ -25,21 +37,21 @@ public class TransactionList extends ArrayList<Transaction> {
     // Sorting methods
 
     /**
-     * Trie les transactions par date decroissante
+     * Sorts the transactions by date in descending order.
      */
     public void sortByDateDescending() {
-        this.sort(TransactionComparators.BY_DATE.reversed());  // ✅ Now works correctly
+        this.sort(TransactionComparators.BY_DATE.reversed());
     }
 
     /**
-     * Trie les transactions par montant croissant
+     * Sorts the transactions by amount in ascending order.
      */
     public void sortByAmountAscending() {
         this.sort(TransactionComparators.BY_AMOUNT);
     }
 
     /**
-     * Trie les transactions par type
+     * Sorts the transactions by type.
      */
     public void sortByType() {
         this.sort(TransactionComparators.BY_TYPE);
@@ -48,9 +60,10 @@ public class TransactionList extends ArrayList<Transaction> {
     // Filtering methods
 
     /**
-     * Filtre les transactions par montant minimum
-     * @param minAmount Solde minimum
-     * @return Transaction List filtrer
+     * Filters the transactions by minimum amount.
+     *
+     * @param minAmount the minimum amount to filter by
+     * @return a filtered transaction list
      */
     public TransactionList filterByMinAmount(BigDecimal minAmount) {
         return this.stream()
@@ -59,9 +72,10 @@ public class TransactionList extends ArrayList<Transaction> {
     }
 
     /**
-     * Filtre les transactions par type
-     * @param type Type de transaction
-     * @return Transaction List filtrer
+     * Filters the transactions by type.
+     *
+     * @param type the type of transaction to filter by
+     * @return a filtered transaction list
      */
     public TransactionList filterByType(String type) {
         return this.stream()
@@ -70,10 +84,11 @@ public class TransactionList extends ArrayList<Transaction> {
     }
 
     /**
-     * Filtre les transactions par date range
-     * @param start Debut
-     * @param end Fin
-     * @return Transaction List filtrer
+     * Filters the transactions by date range.
+     *
+     * @param start the start date
+     * @param end the end date
+     * @return a filtered transaction list
      */
     public TransactionList filterByDateRange(Date start, Date end) {
         return this.stream()
@@ -82,9 +97,10 @@ public class TransactionList extends ArrayList<Transaction> {
     }
 
     /**
-     * Filtre les transactions par mois
-     * @param targetDate Date cible
-     * @return Transaction List filtrer
+     * Filters the transactions by month.
+     *
+     * @param targetDate the target date
+     * @return a filtered transaction list
      */
     public TransactionList filterByMonth(LocalDate targetDate) {
         int year = targetDate.getYear();
@@ -101,9 +117,10 @@ public class TransactionList extends ArrayList<Transaction> {
     }
 
     /**
-     * Filtre les transactions par types
-     * @param types Types de transactions
-     * @return Transaction List filtrer
+     * Filters the transactions by types.
+     *
+     * @param types the types of transactions to filter by
+     * @return a filtered transaction list
      */
     public TransactionList filterByTypes(TransactionType... types) {
         List<TransactionType> typeList = List.of(types);
@@ -113,8 +130,11 @@ public class TransactionList extends ArrayList<Transaction> {
                 .collect(Collectors.toCollection(TransactionList::new));
     }
 
-
-
+    /**
+     * Returns a string representation of the transaction list.
+     *
+     * @return a string containing transaction list information
+     */
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
@@ -126,8 +146,9 @@ public class TransactionList extends ArrayList<Transaction> {
     }
 
     /**
-     * Renvoie la date de la dernière transaction enregistrée.
-     * @return Date de la dernière activité ou null si aucune transaction.
+     * Returns the date of the last recorded transaction.
+     *
+     * @return the date of the last activity or null if no transactions
      */
     public Date getLastActivityDate() {
         return this.stream()

@@ -13,8 +13,18 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The NotificationCard class is a JPanel component that displays a notification
+ * with its details and provides actions based on the notification type.
+ */
 public class NotificationCard extends JPanel {
 
+    /**
+     * Constructs a NotificationCard for the given notification and storage mode.
+     *
+     * @param notification the notification to display
+     * @param storageMode the storage mode to use for services
+     */
     public NotificationCard(Notification notification, StorageMode storageMode) {
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
@@ -101,9 +111,6 @@ public class NotificationCard extends JPanel {
                     ((JComponent) this.getParent()).revalidate()
             );
         });
-
-        footer.add(markReadBtn);
-        footer.add(deleteBtn);
 
         add(title, BorderLayout.NORTH);
         add(body, BorderLayout.CENTER);

@@ -9,8 +9,15 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
 
+/**
+ * The SettingPanel class represents the settings panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface for updating user settings such as password, email, and phone number.
+ */
 public class SettingPanel extends JPanel {
 
+    /**
+     * Constructs a SettingPanel and initializes the user interface components.
+     */
     public SettingPanel() {
         setLayout(new GridBagLayout());
         StyleUtils.styleFormPanel(this);
@@ -26,7 +33,7 @@ public class SettingPanel extends JPanel {
         gbc.gridwidth = 2;
         JLabel titleLabel = new JLabel("Settings");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 28));
-        titleLabel.setForeground(Color.WHITE); // Texte blanc
+        titleLabel.setForeground(Color.WHITE); // White text
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(titleLabel, gbc);
 
@@ -58,6 +65,9 @@ public class SettingPanel extends JPanel {
         add(updatePhoneButton, gbc);
     }
 
+    /**
+     * Opens a dialog to change the user's password.
+     */
     private void openChangePasswordDialog() {
         JPasswordField newPasswordField = new JPasswordField();
         JPasswordField confirmPasswordField = new JPasswordField();
@@ -83,6 +93,9 @@ public class SettingPanel extends JPanel {
         }
     }
 
+    /**
+     * Opens a dialog to update the user's email.
+     */
     private void openUpdateEmailDialog() {
         JTextField emailField = new JTextField();
         StyleUtils.styleTextField(emailField);
@@ -102,11 +115,14 @@ public class SettingPanel extends JPanel {
         }
     }
 
+    /**
+     * Opens a dialog to update the user's phone number.
+     */
     private void openUpdatePhoneDialog() {
         JTextField phoneField = new JTextField();
         StyleUtils.styleTextField(phoneField);
 
-        // Restreindre la saisie à uniquement des chiffres
+        // Restrict input to digits only
         ((AbstractDocument) phoneField.getDocument()).setDocumentFilter(new DocumentFilter() {
             @Override
             public void insertString(FilterBypass fb, int offset, String string, AttributeSet attr) throws BadLocationException {

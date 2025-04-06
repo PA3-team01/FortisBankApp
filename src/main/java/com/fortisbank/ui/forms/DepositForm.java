@@ -11,15 +11,31 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * The DepositForm class is a form for handling deposit transactions.
+ * It extends the TransactionForm class and provides functionality
+ * to deposit funds into a specified account.
+ */
 public class DepositForm extends TransactionForm {
 
     private final Account targetAccount;
 
+    /**
+     * Constructs a DepositForm with the specified target account and storage mode.
+     *
+     * @param targetAccount the account to deposit funds into
+     * @param storageMode the storage mode to use for transaction services
+     */
     public DepositForm(Account targetAccount, StorageMode storageMode) {
         super("Deposit Funds", storageMode);
         this.targetAccount = targetAccount;
     }
 
+    /**
+     * Handles the confirmation of the deposit transaction.
+     *
+     * @return true if the transaction was successful, false otherwise
+     */
     @Override
     protected boolean handleConfirm() {
         BigDecimal amount = getEnteredAmount();

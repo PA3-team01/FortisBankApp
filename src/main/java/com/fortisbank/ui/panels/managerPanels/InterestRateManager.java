@@ -9,6 +9,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 
+/**
+ * The InterestRateManager class represents the interest rate management panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to manage interest rates for different account types.
+ */
 public class InterestRateManager extends JPanel {
 
     private final InterestRateConfigService rateService = InterestRateConfigService.getInstance();
@@ -17,6 +21,9 @@ public class InterestRateManager extends JPanel {
     private final JTextField rateField = new JTextField();
     private final JLabel lastUpdatedLabel = new JLabel("Last updated: N/A");
 
+    /**
+     * Constructs an InterestRateManager and initializes the user interface components.
+     */
     public InterestRateManager() {
         setLayout(new BorderLayout());
         StyleUtils.styleFormPanel(this);
@@ -67,6 +74,11 @@ public class InterestRateManager extends JPanel {
         }
     }
 
+    /**
+     * Populates the rate details for the selected account type.
+     *
+     * @param selectedType the selected account type
+     */
     private void populateRateDetails(AccountType selectedType) {
         if (selectedType == null) return;
 
@@ -83,6 +95,9 @@ public class InterestRateManager extends JPanel {
         }
     }
 
+    /**
+     * Handles the update of the interest rate for the selected account type.
+     */
     private void handleRateUpdate() {
         AccountType selectedType = accountTypeList.getSelectedValue();
         if (selectedType == null) return;

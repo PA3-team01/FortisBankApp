@@ -8,8 +8,15 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The ProfilePanel class represents the profile panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to display the current user's profile information.
+ */
 public class ProfilePanel extends JPanel {
 
+    /**
+     * Constructs a ProfilePanel and initializes the user interface components.
+     */
     public ProfilePanel() {
         setLayout(new GridBagLayout());
         StyleUtils.styleFormPanel(this);
@@ -40,10 +47,8 @@ public class ProfilePanel extends JPanel {
         addLabel("Email:", gbc, 2);
         addValue(currentUser.getEmail(), gbc, 2);
 
-
         addLabel("Role:", gbc, 3);
         addValue(currentUser.getRole().toString(), gbc, 3);
-
 
         addLabel("Phone Number:", gbc, 4);
         if (currentUser instanceof Customer customer) {
@@ -52,10 +57,6 @@ public class ProfilePanel extends JPanel {
             addValue("N/A", gbc, 4);
         }
 
-
-
-
-
         // Padding
         gbc.gridy = 5;
         gbc.gridx = 0;
@@ -63,7 +64,13 @@ public class ProfilePanel extends JPanel {
         add(Box.createVerticalStrut(20), gbc);
     }
 
-
+    /**
+     * Adds a label to the panel at the specified row.
+     *
+     * @param text the text of the label
+     * @param gbc the GridBagConstraints to use for layout
+     * @param row the row at which to add the label
+     */
     private void addLabel(String text, GridBagConstraints gbc, int row) {
         gbc.gridx = 0;
         gbc.gridy = row;
@@ -72,7 +79,13 @@ public class ProfilePanel extends JPanel {
         add(label, gbc);
     }
 
-
+    /**
+     * Adds a value label to the panel at the specified row.
+     *
+     * @param text the text of the value label
+     * @param gbc the GridBagConstraints to use for layout
+     * @param row the row at which to add the value label
+     */
     private void addValue(String text, GridBagConstraints gbc, int row) {
         gbc.gridx = 1;
         gbc.gridy = row;

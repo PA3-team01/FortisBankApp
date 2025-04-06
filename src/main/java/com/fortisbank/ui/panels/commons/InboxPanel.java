@@ -12,6 +12,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * The InboxPanel class represents the inbox panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to display and manage notifications.
+ */
 public class InboxPanel extends JPanel {
 
     private final NotificationService notificationService;
@@ -20,6 +24,11 @@ public class InboxPanel extends JPanel {
     private final JComboBox<String> filterSelector = new JComboBox<>(new String[]{"All", "Unread", "Custom", "System", "Security"});
     private final StorageMode storageMode;
 
+    /**
+     * Constructs an InboxPanel with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public InboxPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         this.notificationService = NotificationService.getInstance(storageMode);
@@ -73,6 +82,9 @@ public class InboxPanel extends JPanel {
         refreshMessages();
     }
 
+    /**
+     * Refreshes the messages displayed in the inbox panel based on the selected filter.
+     */
     private void refreshMessages() {
         messageListPanel.removeAll();
 

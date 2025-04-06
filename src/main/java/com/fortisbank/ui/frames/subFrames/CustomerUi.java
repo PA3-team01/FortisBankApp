@@ -11,12 +11,21 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The CustomerUi class represents the user interface for customers.
+ * It extends JPanel and provides navigation and content display functionality.
+ */
 public class CustomerUi extends JPanel {
 
     private final NavigationBar navPanel;
     private final JPanel contentPanel;
     private StorageMode storageMode;
 
+    /**
+     * Constructs a CustomerUi with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public CustomerUi(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());
@@ -42,12 +51,15 @@ public class CustomerUi extends JPanel {
         navPanel.setButtonAction("Contact", () -> showContent(new SupportContactPanel(storageMode)));
         navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
         navPanel.setButtonAction("Currency Exchange", () -> showContent(new CurrencyExchangePanel(storageMode)));
-        // Pass storageMode
         navPanel.setButtonAction("Help", () -> showContent(new HelpPanel(storageMode)));
         navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
-
     }
 
+    /**
+     * Creates a welcome panel with a welcome message.
+     *
+     * @return the welcome panel
+     */
     private JPanel createWelcomePanel() {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -62,7 +74,9 @@ public class CustomerUi extends JPanel {
     }
 
     /**
-     * Swap the right-side content dynamically with scroll support.
+     * Swaps the right-side content dynamically with scroll support.
+     *
+     * @param component the component to display in the content area
      */
     private void showContent(JComponent component) {
         contentPanel.removeAll();

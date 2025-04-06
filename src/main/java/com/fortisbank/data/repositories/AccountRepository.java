@@ -36,13 +36,21 @@ public class AccountRepository implements IAccountRepository {
     private final CustomerRepository customerRepository;
     private final TransactionRepository transactionRepository;
 
-
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the database connection, customer repository, and transaction repository.
+     */
     private AccountRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
         this.customerRepository = CustomerRepository.getInstance();
         this.transactionRepository = TransactionRepository.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of AccountRepository.
+     *
+     * @return the singleton instance of AccountRepository
+     */
     public static AccountRepository getInstance() {
         if(instance == null){
             instance = new AccountRepository();
@@ -50,6 +58,13 @@ public class AccountRepository implements IAccountRepository {
         return instance;
     }
 
+    /**
+     * Retrieves an account by its ID.
+     *
+     * @param accountId the ID of the account to retrieve
+     * @return the account with the specified ID
+     * @throws AccountNotFoundException if the account is not found
+     */
     @Override
     public Account getAccountById(String accountId) {
         String query = "SELECT * FROM accounts WHERE AccountID = ?";
@@ -62,7 +77,6 @@ public class AccountRepository implements IAccountRepository {
             if (rs.next()) {
                 return mapResultSetToAccount(rs);
             } else {
-
                 throw new AccountNotFoundException("Account with ID " + accountId + " not found.");
             }
         } catch (SQLException e) {
@@ -71,7 +85,12 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
-
+    /**
+     * Retrieves all accounts associated with a specific customer ID.
+     *
+     * @param customerId the ID of the customer whose accounts to retrieve
+     * @return a list of accounts associated with the specified customer ID
+     */
     @Override
     public AccountList getAccountsByCustomerId(String customerId) {
         var accounts = new AccountList();
@@ -92,6 +111,11 @@ public class AccountRepository implements IAccountRepository {
         return accounts;
     }
 
+    /**
+     * Retrieves all accounts from the database.
+     *
+     * @return a list of all accounts
+     */
     @Override
     public AccountList getAllAccounts() {
         var accounts = new AccountList();
@@ -110,6 +134,11 @@ public class AccountRepository implements IAccountRepository {
         return accounts;
     }
 
+    /**
+     * Inserts a new account into the database.
+     *
+     * @param account the account to insert
+     */
     @Override
     public void insertAccount(Account account) {
         String query = "INSERT INTO accounts (AccountID, CustomerID, AccountType, OpenedDate, AvailableBalance, isActive) VALUES (?, ?, ?, ?, ?, ?)";
@@ -131,6 +160,11 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
+    /**
+     * Updates an existing account in the database.
+     *
+     * @param account the account to update
+     */
     @Override
     public void updateAccount(Account account) {
         String query = "UPDATE accounts SET CustomerID = ?, AccountType = ?, OpenedDate = ?, AvailableBalance = ?, isActive = ? WHERE AccountID = ?";
@@ -152,6 +186,11 @@ public class AccountRepository implements IAccountRepository {
         }
     }
 
+    /**
+     * Deletes an account from the database.
+     *
+     * @param accountId the ID of the account to delete
+     */
     @Override
     public void deleteAccount(String accountId) {
         String query = "DELETE FROM accounts WHERE AccountID = ?";
@@ -201,6 +240,4 @@ public class AccountRepository implements IAccountRepository {
                 throw new IllegalArgumentException("Unknown account type: " + accountType);
         }
     }
-
-
 }

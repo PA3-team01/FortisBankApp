@@ -31,6 +31,11 @@ public class InterestRateConfigService {
         loadRates();
     }
 
+    /**
+     * Returns the singleton instance of InterestRateConfigService.
+     *
+     * @return the singleton instance of InterestRateConfigService
+     */
     public static synchronized InterestRateConfigService getInstance() {
         if (instance == null) {
             instance = new InterestRateConfigService();
@@ -38,6 +43,9 @@ public class InterestRateConfigService {
         return instance;
     }
 
+    /**
+     * Loads interest rates from the config file.
+     */
     public void loadRates() {
         try {
             rates = Files.exists(CONFIG_PATH)
@@ -49,6 +57,9 @@ public class InterestRateConfigService {
         }
     }
 
+    /**
+     * Saves the current interest rates to the config file.
+     */
     public void saveRates() {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(CONFIG_PATH.toFile(), rates);
@@ -57,6 +68,12 @@ public class InterestRateConfigService {
         }
     }
 
+    /**
+     * Retrieves the interest rate for the given account type.
+     *
+     * @param type the account type
+     * @return the interest rate for the given account type
+     */
     public BigDecimal getRate(AccountType type) {
         return rates.stream()
                 .filter(r -> r.getAccountType() == type)
@@ -65,6 +82,12 @@ public class InterestRateConfigService {
                 .orElse(BigDecimal.ZERO);
     }
 
+    /**
+     * Updates the interest rate for the given account type.
+     *
+     * @param type the account type
+     * @param newRate the new interest rate
+     */
     public void updateRate(AccountType type, BigDecimal newRate) {
         InterestRate existing = rates.stream()
                 .filter(r -> r.getAccountType() == type)
@@ -81,6 +104,11 @@ public class InterestRateConfigService {
         saveRates();
     }
 
+    /**
+     * Retrieves all interest rates.
+     *
+     * @return the list of all interest rates
+     */
     public List<InterestRate> getAllRates() {
         return rates;
     }

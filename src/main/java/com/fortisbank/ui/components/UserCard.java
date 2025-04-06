@@ -10,8 +10,18 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The UserCard class is a JPanel component that displays user information
+ * and provides an edit button to update user details.
+ */
 public class UserCard extends JPanel {
 
+    /**
+     * Constructs a UserCard for the given user and storage mode.
+     *
+     * @param user the user to display information for
+     * @param storageMode the storage mode to use for services
+     */
     public UserCard(User user, StorageMode storageMode) {
         setLayout(new BorderLayout());
         setBorder(BorderFactory.createLineBorder(StyleUtils.NAVBAR_BG));

@@ -17,6 +17,11 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * The AccountRequestForm class is a JFrame that provides a form for customers
+ * to request new accounts. It dynamically adjusts fields based on the selected
+ * account type and allows submission of the request.
+ */
 public class AccountRequestForm extends JFrame {
 
     private final JComboBox<AccountType> typeSelector = new JComboBox<>();
@@ -29,6 +34,11 @@ public class AccountRequestForm extends JFrame {
 
     private final StorageMode storageMode;
 
+    /**
+     * Constructs an AccountRequestForm with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public AccountRequestForm(StorageMode storageMode) {
         super("Request New Account");
         this.storageMode = storageMode;
@@ -81,6 +91,9 @@ public class AccountRequestForm extends JFrame {
         add(bottom, BorderLayout.SOUTH);
     }
 
+    /**
+     * Populates the manager dropdown with available bank managers.
+     */
     private void populateManagerDropdown() {
         List<BankManager> managers = BankManagerService.getInstance(storageMode).getAllManagers();
         for (BankManager manager : managers) managerSelector.addItem(manager);
@@ -98,6 +111,11 @@ public class AccountRequestForm extends JFrame {
         });
     }
 
+    /**
+     * Renders dynamic fields based on the selected account type.
+     *
+     * @param type the selected account type
+     */
     private void renderDynamicFields(AccountType type) {
         dynamicFieldsPanel.removeAll();
 
@@ -152,7 +170,9 @@ public class AccountRequestForm extends JFrame {
         dynamicFieldsPanel.repaint();
     }
 
-
+    /**
+     * Handles the submission of the account request form.
+     */
     private void handleRequest() {
         try {
             AccountType selectedType = (AccountType) typeSelector.getSelectedItem();

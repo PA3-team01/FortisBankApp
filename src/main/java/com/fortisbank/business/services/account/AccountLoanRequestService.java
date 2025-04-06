@@ -27,12 +27,22 @@ public class AccountLoanRequestService {
         this.notificationService = NotificationService.getInstance(storageMode);
     }
 
+    /**
+     * Returns the singleton instance of AccountLoanRequestService for the given storage mode.
+     *
+     * @param storageMode the storage mode
+     * @return the singleton instance of AccountLoanRequestService
+     */
     public static synchronized AccountLoanRequestService getInstance(StorageMode storageMode) {
         return instances.computeIfAbsent(storageMode, AccountLoanRequestService::new);
     }
 
     /**
      * Customer submits a request for a new account.
+     *
+     * @param customer the customer submitting the request
+     * @param requestedAccount the requested account
+     * @param manager the bank manager
      */
     public void submitAccountRequest(Customer customer, Account requestedAccount, BankManager manager) {
         if (customer == null || requestedAccount == null || manager == null) return;
@@ -50,6 +60,9 @@ public class AccountLoanRequestService {
 
     /**
      * Manager accepts the request and account is created.
+     *
+     * @param customer the customer whose request is accepted
+     * @param account the account to be created
      */
     public void acceptAccountRequest(Customer customer, Account account) {
         if (customer == null || account == null) {
@@ -66,6 +79,10 @@ public class AccountLoanRequestService {
 
     /**
      * Manager rejects the account request.
+     *
+     * @param customer the customer whose request is rejected
+     * @param reason the reason for rejection
+     * @param rejectedAccount the account that was rejected
      */
     public void rejectAccountRequest(Customer customer, String reason, Account rejectedAccount) {
         if (customer == null || rejectedAccount == null) {
@@ -84,6 +101,8 @@ public class AccountLoanRequestService {
 
     /**
      * Utility method to fill the customer's account list.
+     *
+     * @param customer the customer whose account list is to be filled
      */
     private void fillCustomerAccountList(Customer customer) {
         AccountList accounts = accountService.getAccountsByCustomerId(customer.getUserId());

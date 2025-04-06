@@ -10,8 +10,19 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+/**
+ * Utility class for exporting reports to CSV files.
+ */
 public class ReportExporter {
 
+    /**
+     * Exports a customer statement report to a CSV file.
+     *
+     * @param report the customer statement report to export
+     * @param filePath the file path to save the CSV file
+     * @param customerAccounts the list of customer accounts
+     * @throws IOException if an I/O error occurs
+     */
     public static void exportCustomerStatementToCSV(CustomerStatementReport report, String filePath, AccountList customerAccounts) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Customer Statement Report\n");
@@ -46,6 +57,13 @@ public class ReportExporter {
         }
     }
 
+    /**
+     * Exports a bank summary report to a CSV file.
+     *
+     * @param report the bank summary report to export
+     * @param filePath the file path to save the CSV file
+     * @throws IOException if an I/O error occurs
+     */
     public static void exportBankSummaryToCSV(BankSummaryReport report, String filePath) throws IOException {
         try (FileWriter writer = new FileWriter(filePath)) {
             writer.write("Bank Summary Report\n");
@@ -80,7 +98,12 @@ public class ReportExporter {
         }
     }
 
-    // Escapes special characters for CSV compatibility
+    /**
+     * Escapes special characters for CSV compatibility.
+     *
+     * @param input the input string to escape
+     * @return the escaped string
+     */
     private static String csvEscape(String input) {
         if (input == null) return "";
         return "\"" + input.replace("\"", "\"\"") + "\"";

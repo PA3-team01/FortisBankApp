@@ -13,15 +13,29 @@ import java.util.logging.Level;
 
 import static com.fortisbank.data.repositories.AccountRepository.LOGGER;
 
+/**
+ * Repository class for managing bank manager data in the database.
+ * Implements the IBankManagerRepository interface.
+ */
 public class BankManagerRepository implements IBankManagerRepository {
 
     private static BankManagerRepository instance;
     private final DatabaseConnection dbConnection;
 
+    /**
+     * Private constructor to prevent direct instantiation.
+     * Initializes the database connection.
+     */
     private BankManagerRepository() {
         this.dbConnection = DatabaseConnection.getInstance();
     }
 
+    /**
+     * Returns the singleton instance of BankManagerRepository.
+     * Synchronized to prevent multiple threads from creating multiple instances.
+     *
+     * @return the singleton instance of BankManagerRepository
+     */
     public static synchronized BankManagerRepository getInstance() {
         if (instance == null) {
             instance = new BankManagerRepository();
@@ -29,6 +43,13 @@ public class BankManagerRepository implements IBankManagerRepository {
         return instance;
     }
 
+    /**
+     * Retrieves a bank manager by their ID.
+     *
+     * @param managerId the ID of the manager to retrieve
+     * @return the bank manager with the specified ID
+     * @throws ManagerNotFoundException if the manager is not found
+     */
     @Override
     public BankManager getManagerById(String managerId) {
         String query = "SELECT * FROM managers WHERE ManagerID = ?";
@@ -51,6 +72,11 @@ public class BankManagerRepository implements IBankManagerRepository {
         }
     }
 
+    /**
+     * Inserts a new bank manager into the database.
+     *
+     * @param manager the bank manager to insert
+     */
     @Override
     public void insertManager(BankManager manager) {
         String query = "INSERT INTO managers (ManagerID, FirstName, LastName, Email, PINHash, PasswordHash) VALUES (?, ?, ?, ?, ?, ?)";
@@ -71,6 +97,11 @@ public class BankManagerRepository implements IBankManagerRepository {
         }
     }
 
+    /**
+     * Updates an existing bank manager in the database.
+     *
+     * @param manager the bank manager to update
+     */
     @Override
     public void updateManager(BankManager manager) {
         String query = "UPDATE managers SET FirstName = ?, LastName = ?, Email = ?, PINHash = ?, PasswordHash = ? WHERE ManagerID = ?";
@@ -91,6 +122,11 @@ public class BankManagerRepository implements IBankManagerRepository {
         }
     }
 
+    /**
+     * Deletes a bank manager from the database.
+     *
+     * @param managerId the ID of the manager to delete
+     */
     @Override
     public void deleteManager(String managerId) {
         String query = "DELETE FROM managers WHERE ManagerID = ?";
@@ -106,6 +142,11 @@ public class BankManagerRepository implements IBankManagerRepository {
         }
     }
 
+    /**
+     * Retrieves all bank managers from the database.
+     *
+     * @return a list of all bank managers
+     */
     @Override
     public ManagerList getAllManagers() {
         ManagerList managers = new ManagerList();
@@ -124,6 +165,13 @@ public class BankManagerRepository implements IBankManagerRepository {
         return managers;
     }
 
+    /**
+     * Maps a ResultSet object to a BankManager instance.
+     *
+     * @param rs the ResultSet object containing manager data retrieved from the database
+     * @return a BankManager object representing the mapped manager data
+     * @throws SQLException if a database access error occurs or if the ResultSet cannot be read
+     */
     private BankManager mapResultSetToManager(ResultSet rs) throws SQLException {
         BankManager manager = new BankManager();
         manager.setUserId(rs.getString("ManagerID"));

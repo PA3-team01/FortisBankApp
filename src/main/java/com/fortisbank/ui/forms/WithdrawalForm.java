@@ -11,15 +11,31 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * The WithdrawalForm class is a form for handling withdrawal transactions.
+ * It extends the TransactionForm class and provides functionality
+ * to withdraw funds from a specified account.
+ */
 public class WithdrawalForm extends TransactionForm {
 
     private final Account sourceAccount;
 
+    /**
+     * Constructs a WithdrawalForm with the specified source account and storage mode.
+     *
+     * @param sourceAccount the account to withdraw funds from
+     * @param storageMode the storage mode to use for transaction services
+     */
     public WithdrawalForm(Account sourceAccount, StorageMode storageMode) {
         super("Withdraw Funds", storageMode);
         this.sourceAccount = sourceAccount;
     }
 
+    /**
+     * Handles the confirmation of the withdrawal transaction.
+     *
+     * @return true if the transaction was successful, false otherwise
+     */
     @Override
     protected boolean handleConfirm() {
         BigDecimal amount = getEnteredAmount();

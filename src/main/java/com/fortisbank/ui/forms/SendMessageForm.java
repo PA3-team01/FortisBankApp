@@ -10,7 +10,12 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
-//TODO: add dropdown for manager selection
+
+/**
+ * The SendMessageForm class is a JPanel component that provides a form
+ * for sending messages. It includes fields for the sender, recipient,
+ * subject, and message body, and buttons to send or cancel the message.
+ */
 public class SendMessageForm extends JPanel {
 
     private final JTextField fromField = new JTextField();
@@ -19,6 +24,11 @@ public class SendMessageForm extends JPanel {
     private final JTextArea messageArea = new JTextArea(8, 30);
     private final StorageMode storageMode;
 
+    /**
+     * Constructs a SendMessageForm with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public SendMessageForm(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BorderLayout());
@@ -99,6 +109,13 @@ public class SendMessageForm extends JPanel {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Adds a labeled field to the specified panel.
+     *
+     * @param panel the panel to add the field to
+     * @param labelText the text for the label
+     * @param field the text field to add
+     */
     private void addLabeledField(JPanel panel, String labelText, JTextField field) {
         JLabel label = new JLabel(labelText);
         StyleUtils.styleLabel(label);
@@ -108,6 +125,11 @@ public class SendMessageForm extends JPanel {
         panel.add(Box.createVerticalStrut(10));
     }
 
+    /**
+     * Validates the fields in the form.
+     *
+     * @return true if all fields are valid, false otherwise
+     */
     private boolean validateFields() {
         if (toField.getText().trim().isEmpty()) {
             StyleUtils.showStyledErrorDialog(this, "Please enter a recipient email.");
@@ -124,6 +146,9 @@ public class SendMessageForm extends JPanel {
         return true;
     }
 
+    /**
+     * Clears the fields in the form.
+     */
     private void clearFields() {
         toField.setText("");
         subjectField.setText("");

@@ -16,6 +16,10 @@ import java.io.File;
 import java.time.YearMonth;
 import java.util.List;
 
+/**
+ * The ReportsPanel class represents the reports panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to generate and download various reports.
+ */
 public class ReportsPanel extends JPanel {
 
     private final StorageMode storageMode;
@@ -27,6 +31,12 @@ public class ReportsPanel extends JPanel {
     private final JButton generateBtn = new JButton("Generate Report");
     private final JButton downloadBtn = new JButton("Download CSV");
 
+    /**
+     * Constructs a ReportsPanel with the specified storage mode and list of all customers.
+     *
+     * @param storageMode the storage mode to use for services
+     * @param allCustomers the list of all customers
+     */
     public ReportsPanel(StorageMode storageMode, List<Customer> allCustomers) {
         this.storageMode = storageMode;
         this.reportService = new ReportService(RepositoryFactory.getInstance(storageMode));
@@ -87,6 +97,9 @@ public class ReportsPanel extends JPanel {
 
     private Object currentReport;
 
+    /**
+     * Generates the selected report and displays it in the preview table.
+     */
     private void generateReport() {
         if (reportTypeSelector.getSelectedItem().equals("Bank Summary")) {
             BankSummaryReport report = reportService.generateBankSummaryReport();
@@ -122,6 +135,9 @@ public class ReportsPanel extends JPanel {
         }
     }
 
+    /**
+     * Downloads the currently generated report as a CSV file.
+     */
     private void downloadReport() {
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showSaveDialog(this);

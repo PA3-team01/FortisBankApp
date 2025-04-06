@@ -27,20 +27,34 @@ public class StyleUtils {
     public static final Font BUTTON_FONT = new Font("Segoe UI", Font.BOLD, 14);
     public static final Font STATUS_FONT = new Font("Segoe UI", Font.ITALIC, 12);
 
-
     // ========== [TEXT + LABELS] ==========
+    /**
+     * Styles a JLabel with predefined font and color.
+     *
+     * @param label the JLabel to style
+     */
     public static void styleLabel(JLabel label) {
         label.setFont(LABEL_FONT);
         label.setForeground(TEXT_COLOR);
     }
 
+    /**
+     * Styles a status JLabel with predefined font and color based on validity.
+     *
+     * @param label the JLabel to style
+     * @param isValid true if the status is valid, false otherwise
+     */
     public static void styleStatusLabel(JLabel label, boolean isValid) {
         label.setFont(STATUS_FONT);
         label.setForeground(isValid ? SUCCESS_COLOR : ERROR_COLOR);
     }
 
-
     // ========== [TEXT INPUTS] ==========
+    /**
+     * Styles a JTextField with predefined font, color, and border.
+     *
+     * @param field the JTextField to style
+     */
     public static void styleTextField(JTextField field) {
         field.setFont(FIELD_FONT);
         field.setForeground(TEXT_COLOR);
@@ -52,10 +66,20 @@ public class StyleUtils {
                 new EmptyBorder(5, 8, 5, 8)));
     }
 
+    /**
+     * Styles a JPasswordField with predefined font, color, and border.
+     *
+     * @param field the JPasswordField to style
+     */
     public static void stylePasswordField(JPasswordField field) {
         styleTextField(field);
     }
 
+    /**
+     * Styles a JRadioButton with predefined font, color, and cursor.
+     *
+     * @param radioButton the JRadioButton to style
+     */
     public static void styleRadioButton(JRadioButton radioButton) {
         radioButton.setFont(FIELD_FONT);
         radioButton.setForeground(TEXT_COLOR);
@@ -64,6 +88,11 @@ public class StyleUtils {
         radioButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    /**
+     * Styles a JComboBox with predefined font, color, and renderer.
+     *
+     * @param comboBox the JComboBox to style
+     */
     public static void styleDropdown(JComboBox<?> comboBox) {
         comboBox.setFont(FIELD_FONT);
         comboBox.setForeground(TEXT_COLOR);
@@ -84,8 +113,13 @@ public class StyleUtils {
         });
     }
 
-
     // ========== [BUTTONS] ==========
+    /**
+     * Styles a JButton with predefined font, color, and border.
+     *
+     * @param button the JButton to style
+     * @param isPrimary true if the button is primary, false otherwise
+     */
     public static void styleButton(JButton button, boolean isPrimary) {
         button.setFont(BUTTON_FONT);
         button.setFocusPainted(false);
@@ -95,6 +129,11 @@ public class StyleUtils {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
+    /**
+     * Styles a navigation JButton with predefined font, color, and border.
+     *
+     * @param button the JButton to style
+     */
     public static void styleNavButton(JButton button) {
         button.setFont(BUTTON_FONT);
         button.setFocusPainted(false);
@@ -106,8 +145,12 @@ public class StyleUtils {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 40));
     }
 
-
     // ========== [PANELS + FORMS] ==========
+    /**
+     * Styles a JPanel with predefined background color and border.
+     *
+     * @param panel the JPanel to style
+     */
     public static void styleFormPanel(JPanel panel) {
         panel.setBackground(BACKGROUND_COLOR);
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -115,19 +158,33 @@ public class StyleUtils {
                 BorderFactory.createEmptyBorder(10, 10, 10, 10)));
     }
 
+    /**
+     * Styles a navigation JPanel with predefined background color and layout.
+     *
+     * @param navbar the JPanel to style
+     */
     public static void styleNavbar(JPanel navbar) {
         navbar.setBackground(NAVBAR_BG);
         navbar.setLayout(new BoxLayout(navbar, BoxLayout.Y_AXIS));
         navbar.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     }
 
-
     // ========== [FRAMES + DIALOGS] ==========
+    /**
+     * Applies global styling to a JFrame.
+     *
+     * @param frame the JFrame to style
+     */
     public static void applyGlobalFrameStyle(JFrame frame) {
         frame.getContentPane().setBackground(BACKGROUND_COLOR);
         frame.getRootPane().setBorder(BorderFactory.createLineBorder(NAVBAR_BG, 2));
     }
 
+    /**
+     * Applies global styling to a JDialog.
+     *
+     * @param dialog the JDialog to style
+     */
     public static void applyGlobalDialogStyle(JDialog dialog) {
         dialog.getContentPane().setBackground(BACKGROUND_COLOR);
         dialog.setUndecorated(true);
@@ -135,15 +192,26 @@ public class StyleUtils {
         dialog.getRootPane().setBorder(BorderFactory.createLineBorder(NAVBAR_BG, 2));
     }
 
-
     // ========== [TITLES + HEADER BAR] ==========
+    /**
+     * Styles a form title JLabel with predefined font and color.
+     *
+     * @param titleLabel the JLabel to style
+     */
     public static void styleFormTitle(JLabel titleLabel) {
         titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 20));
         titleLabel.setForeground(PRIMARY_COLOR);
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
-    // TODO: Migrate to component: CustomTitleBar
+    /**
+     * Creates a custom title bar for a JFrame.
+     *
+     * @param frame the JFrame to attach the title bar to
+     * @param titleText the text to display in the title bar
+     * @param rightControls additional controls to add to the right side of the title bar
+     * @return the created JPanel representing the title bar
+     */
     public static JPanel createCustomTitleBar(JFrame frame, String titleText, JComponent rightControls) {
         JPanel titleBar = new JPanel(new BorderLayout());
         titleBar.setBackground(PRIMARY_COLOR);
@@ -192,8 +260,14 @@ public class StyleUtils {
         return titleBar;
     }
 
-
-    // TODO: Migrate to reusable StyledDialog
+    /**
+     * Shows a styled dialog with a custom message.
+     *
+     * @param parent the parent component of the dialog
+     * @param title the title of the dialog
+     * @param message the message to display in the dialog
+     * @param success true if the dialog represents a success message, false otherwise
+     */
     public static void showStyledDialog(Component parent, String title, String message, boolean success) {
         JDialog dialog = new JDialog(SwingUtilities.getWindowAncestor(parent), title, Dialog.ModalityType.APPLICATION_MODAL);
         dialog.setUndecorated(true);
@@ -229,10 +303,22 @@ public class StyleUtils {
         dialog.setVisible(true);
     }
 
+    /**
+     * Shows a styled success dialog with a custom message.
+     *
+     * @param parent the parent component of the dialog
+     * @param message the success message to display
+     */
     public static void showStyledSuccessDialog(Component parent, String message) {
         showStyledDialog(parent, "Success", message, true);
     }
 
+    /**
+     * Shows a styled error dialog with a custom message.
+     *
+     * @param parent the parent component of the dialog
+     * @param message the error message to display
+     */
     public static void showStyledErrorDialog(Component parent, String message) {
         showStyledDialog(parent, "Error", message, false);
     }

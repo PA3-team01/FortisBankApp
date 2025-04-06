@@ -21,6 +21,9 @@ import java.util.Date;
 import java.util.EnumMap;
 import java.util.Map;
 
+/**
+ * Service class for handling transactions.
+ */
 public class TransactionService implements ITransactionService {
 
     private static final Map<StorageMode, TransactionService> instances = new EnumMap<>(StorageMode.class);
@@ -29,6 +32,11 @@ public class TransactionService implements ITransactionService {
     private final StorageMode storageMode;
     private final NotificationService notificationService;
 
+    /**
+     * Private constructor to prevent instantiation.
+     *
+     * @param storageMode the storage mode
+     */
     private TransactionService(StorageMode storageMode) {
         this.storageMode = storageMode;
         this.notificationService = NotificationService.getInstance(storageMode);
@@ -37,10 +45,21 @@ public class TransactionService implements ITransactionService {
         this.accountRepository = factory.getAccountRepository();
     }
 
+    /**
+     * Returns the singleton instance of TransactionService for the given storage mode.
+     *
+     * @param storageMode the storage mode
+     * @return the singleton instance of TransactionService
+     */
     public static synchronized TransactionService getInstance(StorageMode storageMode) {
         return instances.computeIfAbsent(storageMode, TransactionService::new);
     }
 
+    /**
+     * Executes a transaction.
+     *
+     * @param transaction the transaction to be executed
+     */
     public void executeTransaction(Transaction transaction) {
         ValidationUtils.validateNotNull(transaction, "Transaction");
         ValidationUtils.validateAmount(transaction.getAmount());
@@ -97,6 +116,11 @@ public class TransactionService implements ITransactionService {
         transactionRepository.insertTransaction(transaction);
     }
 
+    /**
+     * Applies interest to a credit account.
+     *
+     * @param account the credit account
+     */
     public void applyInterestToCreditAccount(CreditAccount account) {
         BigDecimal rate = account.getInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -116,6 +140,11 @@ public class TransactionService implements ITransactionService {
         );
     }
 
+    /**
+     * Applies annual interest to a savings account.
+     *
+     * @param account the savings account
+     */
     public void applyAnnualInterestToSavingsAccount(SavingsAccount account) {
         BigDecimal rate = account.getAnnualInterestRate();
         if (rate == null || rate.compareTo(BigDecimal.ZERO) <= 0) return;
@@ -147,6 +176,13 @@ public class TransactionService implements ITransactionService {
         );
     }
 
+    /**
+     * Filters recent transactions within a specified number of days.
+     *
+     * @param transactions the list of transactions
+     * @param days the number of days
+     * @return the filtered list of transactions
+     */
     public TransactionList filterRecentTransactions(TransactionList transactions, int days) {
         Date startDate = new Date(System.currentTimeMillis() - (long) days * 24 * 60 * 60 * 1000);
         Date endDate = new Date();
@@ -193,18 +229,36 @@ public class TransactionService implements ITransactionService {
         return transactionRepository.getBalanceBeforeDate(customerID, start);
     }
 
+    /**
+     * Validates that an object is not null.
+     *
+     * @param obj the object to validate
+     * @param fieldName the name of the field
+     */
     private void validateNotNull(Object obj, String fieldName) {
         if (obj == null) {
             throw new InvalidTransactionException(fieldName + " cannot be null.");
         }
     }
 
+    /**
+     * Validates that an account has sufficient funds.
+     *
+     * @param account the account
+     * @param amount the amount to validate
+     */
     private void validateSufficientFunds(Account account, BigDecimal amount) {
         if (!account.hasSufficientFunds(amount)) {
             throw new InvalidTransactionException("Insufficient funds in account: " + account.getAccountNumber());
         }
     }
 
+    /**
+     * Validates that a withdrawal does not exceed the credit limit.
+     *
+     * @param account the account
+     * @param withdrawalAmount the withdrawal amount
+     */
     private void validateCreditLimit(Account account, BigDecimal withdrawalAmount) {
         if (account instanceof CreditAccount creditAccount) {
             BigDecimal totalAvailable = creditAccount.getAvailableBalance().add(creditAccount.getCreditLimit());
@@ -214,11 +268,22 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Adjusts the balance of an account.
+     *
+     * @param account the account
+     * @param delta the amount to adjust
+     */
     private void adjustBalance(Account account, BigDecimal delta) {
         BigDecimal updated = account.getAvailableBalance().add(delta);
         account.setAvailableBalance(updated);
     }
 
+    /**
+     * Applies a transaction fee if required.
+     *
+     * @param account the account
+     */
     private void applyTransactionFeeIfRequired(Account account) {
         if (account.getAccountType() != AccountType.CHECKING) return;
 
@@ -234,6 +299,13 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Applies a fee to an account.
+     *
+     * @param account the account
+     * @param feeAmount the fee amount
+     * @param description the description of the fee
+     */
     private void applyFee(Account account, BigDecimal feeAmount, String description) {
         validateSufficientFunds(account, feeAmount);
 
@@ -252,10 +324,19 @@ public class TransactionService implements ITransactionService {
         accountRepository.updateAccount(account);
     }
 
+    /**
+     * Retrieves recent transactions for a specific account.
+     *
+     * @param account the account
+     * @return the list of recent transactions
+     */
     public TransactionList getRecentTransactionsByAccount(Account account) {
         return transactionRepository.getTransactionsByAccount(account.getAccountNumber());
     }
 
+    /**
+     * Applies monthly interest to all credit accounts.
+     */
     public void applyMonthlyInterestToAllCreditAccounts() {
         var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
         var accountService = AccountService.getInstance(storageMode);
@@ -272,6 +353,9 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Applies annual interest to all savings accounts.
+     */
     public void applyAnnualInterestToAllSavingsAccounts() {
         var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
         var accountService = AccountService.getInstance(storageMode);
@@ -288,6 +372,9 @@ public class TransactionService implements ITransactionService {
         }
     }
 
+    /**
+     * Scans for suspicious activity in transactions.
+     */
     public void scanForSuspiciousActivity() {
         var customerRepo = RepositoryFactory.getInstance(storageMode).getCustomerRepository();
         var accountService = AccountService.getInstance(storageMode);

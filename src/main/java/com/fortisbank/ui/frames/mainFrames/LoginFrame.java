@@ -12,6 +12,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The LoginFrame class represents the login window of the Fortis Bank application.
+ * It extends JFrame and provides a user interface for users to log in or register.
+ */
 public class LoginFrame extends JFrame {
 
     private final JTextField emailField = new JTextField(20);
@@ -23,6 +27,11 @@ public class LoginFrame extends JFrame {
     private final StorageMode storageMode;
     private final LoginService loginService;
 
+    /**
+     * Constructs a LoginFrame with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public LoginFrame(StorageMode storageMode) {
         this.storageMode = storageMode;
         this.loginService = LoginService.getInstance(
@@ -35,7 +44,7 @@ public class LoginFrame extends JFrame {
         setLayout(new BorderLayout());
 
         // Custom Title Bar
-        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Login",null);
+        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Fortis Bank - Login", null);
         add(titleBar, BorderLayout.NORTH);
 
         // Main Content Panel
@@ -94,13 +103,15 @@ public class LoginFrame extends JFrame {
         StyleUtils.styleButton(loginButton, true);
         StyleUtils.styleButton(registerButton, false);
 
-        //TODO: remove this in production
+        // TODO: remove this in production
         // prefill the email field and password field
         emailField.setText("user@test.com");
         passwordField.setText("1111");
     }
 
-
+    /**
+     * The LoginAction class handles the login button action.
+     */
     private class LoginAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -128,6 +139,9 @@ public class LoginFrame extends JFrame {
         }
     }
 
+    /**
+     * The RegisterAction class handles the register button action.
+     */
     private class RegisterAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {

@@ -14,6 +14,10 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * The UserUpdateForm class represents the user update form window of the Fortis Bank application.
+ * It extends JFrame and provides a user interface for updating user information.
+ */
 public class UserUpdateForm extends JFrame {
 
     private final JTextField firstNameField = new JTextField(15);
@@ -36,6 +40,12 @@ public class UserUpdateForm extends JFrame {
     private final StorageMode storageMode;
     private final User user;
 
+    /**
+     * Constructs a UserUpdateForm with the specified user and storage mode.
+     *
+     * @param user the user to be updated
+     * @param storageMode the storage mode to use for services
+     */
     public UserUpdateForm(User user, StorageMode storageMode) {
         this.user = user;
         this.storageMode = storageMode;
@@ -151,12 +161,15 @@ public class UserUpdateForm extends JFrame {
         ValidationUtils.attachRealTimeValidation(newPinField, pinStatus, ValidationUtils::isValidPIN, "Valid PIN", "4-digit PIN required");
     }
 
+    /**
+     * The UpdateAction class handles the update button action.
+     */
     private class UpdateAction implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
                 user.setFirstName(firstNameField.getText().trim());
-                user.setLastName(lastNameField.getText().trim());
+                user.setLastName(firstNameField.getText().trim());
                 user.setEmail(emailField.getText().trim());
 
                 if (user instanceof Customer customer) {

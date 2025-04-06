@@ -8,7 +8,11 @@ import com.fortisbank.data.repositories.StorageMode;
 import java.util.concurrent.TimeUnit;
 
 public class AutomationService {
-
+    /**
+     * Starts all daemon tasks for the given storage mode.
+     *
+     * @param storageMode the storage mode
+     */
     public static void startAllDaemonTasks(StorageMode storageMode) {
 
         // 1. Interest Application (Daily)

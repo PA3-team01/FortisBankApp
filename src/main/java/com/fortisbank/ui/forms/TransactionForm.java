@@ -7,12 +7,24 @@ import javax.swing.*;
 import java.awt.*;
 import java.math.BigDecimal;
 
+/**
+ * The TransactionForm class is an abstract JFrame that provides a form
+ * for handling transaction-related operations. It includes fields for
+ * the transaction amount and description, and buttons to confirm or cancel
+ * the transaction.
+ */
 public abstract class TransactionForm extends JFrame {
 
     protected final JTextField amountField = new JTextField();
     protected final JTextField descriptionField = new JTextField();
     protected StorageMode storageMode;
 
+    /**
+     * Constructs a TransactionForm with the specified title and storage mode.
+     *
+     * @param title the title of the form
+     * @param mode the storage mode to use for services
+     */
     public TransactionForm(String title, StorageMode mode) {
         storageMode = mode;
         setUndecorated(true);
@@ -69,6 +81,11 @@ public abstract class TransactionForm extends JFrame {
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
+    /**
+     * Retrieves the entered amount from the amount field.
+     *
+     * @return the entered amount as a BigDecimal, or null if the format is invalid
+     */
     protected BigDecimal getEnteredAmount() {
         try {
             return new BigDecimal(amountField.getText().trim());
@@ -78,5 +95,10 @@ public abstract class TransactionForm extends JFrame {
         }
     }
 
+    /**
+     * Handles the confirmation of the transaction.
+     *
+     * @return true if the transaction was successful, false otherwise
+     */
     protected abstract boolean handleConfirm();
 }

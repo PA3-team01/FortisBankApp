@@ -8,78 +8,93 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
- * Liste pour la gestion des clients
- */
+* List for managing customers.
+*/
 public class CustomerList extends ArrayList<Customer> {
 
-    // ------------------- Constructors -------------------
+ // ------------------- Constructors -------------------
 
-    public CustomerList() {
-        super();
-    }
+ /**
+  * Default constructor initializing an empty customer list.
+  */
+ public CustomerList() {
+     super();
+ }
 
-    public CustomerList(Iterable<Customer> customers) {
-        customers.forEach(this::add);
-    }
+ /**
+  * Constructor initializing the customer list with a collection of customers.
+  *
+  * @param customers an iterable collection of customers to add to the list
+  */
+ public CustomerList(Iterable<Customer> customers) {
+     customers.forEach(this::add);
+ }
 
-    // ------------------- Sorting Methods -------------------
+ // ------------------- Sorting Methods -------------------
 
-    /**
-     * Trie les clients par nom
-     */
-    public void sortByName() {
-        this.sort(CustomerComparators.BY_NAME);
-    }
+ /**
+  * Sorts the customers by name.
+  */
+ public void sortByName() {
+     this.sort(CustomerComparators.BY_NAME);
+ }
 
-    /**
-     * Trie les clients par solde decroissant
-     */
-    public void sortByBalanceDescending() {
-        this.sort(CustomerComparators.BY_BALANCE.reversed());
-    }
+ /**
+  * Sorts the customers by balance in descending order.
+  */
+ public void sortByBalanceDescending() {
+     this.sort(CustomerComparators.BY_BALANCE.reversed());
+ }
 
-    /**
-     * Trie les clients par nombre de transaction
-     */
-    public void sortByTransactionCountAscending() {
-        this.sort(CustomerComparators.BY_TRANSACTION_COUNT);
-    }
+ /**
+  * Sorts the customers by transaction count in ascending order.
+  */
+ public void sortByTransactionCountAscending() {
+     this.sort(CustomerComparators.BY_TRANSACTION_COUNT);
+ }
 
-    /**
-     * Trie les clients par nombre de transaction decroissant
-     */
-    public void sortByTransactionCountDescending() {
-        this.sort(CustomerComparators.BY_TRANSACTION_COUNT.reversed());
-    }
+ /**
+  * Sorts the customers by transaction count in descending order.
+  */
+ public void sortByTransactionCountDescending() {
+     this.sort(CustomerComparators.BY_TRANSACTION_COUNT.reversed());
+ }
 
-    // ------------------- Filtering Methods -------------------
+ // ------------------- Filtering Methods -------------------
 
-    /**
-     * Filtre les client par solde minimum
-     * @param minBalance Solde minimum
-     * @return Customer List filtrer
-     */
-    public CustomerList filterByMinBalance(double minBalance) {
-        return this.stream()
-                .filter(c -> c.getBalance().compareTo(BigDecimal.valueOf(minBalance)) >= 0)
-                .collect(Collectors.toCollection(CustomerList::new));
-    }
+ /**
+  * Filters the customers by minimum balance.
+  *
+  * @param minBalance the minimum balance
+  * @return a filtered customer list
+  */
+ public CustomerList filterByMinBalance(double minBalance) {
+     return this.stream()
+             .filter(c -> c.getBalance().compareTo(BigDecimal.valueOf(minBalance)) >= 0)
+             .collect(Collectors.toCollection(CustomerList::new));
+ }
 
-    /**
-     * Filtre les clients qui contient x
-     * @param substring x a rechercher
-     * @return Customer List filtrer
-     */
-    public CustomerList filterByNameContains(String substring) {
-        return this.stream()
-                .filter(c -> c.getFullName().toLowerCase().contains(substring.toLowerCase()))
-                .collect(Collectors.toCollection(CustomerList::new));
-    }
+ /**
+  * Filters the customers whose name contains the specified substring.
+  *
+  * @param substring the substring to search for
+  * @return a filtered customer list
+  */
+ public CustomerList filterByNameContains(String substring) {
+     return this.stream()
+             .filter(c -> c.getFullName().toLowerCase().contains(substring.toLowerCase()))
+             .collect(Collectors.toCollection(CustomerList::new));
+ }
 
-    // ------------------- String Representation -------------------
+ // ------------------- String Representation -------------------
 
-    @Override
-    public String toString() {
-        return "CustomerList{" + super.toString() + "}";
-    }
+ /**
+  * Returns a string representation of the customer list.
+  *
+  * @return a string containing customer list information
+  */
+ @Override
+ public String toString() {
+     return "CustomerList{" + super.toString() + "}";
+ }
 }

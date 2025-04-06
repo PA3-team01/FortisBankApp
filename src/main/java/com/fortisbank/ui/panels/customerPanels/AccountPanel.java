@@ -12,10 +12,20 @@ import com.fortisbank.ui.uiUtils.StyleUtils;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * The AccountPanel class represents the account panel of the Fortis Bank application.
+ * It extends JPanel and provides a user interface to display the customer's active accounts
+ * and allows the customer to request a new account.
+ */
 public class AccountPanel extends JPanel {
 
     private final StorageMode storageMode;
 
+    /**
+     * Constructs an AccountPanel with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public AccountPanel(StorageMode storageMode) {
         this.storageMode = storageMode;
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
@@ -31,7 +41,7 @@ public class AccountPanel extends JPanel {
 
         // Get the customer's accounts
         AccountList accounts = customer.getAccounts();
-        //filter out inactive accounts
+        // Filter out inactive accounts
         accounts = accounts.stream()
                 .filter(Account::isActive)
                 .collect(AccountList::new, AccountList::add, AccountList::addAll);

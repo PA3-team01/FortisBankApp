@@ -1,43 +1,57 @@
 package com.fortisbank.models.collections;
 
-import com.fortisbank.models.users.BankManager;
+ import com.fortisbank.models.users.BankManager;
 
-import java.util.ArrayList;
-import java.util.stream.Collectors;
+ import java.util.ArrayList;
+ import java.util.stream.Collectors;
 
-/**
- * A typed list for managing BankManager objects.
- * Provides filtering and extensibility for manager-specific operations.
- */
-public class ManagerList extends ArrayList<BankManager> {
+ /**
+  * A typed list for managing BankManager objects.
+  * Provides filtering and extensibility for manager-specific operations.
+  */
+ public class ManagerList extends ArrayList<BankManager> {
 
-    // ------------------- Constructors -------------------
+     // ------------------- Constructors -------------------
 
-    public ManagerList() {
-        super();
-    }
+     /**
+      * Default constructor initializing an empty manager list.
+      */
+     public ManagerList() {
+         super();
+     }
 
-    public ManagerList(Iterable<BankManager> managers) {
-        managers.forEach(this::add);
-    }
+     /**
+      * Constructor initializing the manager list with a collection of managers.
+      *
+      * @param managers an iterable collection of managers to add to the list
+      */
+     public ManagerList(Iterable<BankManager> managers) {
+         managers.forEach(this::add);
+     }
 
-    // ------------------- Filtering -------------------
+     // ------------------- Filtering -------------------
 
-    /**
-     *  Filtre les Manager qui contient x
-     * @param substring x a rechercher
-     * @return Manager List filtrer
-     */
-    public ManagerList filterByNameContains(String substring) {
-        return this.stream()
-                .filter(m -> m.getFullName().toLowerCase().contains(substring.toLowerCase()))
-                .collect(Collectors.toCollection(ManagerList::new));
-    }
+     /**
+      * Filters the managers whose name contains the specified substring.
+      *
+      * @param substring the substring to search for
+      * @return a filtered manager list
+      */
+     public ManagerList filterByNameContains(String substring) {
+         return this.stream()
+                 .filter(m -> m.getFullName().toLowerCase().contains(substring.toLowerCase()))
+                 .collect(Collectors.toCollection(ManagerList::new));
+     }
 
-    // ------------------- String Representation -------------------
+     // ------------------- String Representation -------------------
 
-    @Override
-    public String toString() {
-        return "ManagerList{" + super.toString() + "}";
-    }
-}
+     /**
+      * Returns a string representation of the manager list.
+      *
+      * @return a string containing manager list information
+      */
+     @Override
+     public String toString() {
+         return "ManagerList{" + super.toString() + "}";
+     }
+ }

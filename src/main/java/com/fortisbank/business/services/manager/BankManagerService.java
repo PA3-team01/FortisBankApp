@@ -1,167 +1,208 @@
 package com.fortisbank.business.services.manager;
 
-import com.fortisbank.business.services.account.AccountService;
-import com.fortisbank.data.repositories.IBankManagerRepository;
-import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.collections.ManagerList;
-import com.fortisbank.models.users.BankManager;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.utils.SecurityUtils;
+ import com.fortisbank.business.services.account.AccountService;
+ import com.fortisbank.data.repositories.IBankManagerRepository;
+ import com.fortisbank.data.repositories.RepositoryFactory;
+ import com.fortisbank.data.repositories.StorageMode;
+ import com.fortisbank.models.accounts.Account;
+ import com.fortisbank.models.collections.ManagerList;
+ import com.fortisbank.models.users.BankManager;
+ import com.fortisbank.models.users.Customer;
+ import com.fortisbank.utils.SecurityUtils;
 
-import java.util.EnumMap;
-import java.util.Map;
+ import java.util.EnumMap;
+ import java.util.Map;
 
-/**
- * Service de gestion des manager
- */
-public class BankManagerService implements IBankManagerService {
+ /**
+  * Service class for managing bank managers.
+  */
+ public class BankManagerService implements IBankManagerService {
 
-    private static final Map<StorageMode, BankManagerService> instances = new EnumMap<>(StorageMode.class);
+     private static final Map<StorageMode, BankManagerService> instances = new EnumMap<>(StorageMode.class);
 
-    private final IBankManagerRepository managerRepository;
-    private StorageMode storageMode;
+     private final IBankManagerRepository managerRepository;
+     private StorageMode storageMode;
 
-    private BankManagerService(StorageMode storageMode) {
-        this.storageMode = storageMode;
-        this.managerRepository = RepositoryFactory.getInstance(storageMode).getBankManagerRepository();
-    }
+     /**
+      * Private constructor to prevent instantiation.
+      *
+      * @param storageMode the storage mode
+      */
+     private BankManagerService(StorageMode storageMode) {
+         this.storageMode = storageMode;
+         this.managerRepository = RepositoryFactory.getInstance(storageMode).getBankManagerRepository();
+     }
 
-    public static synchronized BankManagerService getInstance(StorageMode storageMode) {
-        return instances.computeIfAbsent(storageMode, BankManagerService::new);
-    }
+     /**
+      * Returns the singleton instance of BankManagerService for the given storage mode.
+      *
+      * @param storageMode the storage mode
+      * @return the singleton instance of BankManagerService
+      */
+     public static synchronized BankManagerService getInstance(StorageMode storageMode) {
+         return instances.computeIfAbsent(storageMode, BankManagerService::new);
+     }
 
-    // ------------------- CRUD OPERATIONS -------------------
+     // ------------------- CRUD OPERATIONS -------------------
 
-    // Create
+     // Create
 
-    /**
-     * Cree un nouveau manager
-     * @param manager manager
-     * @return le manager cree
-     */
-    public BankManager createManager(BankManager manager) { // ** Do not call directly, use register service **
-        managerRepository.insertManager(manager);
-        return manager;
-    }
-    // update
-    public BankManager updateBankManager(BankManager manager) {
-        managerRepository.updateManager(manager);
-        return manager;
-    }
+     /**
+      * Creates a new bank manager.
+      *
+      * @param manager the manager to be created
+      * @return the created manager
+      */
+     public BankManager createManager(BankManager manager) { // ** Do not call directly, use register service **
+         managerRepository.insertManager(manager);
+         return manager;
+     }
 
-    // ------------------- Core Business Methods -------------------
+     /**
+      * Updates the given bank manager.
+      *
+      * @param manager the manager to be updated
+      * @return the updated manager
+      */
+     public BankManager updateBankManager(BankManager manager) {
+         managerRepository.updateManager(manager);
+         return manager;
+     }
 
-    @Override
-    public Customer createCustomer(String firstName, String lastName, String email, String phone, String hashedPassword, String pinHash) {
-        // Implementation depends on whether manager creates users directly or uses RegisterService
-        //TODO: Implement this method
-        return null;
-    }
+     // ------------------- Core Business Methods -------------------
 
-    /**
-     * Approbation d'un compte
-     * @param account Compte
-     * @return true si approuver
-     */
-    @Override
-    public boolean approveAccount(Account account) {
-        account.setActive(true);
-        return true;
-    }
+     /**
+      * Creates a new customer.
+      *
+      * @param firstName the first name of the customer
+      * @param lastName the last name of the customer
+      * @param email the email of the customer
+      * @param phone the phone number of the customer
+      * @param hashedPassword the hashed password of the customer
+      * @param pinHash the hashed PIN of the customer
+      * @return the created customer
+      */
+     @Override
+     public Customer createCustomer(String firstName, String lastName, String email, String phone, String hashedPassword, String pinHash) {
+         // Implementation depends on whether manager creates users directly or uses RegisterService
+         //TODO: Implement this method
+         return null;
+     }
 
-    /**
-     * Fermer un compte
-     * @param account Compte
-     * @return true si la fermeture du compte reussit
-     */
-    @Override
-    public boolean closeAccount(Account account) {
-        try {
-            if (account == null) {
-                throw new IllegalStateException("Account cannot be null");
-            }
-            if (!account.isActive()) {
-                throw new IllegalStateException("Account is already closed");
-            }
-            AccountService.getInstance(storageMode).closeAccount(account);
+     /**
+      * Approves an account.
+      *
+      * @param account the account to be approved
+      * @return true if the account is approved
+      */
+     @Override
+     public boolean approveAccount(Account account) {
+         account.setActive(true);
+         return true;
+     }
 
-            return true;
-        } catch (IllegalStateException e) {
-            System.err.println("Failed to close account: " + e.getMessage());
-            return false;
-        }
-    }
+     /**
+      * Closes an account.
+      *
+      * @param account the account to be closed
+      * @return true if the account is successfully closed
+      */
+     @Override
+     public boolean closeAccount(Account account) {
+         try {
+             if (account == null) {
+                 throw new IllegalStateException("Account cannot be null");
+             }
+             if (!account.isActive()) {
+                 throw new IllegalStateException("Account is already closed");
+             }
+             AccountService.getInstance(storageMode).closeAccount(account);
 
-    /**
-     * Suppression d'un client
-     * @param customer Client
-     * @return
-     */
-    @Override
-    public boolean deleteCustomer(Customer customer) {
-        // You can delegate to CustomerService or remove via repository directly
-        return false;
-    }
+             return true;
+         } catch (IllegalStateException e) {
+             System.err.println("Failed to close account: " + e.getMessage());
+             return false;
+         }
+     }
 
-    /**
-     * Generer un rapport client
-     */
-    @Override
-    public void generateCustomerReport() {
-        // Placeholder — would generate a report using available data (e.g., PDF, export)
-    }
+     /**
+      * Deletes a customer.
+      *
+      * @param customer the customer to be deleted
+      * @return true if the customer is successfully deleted
+      */
+     @Override
+     public boolean deleteCustomer(Customer customer) {
+         // You can delegate to CustomerService or remove via repository directly
+         return false;
+     }
 
-    // ------------------- Login Support -------------------
+     /**
+      * Generates a customer report.
+      */
+     @Override
+     public void generateCustomerReport() {
+         // Placeholder — would generate a report using available data (e.g., PDF, export)
+     }
 
-    /**
-     * Recupere tout les managers
-     * @return la liste des managers
-     */
-    public ManagerList getAllManagers() {
-        return managerRepository.getAllManagers();
-    }
+     // ------------------- Login Support -------------------
 
-    /**
-     * Recherche un manager par email
-     * @param email Email
-     * @return le manager trouver ou null
-     */
-    public BankManager getManagerByEmail(String email) {
-        for (BankManager manager : getAllManagers()) {
-            if (manager.getEmail().equalsIgnoreCase(email)) {
-                return manager;
-            }
-        }
-        return null;
-    }
+     /**
+      * Retrieves all managers.
+      *
+      * @return the list of all managers
+      */
+     public ManagerList getAllManagers() {
+         return managerRepository.getAllManagers();
+     }
 
-    // ------------------- Utility Methods -------------------
+     /**
+      * Searches for a manager by email.
+      *
+      * @param email the email of the manager
+      * @return the found manager or null
+      */
+     public BankManager getManagerByEmail(String email) {
+         for (BankManager manager : getAllManagers()) {
+             if (manager.getEmail().equalsIgnoreCase(email)) {
+                 return manager;
+             }
+         }
+         return null;
+     }
 
-    /**
-     * Verification pour voir si un email est deja utilise
-     * @param email Email
-     * @return si l'email existe deja
-     */
-    public boolean emailExists(String email) {
-        return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
-    }
+     // ------------------- Utility Methods -------------------
 
+     /**
+      * Checks if an email is already in use.
+      *
+      * @param email the email to check
+      * @return true if the email already exists
+      */
+     public boolean emailExists(String email) {
+         return getAllManagers().stream().anyMatch(manager -> manager.getEmail().equalsIgnoreCase(email));
+     }
 
-    public void updateManagerWithSecurity(BankManager manager, char[] newPassword, char[] newPin) {
-        try {
-            if (newPassword != null && newPassword.length > 0) {
-                manager.setHashedPassword(SecurityUtils.hashPassword(newPassword));
-            }
-            if (newPin != null && newPin.length > 0) {
-                manager.setPINHash(SecurityUtils.hashPIN(newPin));
-            }
-            // Standard info update
-            updateBankManager(manager);
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to update manager security fields", e);
-        }
-    }
+     /**
+      * Updates the manager's security credentials (password and PIN).
+      *
+      * @param manager the manager to be updated
+      * @param newPassword the new password
+      * @param newPin the new PIN
+      */
+     public void updateManagerWithSecurity(BankManager manager, char[] newPassword, char[] newPin) {
+         try {
+             if (newPassword != null && newPassword.length > 0) {
+                 manager.setHashedPassword(SecurityUtils.hashPassword(newPassword));
+             }
+             if (newPin != null && newPin.length > 0) {
+                 manager.setPINHash(SecurityUtils.hashPIN(newPin));
+             }
+             // Standard info update
+             updateBankManager(manager);
+         } catch (Exception e) {
+             throw new RuntimeException("Failed to update manager security fields", e);
+         }
+     }
 
-}
+ }

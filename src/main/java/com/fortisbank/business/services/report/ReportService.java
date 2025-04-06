@@ -21,12 +21,20 @@ import java.time.YearMonth;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for generating various reports.
+ */
 public class ReportService {
 
     private final ICustomerRepository customerRepository;
     private final IAccountRepository accountRepository;
     private final ITransactionRepository transactionRepository;
 
+    /**
+     * Constructs a ReportService with the given repository factory.
+     *
+     * @param factory the repository factory
+     */
     public ReportService(RepositoryFactory factory) {
         this.customerRepository = factory.getCustomerRepository();
         this.accountRepository = factory.getAccountRepository();
@@ -35,6 +43,10 @@ public class ReportService {
 
     /**
      * Generates a monthly statement for a specific customer.
+     *
+     * @param customer the customer
+     * @param month the month for which the statement is generated
+     * @return the customer statement report
      */
     public CustomerStatementReport generateCustomerStatement(Customer customer, YearMonth month) {
         LocalDate start = month.atDay(1);
@@ -64,9 +76,10 @@ public class ReportService {
         return new CustomerStatementReport(customer, transactions, openingBalance, closingBalance, start, end);
     }
 
-
     /**
      * Generates a full bank-wide summary report.
+     *
+     * @return the bank summary report
      */
     public BankSummaryReport generateBankSummaryReport() {
         var customers = customerRepository.getAllCustomers();
@@ -111,6 +124,12 @@ public class ReportService {
         );
     }
 
+    /**
+     * Saves the customer statement report to a CSV file.
+     *
+     * @param report the customer statement report
+     * @param filePath the file path to save the report
+     */
     public void saveCustomerStatementReportToCSV(CustomerStatementReport report, String filePath) {
         try {
             AccountList customerAccounts = accountRepository
@@ -122,7 +141,12 @@ public class ReportService {
         }
     }
 
-
+    /**
+     * Saves the bank summary report to a CSV file.
+     *
+     * @param report the bank summary report
+     * @param filePath the file path to save the report
+     */
     public void saveBankSummaryReportToCSV(BankSummaryReport report, String filePath) {
         try {
             ReportExporter.exportBankSummaryToCSV(report, filePath);

@@ -12,10 +12,19 @@ import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+/**
+ * The DashboardFrame class represents the main dashboard window of the Fortis Bank application.
+ * It extends JFrame and provides a user interface based on the user's role (Manager or Customer).
+ */
 public class DashboardFrame extends JFrame {
 
     private final StorageMode storageMode;
 
+    /**
+     * Constructs a DashboardFrame with the specified storage mode.
+     *
+     * @param storageMode the storage mode to use for services
+     */
     public DashboardFrame(StorageMode storageMode) {
         this.storageMode = storageMode;
 
@@ -83,6 +92,9 @@ public class DashboardFrame extends JFrame {
         contentPanel.add(rolePanel, BorderLayout.CENTER);
     }
 
+    /**
+     * Handles the logout action by clearing the session and opening the login frame.
+     */
     private void handleLogout() {
         SessionManager.clear();
 
@@ -93,6 +105,9 @@ public class DashboardFrame extends JFrame {
         dispose();
     }
 
+    /**
+     * Closes all open transaction forms when the dashboard is closed.
+     */
     private void closeAllTransactionForms() {
         for (Window window : Window.getWindows()) {
             if ((window instanceof JDialog || window instanceof JFrame)

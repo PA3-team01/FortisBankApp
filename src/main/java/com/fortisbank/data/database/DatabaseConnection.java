@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * gere la connexion/ deconnexion
+ * Manages the connection and disconnection to the database.
  */
 public class DatabaseConnection implements IDatabaseConnection {
     private static DatabaseConnection instance; // Singleton instance
@@ -19,6 +19,11 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     // Singleton Instance Method
+    /**
+     * Returns the singleton instance of DatabaseConnection.
+     *
+     * @return the singleton instance of DatabaseConnection
+     */
     public static DatabaseConnection getInstance() {
         if (instance == null) {
             instance = new DatabaseConnection();
@@ -27,9 +32,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     /**
-     * Etablit la connexion a la base de donnees Oracle
+     * Establishes the connection to the Oracle database.
      */
-    // Connect to Oracle Database
     @Override
     public void Connect() {
         if (connection != null) {
@@ -54,9 +58,8 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     /**
-     * Ferme la connexion
+     * Closes the connection to the database.
      */
-    // Disconnect from Database
     @Override
     public void Disconnect() {
         try {
@@ -72,10 +75,10 @@ public class DatabaseConnection implements IDatabaseConnection {
     }
 
     /**
-     * Teste la connexion a la database
-     * @return true su la connexion est reussi
+     * Tests the connection to the database.
+     *
+     * @return true if the connection is successful, false otherwise
      */
-    // Test Database Connection
     public boolean TestConnection() {
         try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
             System.out.println("Database connection test successful.");
@@ -87,7 +90,11 @@ public class DatabaseConnection implements IDatabaseConnection {
         }
     }
 
-    // Get Connection (Optional for external use)
+    /**
+     * Returns the current database connection.
+     *
+     * @return the current database connection
+     */
     public Connection getConnection() {
         return connection;
     }
