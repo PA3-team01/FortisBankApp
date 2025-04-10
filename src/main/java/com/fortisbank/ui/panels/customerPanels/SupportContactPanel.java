@@ -1,8 +1,8 @@
 package com.fortisbank.ui.panels.customerPanels;
 
-import com.fortisbank.data.repositories.StorageMode;
+import com.fortisbank.data.dal_utils.StorageMode;
 import com.fortisbank.ui.forms.SendMessageForm;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

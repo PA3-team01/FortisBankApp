@@ -1,14 +1,14 @@
 package com.fortisbank.ui.panels.customerPanels;
 
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.session.SessionManager;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.accounts.Account;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.business.services.session.SessionManager;
 import com.fortisbank.ui.components.TransactionSummary;
 import com.fortisbank.ui.forms.DepositForm;
 import com.fortisbank.ui.forms.TransferForm;
 import com.fortisbank.ui.forms.WithdrawalForm;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

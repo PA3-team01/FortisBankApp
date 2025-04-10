@@ -2,12 +2,12 @@ package com.fortisbank.ui.components;
 
 import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.business.services.transaction.TransactionService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.session.SessionManager;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.accounts.Account;
+import com.fortisbank.contracts.collections.TransactionList;
+import com.fortisbank.business.services.session.SessionManager;
 import com.fortisbank.ui.frames.subFrames.MonthlyStatementFrame;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

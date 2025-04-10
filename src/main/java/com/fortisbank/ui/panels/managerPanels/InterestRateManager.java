@@ -1,9 +1,9 @@
 package com.fortisbank.ui.panels.managerPanels;
 
 import com.fortisbank.business.services.account.InterestRateConfigService;
-import com.fortisbank.models.accounts.AccountType;
-import com.fortisbank.models.others.InterestRate;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.contracts.models.accounts.AccountType;
+import com.fortisbank.contracts.models.others.InterestRate;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

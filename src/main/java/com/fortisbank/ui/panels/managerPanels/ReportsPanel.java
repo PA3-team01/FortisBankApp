@@ -1,12 +1,12 @@
 package com.fortisbank.ui.panels.managerPanels;
 
 import com.fortisbank.business.services.report.ReportService;
-import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.reports.BankSummaryReport;
-import com.fortisbank.models.reports.CustomerStatementReport;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.data.dal_utils.RepositoryFactory;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.reports.BankSummaryReport;
+import com.fortisbank.contracts.models.reports.CustomerStatementReport;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;

@@ -1,7 +1,7 @@
 package com.fortisbank.business.services.transaction;
 
-import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.transactions.Transaction;
+import com.fortisbank.contracts.collections.TransactionList;
+import com.fortisbank.contracts.models.transactions.Transaction;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

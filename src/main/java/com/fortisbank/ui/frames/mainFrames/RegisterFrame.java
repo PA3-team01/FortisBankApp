@@ -1,9 +1,9 @@
 package com.fortisbank.ui.frames.mainFrames;
 
-import com.fortisbank.business.services.customer.RegisterService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.ui.uiUtils.StyleUtils;
-import com.fortisbank.utils.ValidationUtils;
+import com.fortisbank.business.services.users.customer.RegisterService;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.ui.ui_utils.StyleUtils;
+import com.fortisbank.contracts.utils.ValidationUtils;
 
 import javax.swing.*;
 import java.awt.*;

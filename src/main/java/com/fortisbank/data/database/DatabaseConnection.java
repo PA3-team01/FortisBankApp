@@ -1,6 +1,7 @@
 package com.fortisbank.data.database;
 
-    import com.fortisbank.exceptions.DatabaseConnectionException;
+    import com.fortisbank.data.interfaces.IDatabaseConnection;
+    import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
 
     import java.sql.Connection;
     import java.sql.DriverManager;

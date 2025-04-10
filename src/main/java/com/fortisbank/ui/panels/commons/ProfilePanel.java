@@ -1,9 +1,9 @@
 package com.fortisbank.ui.panels.commons;
 
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.users.User;
-import com.fortisbank.session.SessionManager;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.contracts.models.users.User;
+import com.fortisbank.business.services.session.SessionManager;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

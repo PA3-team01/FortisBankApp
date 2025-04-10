@@ -2,11 +2,11 @@ package com.fortisbank.ui.panels.commons;
 
 import com.fortisbank.business.services.account.AccountLoanRequestService;
 import com.fortisbank.business.services.notification.NotificationService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.others.Notification;
-import com.fortisbank.session.SessionManager;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.others.Notification;
+import com.fortisbank.business.services.session.SessionManager;
 import com.fortisbank.ui.components.NotificationCard;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

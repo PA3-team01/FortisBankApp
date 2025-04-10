@@ -2,14 +2,14 @@ package com.fortisbank.ui.forms;
 
 import com.fortisbank.business.services.account.AccountLoanRequestService;
 import com.fortisbank.business.services.account.InterestRateConfigService;
-import com.fortisbank.business.services.manager.BankManagerService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.*;
-import com.fortisbank.models.users.BankManager;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.session.SessionManager;
-import com.fortisbank.ui.uiUtils.StyleUtils;
-import com.fortisbank.utils.IdGenerator;
+import com.fortisbank.business.services.users.manager.BankManagerService;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.accounts.*;
+import com.fortisbank.contracts.models.users.BankManager;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.business.services.session.SessionManager;
+import com.fortisbank.ui.ui_utils.StyleUtils;
+import com.fortisbank.contracts.utils.IdGenerator;
 
 import javax.swing.*;
 import java.awt.*;

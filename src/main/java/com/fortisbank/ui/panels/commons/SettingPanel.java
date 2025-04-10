@@ -1,6 +1,6 @@
 package com.fortisbank.ui.panels.commons;
 
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import javax.swing.text.AbstractDocument;

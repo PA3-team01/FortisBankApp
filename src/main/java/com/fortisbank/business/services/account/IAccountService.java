@@ -1,7 +1,7 @@
 package com.fortisbank.business.services.account;
 
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.collections.AccountList;
+import com.fortisbank.contracts.models.accounts.Account;
+import com.fortisbank.contracts.collections.AccountList;
 
 /**
 * Interface for account-related operations.

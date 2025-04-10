@@ -1,7 +1,7 @@
 package com.fortisbank.ui.panels.customerPanels;
 
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.utils.CurrencyType;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.others.CurrencyType;
 
 import javax.swing.*;
 import java.awt.*;

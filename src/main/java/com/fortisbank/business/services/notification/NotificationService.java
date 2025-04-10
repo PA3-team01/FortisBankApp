@@ -1,264 +1,220 @@
 package com.fortisbank.business.services.notification;
 
- import com.fortisbank.business.services.customer.CustomerService;
- import com.fortisbank.business.services.manager.BankManagerService;
- import com.fortisbank.data.repositories.StorageMode;
- import com.fortisbank.models.accounts.Account;
- import com.fortisbank.models.others.Notification;
- import com.fortisbank.models.others.NotificationType;
- import com.fortisbank.models.transactions.Transaction;
- import com.fortisbank.models.users.BankManager;
- import com.fortisbank.models.users.Customer;
- import com.fortisbank.models.users.User;
+     import com.fortisbank.business.services.users.customer.CustomerService;
+     import com.fortisbank.business.services.users.manager.BankManagerService;
+     import com.fortisbank.data.dal_utils.StorageMode;
+     import com.fortisbank.contracts.models.accounts.Account;
+     import com.fortisbank.contracts.models.others.Notification;
+     import com.fortisbank.contracts.models.others.NotificationType;
+     import com.fortisbank.contracts.models.transactions.Transaction;
+     import com.fortisbank.contracts.models.users.BankManager;
+     import com.fortisbank.contracts.models.users.Customer;
+     import com.fortisbank.contracts.models.users.User;
 
- import java.util.ArrayList;
- import java.util.List;
- import java.util.stream.Collectors;
-
- /**
-  * Central service to manage and dispatch notifications to users.
-  * Implemented as a singleton.
-  */
- public class NotificationService {
-
-     private StorageMode storageMode;
-
-     private static NotificationService instance;
+     import java.util.ArrayList;
+     import java.util.List;
+     import java.util.logging.Level;
+     import java.util.logging.Logger;
+     import java.util.stream.Collectors;
 
      /**
-      * Private constructor to prevent instantiation.
-      *
-      * @param storageMode the storage mode
+      * Central service to manage and dispatch notifications to users.
+      * Implemented as a singleton.
       */
-     private NotificationService(StorageMode storageMode) {
-         this.storageMode = storageMode;
-     }
+     public class NotificationService {
 
-     /**
-      * Returns the singleton instance of NotificationService for the given storage mode.
-      *
-      * @param storageMode the storage mode
-      * @return the singleton instance of NotificationService
-      */
-     public static NotificationService getInstance(StorageMode storageMode) {
-         if (instance == null) {
-             instance = new NotificationService(storageMode);
-         }
-         return instance;
-     }
+         private static final Logger LOGGER = Logger.getLogger(NotificationService.class.getName());
+         private StorageMode storageMode;
 
-     // === Notification Dispatching ===
+         private static NotificationService instance;
 
-     /**
-      * Sends a notification to the user.
-      *
-      * @param recipient the recipient
-      * @param type the type of notification
-      * @param title the title of the notification
-      * @param message the message of the notification
-      */
-     public void sendNotification(User recipient, NotificationType type, String title, String message) {
-         if (recipient == null) return;
-         Notification notification = new Notification(type, title, message);
-         recipient.getInbox().add(notification);
-
-         // update users in the database (Customer and BankManager)
-         if (recipient instanceof Customer) {
-             CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+         /**
+          * Private constructor to prevent instantiation.
+          *
+          * @param storageMode the storage mode
+          */
+         private NotificationService(StorageMode storageMode) {
+             this.storageMode = storageMode;
          }
 
-         if (recipient instanceof BankManager) {
-             BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
-         }
-     }
-
-     /**
-      * Sends a notification to the user with additional customer and account information.
-      *
-      * @param recipient the recipient
-      * @param type the type of notification
-      * @param title the title of the notification
-      * @param message the message of the notification
-      * @param customer the customer related to the notification
-      * @param account the account related to the notification
-      */
-     public void sendNotification(User recipient, NotificationType type, String title, String message, Customer customer, Account account) {
-         if (recipient == null) return;
-
-         Notification notification = new Notification(type, title, message, customer, account);
-         recipient.getInbox().add(notification);
-
-         // update users in the database (Customer and BankManager)
-         if (recipient instanceof Customer) {
-             CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+         /**
+          * Returns the singleton instance of NotificationService for the given storage mode.
+          *
+          * @param storageMode the storage mode
+          * @return the singleton instance of NotificationService
+          */
+         public static NotificationService getInstance(StorageMode storageMode) {
+             if (instance == null) {
+                 instance = new NotificationService(storageMode);
+             }
+             return instance;
          }
 
-         if (recipient instanceof BankManager) {
-             BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
+         // === Notification Dispatching ===
+
+         public void sendNotification(User recipient, NotificationType type, String title, String message) {
+             try {
+                 if (recipient == null) {
+                     throw new IllegalArgumentException("Recipient cannot be null.");
+                 }
+                 Notification notification = new Notification(type, title, message);
+                 recipient.getInbox().add(notification);
+
+                 if (recipient instanceof Customer) {
+                     CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+                 } else if (recipient instanceof BankManager) {
+                     BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
+                 }
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error sending notification: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to send notification", e);
+             }
+         }
+
+         public void sendNotification(User recipient, NotificationType type, String title, String message, Customer customer, Account account) {
+             try {
+                 if (recipient == null) {
+                     throw new IllegalArgumentException("Recipient cannot be null.");
+                 }
+                 Notification notification = new Notification(type, title, message, customer, account);
+                 recipient.getInbox().add(notification);
+
+                 if (recipient instanceof Customer) {
+                     CustomerService.getInstance(storageMode).updateCustomer((Customer) recipient);
+                 } else if (recipient instanceof BankManager) {
+                     BankManagerService.getInstance(storageMode).updateBankManager((BankManager) recipient);
+                 }
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error sending notification with additional details: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to send notification with additional details", e);
+             }
+         }
+
+         // === Predefined Notification Helpers ===
+
+         public void notifyTransactionReceipt(User user, Transaction tx) {
+             try {
+                 String title = "Transaction Completed";
+                 String message = String.format("Your %s of $%.2f on %s was successful.",
+                         tx.getTransactionType(), tx.getAmount(), tx.getTransactionDate());
+                 sendNotification(user, NotificationType.TRANSACTION_RECEIPT, title, message);
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error notifying transaction receipt: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to notify transaction receipt", e);
+             }
+         }
+
+         public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
+             try {
+                 if (manager == null || customer == null || requestedAccount == null) {
+                     throw new IllegalArgumentException("Manager, customer, and requested account cannot be null.");
+                 }
+                 String title = "New Account Request";
+                 String message = String.format("Customer %s requested a new %s account.",
+                         customer.getFullName(), requestedAccount.getAccountType());
+                 sendNotification(manager, NotificationType.ACCOUNT_OPENING_REQUEST, title, message, customer, requestedAccount);
+
+                 sendNotification(customer, NotificationType.INFO, "Request Sent",
+                         "Your account request was sent to the manager.", customer, requestedAccount);
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error notifying account request: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to notify account request", e);
+             }
+         }
+
+         public void notifyApproval(Customer customer, Account approvedAccount) {
+             try {
+                 String title = "Account Approved";
+                 String message = String.format("Your account (%s) has been approved.", approvedAccount.getAccountNumber());
+                 sendNotification(customer, NotificationType.ACCOUNT_APPROVAL, title, message, customer, approvedAccount);
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error notifying account approval: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to notify account approval", e);
+             }
+         }
+
+         public void notifyRejection(Customer customer, String reason, Account rejectedAccount) {
+             try {
+                 String title = "Account Rejected";
+                 String message = "Your account request was declined: " + reason;
+                 sendNotification(customer, NotificationType.ACCOUNT_REJECTION, title, message, customer, rejectedAccount);
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error notifying account rejection: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to notify account rejection", e);
+             }
+         }
+
+         // === Inbox Helpers ===
+
+         public List<Notification> getAllNotifications(User user) {
+             try {
+                 if (user == null || user.getInbox() == null) {
+                     return new ArrayList<>();
+                 }
+                 return reverseCopy(user.getInbox());
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error retrieving all notifications: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to retrieve all notifications", e);
+             }
+         }
+
+         public List<Notification> getUnreadNotifications(User user) {
+             try {
+                 if (user == null || user.getInbox() == null) {
+                     return new ArrayList<>();
+                 }
+                 return user.getInbox().stream()
+                         .filter(n -> !n.isRead())
+                         .collect(Collectors.toList());
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error retrieving unread notifications: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to retrieve unread notifications", e);
+             }
+         }
+
+         public void markAllAsRead(User user) {
+             try {
+                 if (user == null || user.getInbox() == null) {
+                     return;
+                 }
+                 user.getInbox().forEach(Notification::markAsRead);
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error marking all notifications as read: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to mark all notifications as read", e);
+             }
+         }
+
+         public void clearInbox(User user) {
+             try {
+                 if (user == null || user.getInbox() == null) {
+                     return;
+                 }
+                 user.getInbox().clear();
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error clearing inbox: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to clear inbox", e);
+             }
+         }
+
+         private List<Notification> reverseCopy(List<Notification> list) {
+             try {
+                 List<Notification> reversed = new ArrayList<>(list);
+                 reversed.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
+                 return reversed;
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Error reversing notification list: {0}", e.getMessage());
+                 throw new RuntimeException("Failed to reverse notification list", e);
+             }
+         }
+
+         public void notifyNewMessage(BankManager manager, String fullName) {
+                try {
+                    String title = "New Message";
+                    String message = String.format("You have a new message from %s.", fullName);
+                    sendNotification(manager, NotificationType.NEW_MESSAGE, title, message);
+                } catch (Exception e) {
+                    LOGGER.log(Level.SEVERE, "Error notifying new message: {0}", e.getMessage());
+                    throw new RuntimeException("Failed to notify new message", e);
+                }
          }
      }
-
-     // === Predefined Notification Helpers ===
-
-     /**
-      * Notifies the user of a completed transaction.
-      *
-      * @param user the user
-      * @param tx the transaction
-      */
-     public void notifyTransactionReceipt(User user, Transaction tx) {
-         String title = "Transaction Completed";
-         String message = String.format("Your %s of $%.2f on %s was successful.",
-                 tx.getTransactionType(), tx.getAmount(), tx.getTransactionDate());
-         sendNotification(user, NotificationType.TRANSACTION_RECEIPT, title, message);
-     }
-
-     /**
-      * Notifies the manager of a new account request from a customer.
-      *
-      * @param manager the manager
-      * @param customer the customer
-      * @param requestedAccount the requested account
-      */
-     public void notifyAccountRequest(User manager, Customer customer, Account requestedAccount) {
-         if (manager == null || customer == null || requestedAccount == null) return;
-         String title = "New Account Request";
-         String message = String.format("Customer %s requested a new %s account.",
-                 customer.getFullName(), requestedAccount.getAccountType());
-         sendNotification(manager, NotificationType.ACCOUNT_OPENING_REQUEST, title, message, customer, requestedAccount);
-
-         // Confirmation to customer
-         sendNotification(customer, NotificationType.INFO, "Request Sent",
-                 "Your account request was sent to the manager.", customer, requestedAccount);
-     }
-
-     /**
-      * Notifies the customer of an approved account.
-      *
-      * @param customer the customer
-      * @param approvedAccount the approved account
-      */
-     public void notifyApproval(Customer customer, Account approvedAccount) {
-         String title = "Account Approved";
-         String message = String.format("Your account (%s) has been approved.", approvedAccount.getAccountNumber());
-         sendNotification(customer, NotificationType.ACCOUNT_APPROVAL, title, message, customer, approvedAccount);
-     }
-
-     /**
-      * Notifies the customer of a rejected account request.
-      *
-      * @param customer the customer
-      * @param reason the reason for rejection
-      * @param rejectedAccount the rejected account
-      */
-     public void notifyRejection(Customer customer, String reason, Account rejectedAccount) {
-         String title = "Account Rejected";
-         String message = "Your account request was declined: " + reason;
-         sendNotification(customer, NotificationType.ACCOUNT_REJECTION, title, message, customer, rejectedAccount);
-     }
-
-     /**
-      * Notifies the user of a new message.
-      *
-      * @param user the user
-      * @param fromName the name of the sender
-      */
-     public void notifyNewMessage(User user, String fromName) {
-         String title = "New Message";
-         String message = String.format("You received a new message from %s.", fromName);
-         sendNotification(user, NotificationType.NEW_MESSAGE, title, message);
-     }
-
-     /**
-      * Notifies the user of a security alert.
-      *
-      * @param user the user
-      * @param details the details of the alert
-      */
-     public void notifySecurityAlert(User user, String details) {
-         String title = "Security Alert";
-         String message = "Important security notice: " + details;
-         sendNotification(user, NotificationType.SECURITY_ALERT, title, message);
-     }
-
-     /**
-      * Notifies the user of a system update.
-      *
-      * @param user the user
-      * @param updateDetails the details of the update
-      */
-     public void notifySystemUpdate(User user, String updateDetails) {
-         String title = "System Update";
-         String message = "Recent changes: " + updateDetails;
-         sendNotification(user, NotificationType.SYSTEM_UPDATE, title, message);
-     }
-
-     /**
-      * Sends a custom notification to the user.
-      *
-      * @param user the user
-      * @param title the title of the notification
-      * @param message the message of the notification
-      */
-     public void notifyCustom(User user, String title, String message) {
-         sendNotification(user, NotificationType.CUSTOM, title, message);
-     }
-
-     // === Inbox Helpers ===
-
-     /**
-      * Retrieves all notifications of the user, sorted from most recent to oldest.
-      *
-      * @param user the user
-      * @return the list of notifications
-      */
-     public List<Notification> getAllNotifications(User user) {
-         if (user == null || user.getInbox() == null) return new ArrayList<>();
-         return reverseCopy(user.getInbox());
-     }
-
-     /**
-      * Retrieves the unread notifications of the user.
-      *
-      * @param user the user
-      * @return the list of unread notifications
-      */
-     public List<Notification> getUnreadNotifications(User user) {
-         if (user == null || user.getInbox() == null) return new ArrayList<>();
-         return user.getInbox().stream()
-                 .filter(n -> !n.isRead())
-                 .collect(Collectors.toList());
-     }
-
-     /**
-      * Marks all notifications as read.
-      *
-      * @param user the user
-      */
-     public void markAllAsRead(User user) {
-         if (user == null || user.getInbox() == null) return;
-         user.getInbox().forEach(Notification::markAsRead);
-     }
-
-     /**
-      * Clears the inbox of the user.
-      *
-      * @param user the user
-      */
-     public void clearInbox(User user) {
-         if (user == null || user.getInbox() == null) return;
-         user.getInbox().clear();
-     }
-
-     /**
-      * Creates a reversed copy of the notification list, sorted by descending date.
-      *
-      * @param list the list of notifications
-      * @return the reversed list of notifications
-      */
-     private List<Notification> reverseCopy(List<Notification> list) {
-         List<Notification> reversed = new ArrayList<>(list);
-         reversed.sort((a, b) -> b.getTimestamp().compareTo(a.getTimestamp()));
-         return reversed;
-     }
- }

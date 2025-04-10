@@ -1,11 +1,11 @@
 package com.fortisbank.ui.frames.mainFrames;
 
-import com.fortisbank.business.services.customer.CustomerService;
-import com.fortisbank.business.services.customer.LoginService;
-import com.fortisbank.business.services.manager.BankManagerService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.users.User;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.business.services.users.customer.CustomerService;
+import com.fortisbank.business.services.users.customer.LoginService;
+import com.fortisbank.business.services.users.manager.BankManagerService;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.users.User;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

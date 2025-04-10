@@ -1,13 +1,13 @@
 package com.fortisbank.ui.panels.managerPanels;
 
-import com.fortisbank.business.services.customer.CustomerService;
-import com.fortisbank.business.services.manager.BankManagerService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.collections.ManagerList;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.users.User;
+import com.fortisbank.business.services.users.customer.CustomerService;
+import com.fortisbank.business.services.users.manager.BankManagerService;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.collections.ManagerList;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.contracts.models.users.User;
 import com.fortisbank.ui.components.UserCard;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

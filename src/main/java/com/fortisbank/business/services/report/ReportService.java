@@ -1,157 +1,151 @@
 package com.fortisbank.business.services.report;
 
-import com.fortisbank.data.repositories.IAccountRepository;
-import com.fortisbank.data.repositories.ICustomerRepository;
-import com.fortisbank.data.repositories.ITransactionRepository;
-import com.fortisbank.data.repositories.RepositoryFactory;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.accounts.AccountType;
-import com.fortisbank.models.collections.AccountList;
-import com.fortisbank.models.collections.TransactionList;
-import com.fortisbank.models.reports.BankSummaryReport;
-import com.fortisbank.models.reports.CustomerStatementReport;
-import com.fortisbank.models.transactions.Transaction;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.utils.ReportExporter;
+    import com.fortisbank.data.interfaces.IAccountRepository;
+    import com.fortisbank.data.interfaces.ICustomerRepository;
+    import com.fortisbank.data.interfaces.ITransactionRepository;
+    import com.fortisbank.data.dal_utils.RepositoryFactory;
+    import com.fortisbank.contracts.models.accounts.Account;
+    import com.fortisbank.contracts.models.accounts.AccountType;
+    import com.fortisbank.contracts.collections.AccountList;
+    import com.fortisbank.contracts.collections.TransactionList;
+    import com.fortisbank.contracts.models.reports.BankSummaryReport;
+    import com.fortisbank.contracts.models.reports.CustomerStatementReport;
+    import com.fortisbank.contracts.models.transactions.Transaction;
+    import com.fortisbank.contracts.models.users.Customer;
+    import com.fortisbank.business.bll_utils.ReportExporter;
 
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.YearMonth;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-/**
- * Service class for generating various reports.
- */
-public class ReportService {
-
-    private final ICustomerRepository customerRepository;
-    private final IAccountRepository accountRepository;
-    private final ITransactionRepository transactionRepository;
+    import java.io.IOException;
+    import java.math.BigDecimal;
+    import java.time.LocalDate;
+    import java.time.YearMonth;
+    import java.util.Map;
+    import java.util.logging.Level;
+    import java.util.logging.Logger;
+    import java.util.stream.Collectors;
 
     /**
-     * Constructs a ReportService with the given repository factory.
-     *
-     * @param factory the repository factory
+     * Service class for generating various reports.
      */
-    public ReportService(RepositoryFactory factory) {
-        this.customerRepository = factory.getCustomerRepository();
-        this.accountRepository = factory.getAccountRepository();
-        this.transactionRepository = factory.getTransactionRepository();
-    }
+    public class ReportService {
 
-    /**
-     * Generates a monthly statement for a specific customer.
-     *
-     * @param customer the customer
-     * @param month the month for which the statement is generated
-     * @return the customer statement report
-     */
-    public CustomerStatementReport generateCustomerStatement(Customer customer, YearMonth month) {
-        LocalDate start = month.atDay(1);
-        LocalDate end = month.atEndOfMonth();
+        private static final Logger LOGGER = Logger.getLogger(ReportService.class.getName());
 
-        TransactionList transactions = transactionRepository
-                .getTransactionsByCustomerAndDateRange(customer.getUserId(), start, end);
+        private final ICustomerRepository customerRepository;
+        private final IAccountRepository accountRepository;
+        private final ITransactionRepository transactionRepository;
 
-        BigDecimal openingBalance = transactionRepository.getBalanceBeforeDate(customer.getUserId(), start);
+        /**
+         * Constructs a ReportService with the given repository factory.
+         *
+         * @param factory the repository factory
+         */
+        public ReportService(RepositoryFactory factory) {
+            this.customerRepository = factory.getCustomerRepository();
+            this.accountRepository = factory.getAccountRepository();
+            this.transactionRepository = factory.getTransactionRepository();
+        }
 
-        // Fetch all customer accounts (not just IDs!)
-        AccountList customerAccounts = accountRepository
-                .getAccountsByCustomerId(customer.getUserId());
+        public CustomerStatementReport generateCustomerStatement(Customer customer, YearMonth month) {
+            try {
+                LocalDate start = month.atDay(1);
+                LocalDate end = month.atEndOfMonth();
 
-        BigDecimal closingBalance = openingBalance;
+                TransactionList transactions = transactionRepository
+                        .getTransactionsByCustomerAndDateRange(customer.getUserId(), start, end);
 
-        for (Transaction t : transactions) {
-            for (Account acc : customerAccounts) {
-                BigDecimal signed = t.getSignedAmountFor(acc);
-                if (signed.compareTo(BigDecimal.ZERO) != 0) {
-                    closingBalance = closingBalance.add(signed);
-                    break; // Stop after finding the matching context
+                BigDecimal openingBalance = transactionRepository.getBalanceBeforeDate(customer.getUserId(), start);
+
+                AccountList customerAccounts = accountRepository.getAccountsByCustomerId(customer.getUserId());
+
+                BigDecimal closingBalance = openingBalance;
+
+                for (Transaction t : transactions) {
+                    for (Account acc : customerAccounts) {
+                        BigDecimal signed = t.getSignedAmountFor(acc);
+                        if (signed.compareTo(BigDecimal.ZERO) != 0) {
+                            closingBalance = closingBalance.add(signed);
+                            break;
+                        }
+                    }
                 }
+
+                return new CustomerStatementReport(customer, transactions, openingBalance, closingBalance, start, end);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error generating customer statement: {0}", e.getMessage());
+                throw new RuntimeException("Failed to generate customer statement", e);
             }
         }
 
-        return new CustomerStatementReport(customer, transactions, openingBalance, closingBalance, start, end);
-    }
+        public BankSummaryReport generateBankSummaryReport() {
+            try {
+                var customers = customerRepository.getAllCustomers();
+                var accounts = accountRepository.getAllAccounts();
+                var transactions = transactionRepository.getAllTransactions();
 
-    /**
-     * Generates a full bank-wide summary report.
-     *
-     * @return the bank summary report
-     */
-    public BankSummaryReport generateBankSummaryReport() {
-        var customers = customerRepository.getAllCustomers();
-        var accounts = accountRepository.getAllAccounts();
-        var transactions = transactionRepository.getAllTransactions();
+                Map<String, Long> accountTypeCounts = accounts.stream()
+                        .collect(Collectors.groupingBy(
+                                acc -> acc.getAccountType().name(),
+                                Collectors.counting()
+                        ));
 
-        Map<String, Long> accountTypeCounts = accounts.stream()
-                .collect(Collectors.groupingBy(
-                        acc -> acc.getAccountType().name(),
-                        Collectors.counting()
-                ));
+                BigDecimal totalBalance = accounts.stream()
+                        .map(Account::getAvailableBalance)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalBalance = accounts.stream()
-                .map(Account::getAvailableBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal totalCreditUsed = accounts.stream()
+                        .filter(acc -> acc.getAccountType() == AccountType.CREDIT)
+                        .map(Account::getCreditLimit)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalCreditUsed = accounts.stream()
-                .filter(acc -> acc.getAccountType() == AccountType.CREDIT)
-                .map(Account::getCreditLimit)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal totalFees = transactions.stream()
+                        .filter(t -> t.getTransactionType() == com.fortisbank.contracts.models.transactions.TransactionType.FEE)
+                        .map(Transaction::getAmount)
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalFees = transactions.stream()
-                .filter(t -> t.getTransactionType() == com.fortisbank.models.transactions.TransactionType.FEE)
-                .map(Transaction::getAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                AccountList lowBalanceAccounts = new AccountList(
+                        accounts.stream()
+                                .filter(acc -> acc.getAvailableBalance().compareTo(new BigDecimal("50")) < 0)
+                                .collect(Collectors.toList())
+                );
 
-        AccountList lowBalanceAccounts = new AccountList(
-                accounts.stream()
-                        .filter(acc -> acc.getAvailableBalance().compareTo(new BigDecimal("50")) < 0)
-                        .collect(Collectors.toList())
-        );
+                return new BankSummaryReport(
+                        customers.size(),
+                        accounts.size(),
+                        accountTypeCounts,
+                        totalBalance,
+                        totalCreditUsed,
+                        totalFees,
+                        transactions,
+                        lowBalanceAccounts
+                );
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error generating bank summary report: {0}", e.getMessage());
+                throw new RuntimeException("Failed to generate bank summary report", e);
+            }
+        }
 
-        return new BankSummaryReport(
-                customers.size(),
-                accounts.size(),
-                accountTypeCounts,
-                totalBalance,
-                totalCreditUsed,
-                totalFees,
-                transactions,
-                lowBalanceAccounts
-        );
-    }
+        public void saveCustomerStatementReportToCSV(CustomerStatementReport report, String filePath) {
+            try {
+                AccountList customerAccounts = accountRepository.getAccountsByCustomerId(report.getCustomer().getUserId());
+                ReportExporter.exportCustomerStatementToCSV(report, filePath, customerAccounts);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Error exporting customer report: {0}", e.getMessage());
+                throw new RuntimeException("Failed to export customer report", e);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Unexpected error exporting customer report: {0}", e.getMessage());
+                throw new RuntimeException("Unexpected error exporting customer report", e);
+            }
+        }
 
-    /**
-     * Saves the customer statement report to a CSV file.
-     *
-     * @param report the customer statement report
-     * @param filePath the file path to save the report
-     */
-    public void saveCustomerStatementReportToCSV(CustomerStatementReport report, String filePath) {
-        try {
-            AccountList customerAccounts = accountRepository
-                    .getAccountsByCustomerId(report.getCustomer().getUserId());
-
-            ReportExporter.exportCustomerStatementToCSV(report, filePath, customerAccounts);
-        } catch (IOException e) {
-            System.err.println("Error exporting customer report: " + e.getMessage());
+        public void saveBankSummaryReportToCSV(BankSummaryReport report, String filePath) {
+            try {
+                ReportExporter.exportBankSummaryToCSV(report, filePath);
+            } catch (IOException e) {
+                LOGGER.log(Level.SEVERE, "Error exporting bank report: {0}", e.getMessage());
+                throw new RuntimeException("Failed to export bank report", e);
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Unexpected error exporting bank report: {0}", e.getMessage());
+                throw new RuntimeException("Unexpected error exporting bank report", e);
+            }
         }
     }
-
-    /**
-     * Saves the bank summary report to a CSV file.
-     *
-     * @param report the bank summary report
-     * @param filePath the file path to save the report
-     */
-    public void saveBankSummaryReportToCSV(BankSummaryReport report, String filePath) {
-        try {
-            ReportExporter.exportBankSummaryToCSV(report, filePath);
-        } catch (IOException e) {
-            System.err.println("Error exporting bank report: " + e.getMessage());
-        }
-    }
-}

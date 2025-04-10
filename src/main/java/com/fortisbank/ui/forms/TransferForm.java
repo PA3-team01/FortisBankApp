@@ -1,16 +1,16 @@
 package com.fortisbank.ui.forms;
 
-import com.fortisbank.business.services.customer.CustomerService;
+import com.fortisbank.business.services.users.customer.CustomerService;
 import com.fortisbank.business.services.transaction.TransactionService;
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.accounts.Account;
-import com.fortisbank.models.collections.CustomerList;
-import com.fortisbank.models.transactions.Transaction;
-import com.fortisbank.models.transactions.TransactionFactory;
-import com.fortisbank.models.transactions.TransactionType;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.session.SessionManager;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.accounts.Account;
+import com.fortisbank.contracts.collections.CustomerList;
+import com.fortisbank.contracts.models.transactions.Transaction;
+import com.fortisbank.contracts.models.transactions.TransactionFactory;
+import com.fortisbank.contracts.models.transactions.TransactionType;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.business.services.session.SessionManager;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

@@ -1,11 +1,11 @@
 package com.fortisbank.ui.components;
 
-import com.fortisbank.data.repositories.StorageMode;
-import com.fortisbank.models.users.BankManager;
-import com.fortisbank.models.users.Customer;
-import com.fortisbank.models.users.User;
+import com.fortisbank.data.dal_utils.StorageMode;
+import com.fortisbank.contracts.models.users.BankManager;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.contracts.models.users.User;
 import com.fortisbank.ui.frames.subFrames.UserUpdateForm;
-import com.fortisbank.ui.uiUtils.StyleUtils;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;

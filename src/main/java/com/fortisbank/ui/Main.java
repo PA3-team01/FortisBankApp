@@ -1,8 +1,8 @@
 package com.fortisbank.ui;
 
 import com.fortisbank.business.services.automation.AutomationService;
-import com.fortisbank.business.services.customer.RegisterService;
-import com.fortisbank.data.repositories.StorageMode;
+import com.fortisbank.business.services.users.customer.RegisterService;
+import com.fortisbank.data.dal_utils.StorageMode;
 import com.fortisbank.ui.frames.mainFrames.LoginFrame;
 
 import javax.swing.*;

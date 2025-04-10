@@ -8,11 +8,11 @@ FortisBank is a robust, modular, enterprise-grade banking management system deve
 
 FortisBank adheres to a layered architecture embracing **clean code principles**, **separation of concerns**, and **resource modularity**:
 
-- **Models** (`com.fortisbank.models`) – Define core domain objects: users, accounts, transactions, reports.
-- **Repositories** (`com.fortisbank.data.repositories`) – Abstract storage logic via **Strategy pattern** for file-based and future database backends.
+- **Models** (`com.fortisbank.contracts`) – Define core domain objects: users, accounts, transactions, reports.
+- **Repositories** (`com.fortisbank.data.interfaces`) – Abstract storage logic via **Strategy pattern** for file-based and future database backends.
 - **Services** (`com.fortisbank.business.services`) – Contain business logic with dependency injection, responsible for user management, transactions, and automation.
 - **UI** (`com.fortisbank.ui`) – Built with Swing, featuring responsive components, panels, forms, and custom-styled dialogs.
-- **Utilities** (`com.fortisbank.utils`, `com.fortisbank.ui.uiUtils`) – Provide encryption, validation, logging, styling, and formatting utilities.
+- **Utilities** (`com.fortisbank.contracts.utils`, `com.fortisbank.ui.ui_utils`) – Provide encryption, validation, logging, styling, and formatting utilities.
 
 The system leverages the **Factory Pattern** (`RepositoryFactory`, `AccountFactory`, etc.) and **Singleton Pattern** (e.g., `CustomerService`, `AccountService`) for optimized object lifecycle and resource control.
 
@@ -119,11 +119,11 @@ Built atop the `ReportService` class, it leverages domain data from all layers:
 ## 📁 Package Overview (via Javadoc)
 
 Top-level packages:
-- `com.fortisbank.models.*`
+- `com.fortisbank.contracts.*`
 - `com.fortisbank.business.services.*`
-- `com.fortisbank.data.repositories.*`
+- `com.fortisbank.data.interfaces.*`
 - `com.fortisbank.ui.*`
-- `com.fortisbank.utils.*`
+- `com.fortisbank.contracts.utils.*`
 
 ---
 
