@@ -1,101 +1,95 @@
 package com.fortisbank.data.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+    import com.fortisbank.exceptions.DatabaseConnectionException;
 
-/**
- * Manages the connection and disconnection to the database.
- */
-public class DatabaseConnection implements IDatabaseConnection {
-    private static DatabaseConnection instance; // Singleton instance
-    private Connection connection;
-    private final String connectionString = "jdbc:oracle:thin:@localhost:1521:xe"; // TODO: Change this
-    private final String username = "your_username"; // TODO: Change this
-    private final String password = "your_password"; // TODO: Change this
-
-    // Private constructor to prevent direct instantiation
-    private DatabaseConnection() {
-    }
-
-    // Singleton Instance Method
-    /**
-     * Returns the singleton instance of DatabaseConnection.
-     *
-     * @return the singleton instance of DatabaseConnection
-     */
-    public static DatabaseConnection getInstance() {
-        if (instance == null) {
-            instance = new DatabaseConnection();
-        }
-        return instance;
-    }
+    import java.sql.Connection;
+    import java.sql.DriverManager;
+    import java.sql.SQLException;
+    import java.util.logging.Level;
+    import java.util.logging.Logger;
 
     /**
-     * Establishes the connection to the Oracle database.
+     * Manages the connection and disconnection to the database.
      */
-    @Override
-    public void Connect() {
-        if (connection != null) {
-            System.out.println("Already connected to the database."); //TODO: use logger
-            return;
+    public class DatabaseConnection implements IDatabaseConnection {
+        private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
+        private static final int MAX_RETRIES = 3; // Retry limit
+        private static DatabaseConnection instance;
+        private Connection connection;
+        private final String connectionString = "jdbc:oracle:thin:@localhost:1521:xe"; // TODO: Change this
+        private final String username = "your_username"; // TODO: Change this
+        private final String password = "your_password"; // TODO: Change this
+
+        private DatabaseConnection() {
         }
 
-        try {
-            // Load the Oracle JDBC Driver (Not needed for Java 6+ but good practice)
-            Class.forName("oracle.jdbc.OracleDriver");
-
-            // Establish connection
-            connection = DriverManager.getConnection(connectionString, username, password);
-            System.out.println("Connected to Oracle Database successfully.");
-        } catch (ClassNotFoundException e) {
-            System.err.println("Oracle JDBC Driver not found.");
-            e.printStackTrace();
-        } catch (SQLException e) {
-            System.err.println("Failed to connect to the database.");
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * Closes the connection to the database.
-     */
-    @Override
-    public void Disconnect() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                connection.close();
-                connection = null;
-                System.out.println("Disconnected from the database.");
+        public static DatabaseConnection getInstance() {
+            if (instance == null) {
+                synchronized (DatabaseConnection.class) {
+                    if (instance == null) {
+                        instance = new DatabaseConnection();
+                    }
+                }
             }
-        } catch (SQLException e) {
-            System.err.println("Error while disconnecting.");
-            e.printStackTrace();
+            return instance;
+        }
+
+        @Override
+        public Connection getConnection() throws DatabaseConnectionException {
+            if (connection == null || isConnectionClosed()) {
+                connectWithRetry();
+            }
+            return connection;
+        }
+
+        @Override
+        public boolean TestConnection() {
+            // This method does not rethrow exceptions because its purpose is to provide a simple
+            // boolean result indicating whether the connection test was successful or not.
+            // This design avoids burdening the caller with exception handling for a test operation.
+            try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
+                LOGGER.log(Level.INFO, "Database connection test successful.");
+                return true;
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Database connection test failed.", e);
+                return false;
+            }
+        }
+
+        private void connectWithRetry() throws DatabaseConnectionException {
+            int attempts = 0;
+            while (attempts < MAX_RETRIES) {
+                try {
+                    connect();
+                    return;
+                } catch (SQLException e) {
+                    attempts++;
+                    LOGGER.log(Level.WARNING, "Connection attempt {0} failed. Retrying...", attempts);
+                    if (attempts >= MAX_RETRIES) {
+                        LOGGER.log(Level.SEVERE, "All connection attempts failed.", e);
+                        throw new DatabaseConnectionException("Failed to connect to the database after " + MAX_RETRIES + " attempts.", e);
+                    }
+                }
+            }
+        }
+
+        private void connect() throws SQLException {
+            try {
+                Class.forName("oracle.jdbc.OracleDriver");
+                connection = DriverManager.getConnection(connectionString, username, password);
+                LOGGER.log(Level.INFO, "Connected to Oracle Database successfully.");
+            } catch (ClassNotFoundException e) {
+                LOGGER.log(Level.SEVERE, "Oracle JDBC Driver not found.", e);
+                throw new SQLException("Oracle JDBC Driver not found.", e);
+            }
+        }
+
+        private boolean isConnectionClosed() {
+            try {
+                return connection == null || connection.isClosed();
+            } catch (SQLException e) {
+                LOGGER.log(Level.SEVERE, "Error checking connection status.", e);
+                return true;
+            }
         }
     }
-
-    /**
-     * Tests the connection to the database.
-     *
-     * @return true if the connection is successful, false otherwise
-     */
-    public boolean TestConnection() {
-        try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
-            System.out.println("Database connection test successful.");
-            return true;
-        } catch (SQLException e) {
-            System.err.println("Database connection test failed.");
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    /**
-     * Returns the current database connection.
-     *
-     * @return the current database connection
-     */
-    public Connection getConnection() {
-        return connection;
-    }
-}

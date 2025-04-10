@@ -1,21 +1,14 @@
 package com.fortisbank.data.database;
 
+import com.fortisbank.exceptions.DatabaseConnectionException;
+
 import java.sql.Connection;
+import java.sql.SQLException;
 
 /**
  * Interface for managing database connections.
  */
 public interface IDatabaseConnection {
-
-    /**
-     * Establishes the connection to the database.
-     */
-    void Connect();
-
-    /**
-     * Closes the connection to the database.
-     */
-    void Disconnect();
 
     /**
      * Tests the connection to the database.
@@ -29,5 +22,5 @@ public interface IDatabaseConnection {
      *
      * @return the current database connection
      */
-    Connection getConnection();
+    Connection getConnection() throws SQLException, DatabaseConnectionException;
 }
