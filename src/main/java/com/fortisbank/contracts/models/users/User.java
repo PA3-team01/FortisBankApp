@@ -49,7 +49,8 @@ package com.fortisbank.contracts.models.users;
         /**
          * The inbox containing notifications for the user.
          */
-        protected List<Notification> inbox;
+
+        protected transient List<Notification> inbox;
 
         /**
          * Constructor initializing a user with specified values.

@@ -21,7 +21,7 @@ public abstract class Account implements Serializable {
     /**
      * Unique account number.
      */
-    protected final String accountNumber;
+    protected String accountNumber;
 
     /**
      * Customer who owns the account.
@@ -165,6 +165,15 @@ public abstract class Account implements Serializable {
     }
 
     // Setters
+
+    /**
+     * Sets the account number.
+     *
+     * @param accountNumber the account number to set
+     */
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
     /**
      * Sets the available balance in the account.

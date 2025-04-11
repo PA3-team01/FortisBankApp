@@ -141,4 +141,12 @@ public class Customer extends User implements Serializable {
                 ", Accounts=" + (accounts != null ? accounts.size() + " linked" : "None") +
                 '}';
     }
+    // override equals  to compare by userId
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Customer)) return false;
+        Customer other = (Customer) obj;
+        return this.userId.equals(other.userId);
+    }
 }

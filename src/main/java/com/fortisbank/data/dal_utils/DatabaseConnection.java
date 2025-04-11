@@ -1,4 +1,4 @@
-package com.fortisbank.data.database;
+package com.fortisbank.data.dal_utils;
 
     import com.fortisbank.data.interfaces.IDatabaseConnection;
     import com.fortisbank.contracts.exceptions.DatabaseConnectionException;

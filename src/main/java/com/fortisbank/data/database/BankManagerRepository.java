@@ -1,5 +1,6 @@
 package com.fortisbank.data.database;
 
+import com.fortisbank.data.dal_utils.DatabaseConnection;
 import com.fortisbank.data.interfaces.IBankManagerRepository;
 import com.fortisbank.contracts.exceptions.BankManagerRepositoryException;
 import com.fortisbank.contracts.exceptions.DatabaseConnectionException;

@@ -33,11 +33,24 @@ package com.fortisbank.data.file;
 
          @Override
          public BankManager getManagerById(String id) throws BankManagerRepositoryException {
-             return executeQuery(managers -> managers.stream()
-                     .filter(m -> m.getUserId().equals(id))
-                     .findFirst()
-                     .orElse(null), "Error retrieving manager with ID: " + id);
+             return executeQuery(managers -> {
+                 BankManager manager = managers.stream()
+                         .filter(m -> m.getUserId().equals(id))
+                         .findFirst()
+                         .orElse(null);
+
+                 if (manager != null) {
+                     try {
+                         manager.setInbox(NotificationRepositoryFile.getInstance().getNotificationsByUserId(id));
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Failed to load inbox for manager " + id, e);
+                     }
+                 }
+
+                 return manager;
+             }, "Error retrieving manager with ID: " + id);
          }
+
 
          @Override
          public void insertManager(BankManager manager) throws BankManagerRepositoryException {
@@ -63,8 +76,18 @@ package com.fortisbank.data.file;
 
          @Override
          public ManagerList getAllManagers() throws BankManagerRepositoryException {
-             return executeQuery(ManagerList::new, "Error retrieving all managers");
+             return executeQuery(managers -> {
+                 for (BankManager manager : managers) {
+                     try {
+                         manager.setInbox(NotificationRepositoryFile.getInstance().getNotificationsByUserId(manager.getUserId()));
+                     } catch (Exception e) {
+                         LOGGER.log(Level.WARNING, "Failed to load inbox for manager " + manager.getUserId(), e);
+                     }
+                 }
+                 return new ManagerList(managers);
+             }, "Error retrieving all managers");
          }
+
 
          private <T> T executeQuery(QueryFunction<List<BankManager>, T> function, String errorMessage) throws BankManagerRepositoryException {
              try {
