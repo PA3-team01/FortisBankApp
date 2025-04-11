@@ -1,7 +1,7 @@
 [ {
   "accountType" : "SAVINGS",
-  "rate" : 0.026,
-  "lastUpdated" : [ 2025, 4, 5, 14, 24, 23, 76131000 ]
+  "rate" : 0.025,
+  "lastUpdated" : [ 2025, 4, 11, 11, 27, 54, 151377100 ]
 }, {
   "accountType" : "CREDIT",
   "rate" : 0.019,

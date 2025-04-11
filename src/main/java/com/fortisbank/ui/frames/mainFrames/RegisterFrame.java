@@ -9,12 +9,16 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The RegisterFrame class represents the registration window of the Fortis Bank application.
  * It extends JFrame and provides a user interface for new customers to register.
  */
 public class RegisterFrame extends JFrame {
+
+    private static final Logger LOGGER = Logger.getLogger(RegisterFrame.class.getName());
 
     private final JTextField firstNameField = new JTextField(15);
     private final JTextField lastNameField = new JTextField(15);
@@ -43,110 +47,116 @@ public class RegisterFrame extends JFrame {
     public RegisterFrame(StorageMode storageMode) {
         this.registerService = RegisterService.getInstance(storageMode);
 
-        // Custom undecorated window
-        setUndecorated(true);
-        setLayout(new BorderLayout());
+        try {
+            // Custom undecorated window
+            setUndecorated(true);
+            setLayout(new BorderLayout());
 
-        JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Register New Customer", null);
-        add(titleBar, BorderLayout.NORTH);
+            JPanel titleBar = StyleUtils.createCustomTitleBar(this, "Register New Customer", null);
+            add(titleBar, BorderLayout.NORTH);
 
-        JPanel contentPanel = new JPanel(new GridBagLayout());
-        StyleUtils.styleFormPanel(contentPanel);
-        add(contentPanel, BorderLayout.CENTER);
+            JPanel contentPanel = new JPanel(new GridBagLayout());
+            StyleUtils.styleFormPanel(contentPanel);
+            add(contentPanel, BorderLayout.CENTER);
 
-        setSize(500, 520);
-        setLocationRelativeTo(null);
+            setSize(500, 520);
+            setLocationRelativeTo(null);
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(5, 10, 5, 10);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+            GridBagConstraints gbc = new GridBagConstraints();
+            gbc.insets = new Insets(5, 10, 5, 10);
+            gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Row 0
-        gbc.gridx = 0; gbc.gridy = 0;
-        JLabel firstNameLabel = new JLabel("First Name:");
-        contentPanel.add(firstNameLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(firstNameField, gbc);
+            // Row 0
+            gbc.gridx = 0; gbc.gridy = 0;
+            JLabel firstNameLabel = new JLabel("First Name:");
+            contentPanel.add(firstNameLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(firstNameField, gbc);
 
-        // Row 1
-        gbc.gridx = 0; gbc.gridy = 1;
-        JLabel lastNameLabel = new JLabel("Last Name:");
-        contentPanel.add(lastNameLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(lastNameField, gbc);
+            // Row 1
+            gbc.gridx = 0; gbc.gridy = 1;
+            JLabel lastNameLabel = new JLabel("Last Name:");
+            contentPanel.add(lastNameLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(lastNameField, gbc);
 
-        // Row 2
-        gbc.gridx = 0; gbc.gridy = 2;
-        JLabel emailLabel = new JLabel("Email:");
-        contentPanel.add(emailLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(emailField, gbc);
-        gbc.gridx = 1; gbc.gridy = 3;
-        contentPanel.add(emailStatus, gbc);
+            // Row 2
+            gbc.gridx = 0; gbc.gridy = 2;
+            JLabel emailLabel = new JLabel("Email:");
+            contentPanel.add(emailLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(emailField, gbc);
+            gbc.gridx = 1; gbc.gridy = 3;
+            contentPanel.add(emailStatus, gbc);
 
-        // Row 4
-        gbc.gridx = 0; gbc.gridy = 4;
-        JLabel phoneLabel = new JLabel("Phone:");
-        contentPanel.add(phoneLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(phoneField, gbc);
-        gbc.gridx = 1; gbc.gridy = 5;
-        contentPanel.add(phoneStatus, gbc);
+            // Row 4
+            gbc.gridx = 0; gbc.gridy = 4;
+            JLabel phoneLabel = new JLabel("Phone:");
+            contentPanel.add(phoneLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(phoneField, gbc);
+            gbc.gridx = 1; gbc.gridy = 5;
+            contentPanel.add(phoneStatus, gbc);
 
-        // Row 6
-        gbc.gridx = 0; gbc.gridy = 6;
-        JLabel passwordLabel = new JLabel("Password:");
-        contentPanel.add(passwordLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(passwordField, gbc);
-        gbc.gridx = 1; gbc.gridy = 7;
-        contentPanel.add(passwordStatus, gbc);
+            // Row 6
+            gbc.gridx = 0; gbc.gridy = 6;
+            JLabel passwordLabel = new JLabel("Password:");
+            contentPanel.add(passwordLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(passwordField, gbc);
+            gbc.gridx = 1; gbc.gridy = 7;
+            contentPanel.add(passwordStatus, gbc);
 
-        // Row 8
-        gbc.gridx = 0; gbc.gridy = 8;
-        JLabel pinLabel = new JLabel("4-digit PIN:");
-        contentPanel.add(pinLabel, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(pinField, gbc);
-        gbc.gridx = 1; gbc.gridy = 9;
-        contentPanel.add(pinStatus, gbc);
+            // Row 8
+            gbc.gridx = 0; gbc.gridy = 8;
+            JLabel pinLabel = new JLabel("4-digit PIN:");
+            contentPanel.add(pinLabel, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(pinField, gbc);
+            gbc.gridx = 1; gbc.gridy = 9;
+            contentPanel.add(pinStatus, gbc);
 
-        // Row 10 - Buttons
-        gbc.gridx = 0; gbc.gridy = 10; gbc.gridwidth = 1;
-        contentPanel.add(registerButton, gbc);
-        gbc.gridx = 1;
-        contentPanel.add(cancelButton, gbc);
+            // Row 10 - Buttons
+            gbc.gridx = 0; gbc.gridy = 10; gbc.gridwidth = 1;
+            contentPanel.add(registerButton, gbc);
+            gbc.gridx = 1;
+            contentPanel.add(cancelButton, gbc);
 
-        // Row 11 - Status
-        gbc.gridx = 0; gbc.gridy = 11; gbc.gridwidth = 2;
-        gbc.anchor = GridBagConstraints.CENTER;
-        contentPanel.add(statusLabel, gbc);
+            // Row 11 - Status
+            gbc.gridx = 0; gbc.gridy = 11; gbc.gridwidth = 2;
+            gbc.anchor = GridBagConstraints.CENTER;
+            contentPanel.add(statusLabel, gbc);
 
-        // Event actions
-        registerButton.addActionListener(new RegisterAction());
-        cancelButton.addActionListener(e -> dispose());
+            // Event actions
+            registerButton.addActionListener(new RegisterAction());
+            cancelButton.addActionListener(e -> dispose());
 
-        // Apply Styles
-        for (JLabel label : new JLabel[]{firstNameLabel, lastNameLabel, emailLabel, phoneLabel, passwordLabel, pinLabel, statusLabel}) {
-            StyleUtils.styleLabel(label);
+            // Apply Styles
+            for (JLabel label : new JLabel[]{firstNameLabel, lastNameLabel, emailLabel, phoneLabel, passwordLabel, pinLabel, statusLabel}) {
+                StyleUtils.styleLabel(label);
+            }
+            for (JLabel label : new JLabel[]{emailStatus, phoneStatus, passwordStatus, pinStatus}) {
+                StyleUtils.styleStatusLabel(label, false);
+            }
+            for (JTextField field : new JTextField[]{firstNameField, lastNameField, emailField, phoneField}) {
+                StyleUtils.styleTextField(field);
+            }
+            StyleUtils.stylePasswordField(passwordField);
+            StyleUtils.stylePasswordField(pinField);
+            StyleUtils.styleButton(registerButton, true);
+            StyleUtils.styleButton(cancelButton, false);
+
+            // Input restrictions and validation
+            ValidationUtils.restrictToDigits(pinField, 4);
+            ValidationUtils.attachRealTimeValidation(emailField, emailStatus, ValidationUtils::isValidEmail, "Valid email", "Invalid email");
+            ValidationUtils.attachRealTimeValidation(phoneField, phoneStatus, ValidationUtils::isValidPhone, "Valid phone", "Invalid phone");
+            ValidationUtils.attachRealTimeValidation(passwordField, passwordStatus, ValidationUtils::isStrongPassword, "Strong password", "Weak password");
+            ValidationUtils.attachRealTimeValidation(pinField, pinStatus, ValidationUtils::isValidPIN, "Valid PIN", "4-digit PIN required");
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error initializing RegisterFrame: {0}", e.getMessage());
+            StyleUtils.showStyledErrorDialog(this, "Failed to initialize the registration frame: " + e.getMessage());
         }
-        for (JLabel label : new JLabel[]{emailStatus, phoneStatus, passwordStatus, pinStatus}) {
-            StyleUtils.styleStatusLabel(label, false);
-        }
-        for (JTextField field : new JTextField[]{firstNameField, lastNameField, emailField, phoneField}) {
-            StyleUtils.styleTextField(field);
-        }
-        StyleUtils.stylePasswordField(passwordField);
-        StyleUtils.stylePasswordField(pinField);
-        StyleUtils.styleButton(registerButton, true);
-        StyleUtils.styleButton(cancelButton, false);
-
-        // Input restrictions and validation
-        ValidationUtils.restrictToDigits(pinField, 4);
-        ValidationUtils.attachRealTimeValidation(emailField, emailStatus, ValidationUtils::isValidEmail, "Valid email", "Invalid email");
-        ValidationUtils.attachRealTimeValidation(phoneField, phoneStatus, ValidationUtils::isValidPhone, "Valid phone", "Invalid phone");
-        ValidationUtils.attachRealTimeValidation(passwordField, passwordStatus, ValidationUtils::isStrongPassword, "Strong password", "Weak password");
-        ValidationUtils.attachRealTimeValidation(pinField, pinStatus, ValidationUtils::isValidPIN, "Valid PIN", "4-digit PIN required");
     }
 
     /**
@@ -170,6 +180,7 @@ public class RegisterFrame extends JFrame {
                     dispose();
                 }
             } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Registration failed: {0}", ex.getMessage());
                 StyleUtils.showStyledErrorDialog(RegisterFrame.this, "Registration failed: " + ex.getMessage());
             } finally {
                 passwordField.setText("");
@@ -177,5 +188,4 @@ public class RegisterFrame extends JFrame {
             }
         }
     }
-
 }

@@ -21,8 +21,8 @@ import java.util.Calendar;
  */
 public class AccountInfo extends JPanel {
 
-    private final JComboBox<String> monthCombo;
-    private final JComboBox<Integer> yearCombo;
+    private JComboBox<String> monthCombo;
+    private JComboBox<Integer> yearCombo;
     private final TransactionService transactionService;
     private final StorageMode storageMode;
 
@@ -34,87 +34,103 @@ public class AccountInfo extends JPanel {
      */
     public AccountInfo(Account account, StorageMode storageMode) {
         this.storageMode = storageMode;
-        this.transactionService = TransactionService.getInstance(storageMode);
 
-        setLayout(new BorderLayout());
-        StyleUtils.styleFormPanel(this);
+        TransactionService tempTransactionService;
+        try {
+            tempTransactionService = TransactionService.getInstance(storageMode);
+        } catch (Exception e) {
+            StyleUtils.showStyledErrorDialog(this, "Failed to initialize TransactionService: " + e.getMessage());
+            tempTransactionService = null;
+        }
+        this.transactionService = tempTransactionService;
 
-        // === Header: Account Info ===
-        String infoHtml = "<html>" + account.displayAccountInfo().replace("\n", "<br>") + "</html>";
-        JLabel title = new JLabel(infoHtml);
-        StyleUtils.styleFormTitle(title);
-        add(title, BorderLayout.NORTH);
+        try {
+            setLayout(new BorderLayout());
+            StyleUtils.styleFormPanel(this);
 
-        // === Center: Transaction Summary + Statement Controls ===
-        JPanel centerPanel = new JPanel();
-        centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
-        centerPanel.setOpaque(false);
+            // === Header: Account Info ===
+            String infoHtml = "<html>" + account.displayAccountInfo().replace("\n", "<br>") + "</html>";
+            JLabel title = new JLabel(infoHtml);
+            StyleUtils.styleFormTitle(title);
+            add(title, BorderLayout.NORTH);
 
-        TransactionSummary summary = new TransactionSummary(account, storageMode);
-        centerPanel.add(summary);
+            // === Center: Transaction Summary + Statement Controls ===
+            JPanel centerPanel = new JPanel();
+            centerPanel.setLayout(new BoxLayout(centerPanel, BoxLayout.Y_AXIS));
+            centerPanel.setOpaque(false);
 
-        // === Statement Controls ===
-        JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        controls.setOpaque(false);
+            TransactionSummary summary = new TransactionSummary(account, storageMode);
+            centerPanel.add(summary);
 
-        monthCombo = new JComboBox<>();
-        yearCombo = new JComboBox<>();
-        StyleUtils.styleDropdown(monthCombo);
-        StyleUtils.styleDropdown(yearCombo);
-        populateMonthYear();
+            // === Statement Controls ===
+            JPanel controls = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            controls.setOpaque(false);
 
-        JButton statementBtn = new JButton("Get Statement");
-        StyleUtils.styleButton(statementBtn, true);
-        statementBtn.addActionListener(e -> generateStatement(account));
+            monthCombo = new JComboBox<>();
+            yearCombo = new JComboBox<>();
+            StyleUtils.styleDropdown(monthCombo);
+            StyleUtils.styleDropdown(yearCombo);
+            populateMonthYear();
 
-        controls.add(new JLabel("Month:"));
-        controls.add(monthCombo);
-        controls.add(new JLabel("Year:"));
-        controls.add(yearCombo);
-        controls.add(statementBtn);
+            JButton statementBtn = new JButton("Get Statement");
+            StyleUtils.styleButton(statementBtn, true);
+            statementBtn.addActionListener(e -> generateStatement(account));
 
-        centerPanel.add(Box.createVerticalStrut(10));
-        centerPanel.add(controls);
-
-        // === Close Account Button ===
-        if (account.isActive() && account.getAvailableBalance().compareTo(java.math.BigDecimal.ZERO) == 0) {
-            JButton closeBtn = new JButton("Close Account");
-            StyleUtils.styleButton(closeBtn, false);
-            closeBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-            closeBtn.addActionListener(e -> {
-                int confirm = JOptionPane.showConfirmDialog(this,
-                        "Are you sure you want to close this account?",
-                        "Confirm Closure",
-                        JOptionPane.YES_NO_OPTION);
-
-                if (confirm == JOptionPane.YES_OPTION) {
-                    try {
-                        AccountService.getInstance(storageMode).closeAccount(account);
-                        StyleUtils.showStyledSuccessDialog(this, "Account closed successfully.");
-                        SwingUtilities.getWindowAncestor(this).dispose(); // refresh by closing and reopening panel if needed
-                    } catch (Exception ex) {
-                        StyleUtils.showStyledErrorDialog(this, ex.getMessage());
-                    }
-                }
-            });
+            controls.add(new JLabel("Month:"));
+            controls.add(monthCombo);
+            controls.add(new JLabel("Year:"));
+            controls.add(yearCombo);
+            controls.add(statementBtn);
 
             centerPanel.add(Box.createVerticalStrut(10));
-            centerPanel.add(closeBtn);
-        }
+            centerPanel.add(controls);
 
-        add(centerPanel, BorderLayout.CENTER);
+            // === Close Account Button ===
+            if (account.isActive() && account.getAvailableBalance().compareTo(java.math.BigDecimal.ZERO) == 0) {
+                JButton closeBtn = new JButton("Close Account");
+                StyleUtils.styleButton(closeBtn, false);
+                closeBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+                closeBtn.addActionListener(e -> {
+                    int confirm = JOptionPane.showConfirmDialog(this,
+                            "Are you sure you want to close this account?",
+                            "Confirm Closure",
+                            JOptionPane.YES_NO_OPTION);
+
+                    if (confirm == JOptionPane.YES_OPTION) {
+                        try {
+                            AccountService.getInstance(storageMode).closeAccount(account);
+                            StyleUtils.showStyledSuccessDialog(this, "Account closed successfully.");
+                            SwingUtilities.getWindowAncestor(this).dispose(); // refresh by closing and reopening panel if needed
+                        } catch (Exception ex) {
+                            StyleUtils.showStyledErrorDialog(this, ex.getMessage());
+                        }
+                    }
+                });
+
+                centerPanel.add(Box.createVerticalStrut(10));
+                centerPanel.add(closeBtn);
+            }
+
+            add(centerPanel, BorderLayout.CENTER);
+        } catch (Exception e) {
+            StyleUtils.showStyledErrorDialog(this, "Failed to initialize AccountInfo panel: " + e.getMessage());
+        }
     }
 
     /**
      * Populates the month and year combo boxes with values.
      */
     private void populateMonthYear() {
-        for (int i = 1; i <= 12; i++) {
-            monthCombo.addItem(String.format("%02d", i)); // "01" to "12"
-        }
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-        for (int i = 0; i < 5; i++) {
-            yearCombo.addItem(currentYear - i); // Last 5 years
+        try {
+            for (int i = 1; i <= 12; i++) {
+                monthCombo.addItem(String.format("%02d", i)); // "01" to "12"
+            }
+            int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+            for (int i = 0; i < 5; i++) {
+                yearCombo.addItem(currentYear - i); // Last 5 years
+            }
+        } catch (Exception e) {
+            StyleUtils.showStyledErrorDialog(this, "Failed to populate month and year: " + e.getMessage());
         }
     }
 
@@ -124,14 +140,18 @@ public class AccountInfo extends JPanel {
      * @param account the account to generate the statement for
      */
     private void generateStatement(Account account) {
-        String selectedMonth = (String) monthCombo.getSelectedItem();
-        int selectedYear = (int) yearCombo.getSelectedItem();
-        String userId = SessionManager.getCurrentUser().getUserId();
+        try {
+            String selectedMonth = (String) monthCombo.getSelectedItem();
+            int selectedYear = (int) yearCombo.getSelectedItem();
+            String userId = SessionManager.getCurrentUser().getUserId();
 
-        LocalDate startDate = LocalDate.of(selectedYear, Integer.parseInt(selectedMonth), 1);
-        LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
+            LocalDate startDate = LocalDate.of(selectedYear, Integer.parseInt(selectedMonth), 1);
+            LocalDate endDate = startDate.withDayOfMonth(startDate.lengthOfMonth());
 
-        TransactionList filtered = transactionService.getTransactionsByCustomerAndDateRange(userId, startDate, endDate);
-        new MonthlyStatementFrame(account, filtered, selectedMonth, selectedYear);
+            TransactionList filtered = transactionService.getTransactionsByCustomerAndDateRange(userId, startDate, endDate);
+            new MonthlyStatementFrame(account, filtered, selectedMonth, selectedYear);
+        } catch (Exception e) {
+            StyleUtils.showStyledErrorDialog(this, "Failed to generate statement: " + e.getMessage());
+        }
     }
 }

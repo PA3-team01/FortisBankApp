@@ -8,12 +8,16 @@ import com.fortisbank.contracts.models.transactions.Transaction;
 import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * The TransactionSummary class is a JPanel component that displays a summary
  * of recent transactions for a given account.
  */
 public class TransactionSummary extends JPanel {
+
+    private static final Logger LOGGER = Logger.getLogger(TransactionSummary.class.getName());
 
     private TransactionService transactionService;
     private StorageMode storageMode;
@@ -26,29 +30,35 @@ public class TransactionSummary extends JPanel {
      * @param storageMode the storage mode to use for transaction services
      */
     public TransactionSummary(Account account, StorageMode storageMode) {
-        this.storageMode = storageMode;
-        this.transactionService = TransactionService.getInstance(storageMode);
-        this.transactionList = transactionService.getRecentTransactionsByAccount(account);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
-        setOpaque(false);
+        try {
+            this.storageMode = storageMode;
+            this.transactionService = TransactionService.getInstance(storageMode);
+            this.transactionList = transactionService.getRecentTransactionsByAccount(account);
 
-        JLabel title = new JLabel("Recent Transactions");
-        StyleUtils.styleLabel(title);
-        add(title);
-        add(Box.createVerticalStrut(5));
+            setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+            setOpaque(false);
 
-        if (transactionList.isEmpty()) {
-            JLabel none = new JLabel("No recent transactions.");
-            StyleUtils.styleLabel(none);
-            add(none);
-        } else {
-            for (Transaction tx : transactionList) {
-                JLabel txLabel = new JLabel("• [" + tx.getTransactionDate() + "] " +
-                        tx.getTransactionType() + " — $" + String.format("%.2f", tx.getAmount()));
-                StyleUtils.styleLabel(txLabel);
-                add(txLabel);
-                add(Box.createVerticalStrut(4));
+            JLabel title = new JLabel("Recent Transactions");
+            StyleUtils.styleLabel(title);
+            add(title);
+            add(Box.createVerticalStrut(5));
+
+            if (transactionList.isEmpty()) {
+                JLabel none = new JLabel("No recent transactions.");
+                StyleUtils.styleLabel(none);
+                add(none);
+            } else {
+                for (Transaction tx : transactionList) {
+                    JLabel txLabel = new JLabel("• [" + tx.getTransactionDate() + "] " +
+                            tx.getTransactionType() + " — $" + String.format("%.2f", tx.getAmount()));
+                    StyleUtils.styleLabel(txLabel);
+                    add(txLabel);
+                    add(Box.createVerticalStrut(4));
+                }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error initializing TransactionSummary: {0}", e.getMessage());
+            StyleUtils.showStyledErrorDialog(this, "Failed to load transaction summary: " + e.getMessage());
         }
     }
 }

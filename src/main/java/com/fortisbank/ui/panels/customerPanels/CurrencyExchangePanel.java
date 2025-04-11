@@ -2,6 +2,7 @@ package com.fortisbank.ui.panels.customerPanels;
 
 import com.fortisbank.data.dal_utils.StorageMode;
 import com.fortisbank.contracts.models.others.CurrencyType;
+import com.fortisbank.ui.ui_utils.StyleUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,9 +10,12 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class CurrencyExchangePanel extends JPanel {
 
+    private static final Logger LOGGER = Logger.getLogger(CurrencyExchangePanel.class.getName());
     private final StorageMode storageMode;
 
     public CurrencyExchangePanel(StorageMode storageMode) {
@@ -47,18 +51,22 @@ public class CurrencyExchangePanel extends JPanel {
         leftRatePanel.add(timeLabel);
         leftRatePanel.add(Box.createVerticalStrut(10));
 
-        // Load rates from CurrencyType
-        CurrencyType currencyType = CurrencyType.getInstance();
-        Map<String, BigDecimal> rates = currencyType.getAllExchangeRates();
+        try {
+            CurrencyType currencyType = CurrencyType.getInstance();
+            Map<String, BigDecimal> rates = currencyType.getAllExchangeRates();
 
-        for (Map.Entry<String, BigDecimal> entry : rates.entrySet()) {
-            if (!entry.getKey().equalsIgnoreCase("USD")) {
-                JLabel rateLabel = new JLabel("1 USD = " + entry.getValue() + " " + entry.getKey());
-                rateLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-                rateLabel.setForeground(Color.LIGHT_GRAY);
-                leftRatePanel.add(rateLabel);
-                leftRatePanel.add(Box.createVerticalStrut(5));
+            for (Map.Entry<String, BigDecimal> entry : rates.entrySet()) {
+                if (!entry.getKey().equalsIgnoreCase("USD")) {
+                    JLabel rateLabel = new JLabel("1 USD = " + entry.getValue() + " " + entry.getKey());
+                    rateLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+                    rateLabel.setForeground(Color.LIGHT_GRAY);
+                    leftRatePanel.add(rateLabel);
+                    leftRatePanel.add(Box.createVerticalStrut(5));
+                }
             }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error loading exchange rates: {0}", e.getMessage());
+            StyleUtils.showStyledErrorDialog(this, "Failed to load exchange rates: " + e.getMessage());
         }
 
         add(leftRatePanel, BorderLayout.WEST);
@@ -150,14 +158,12 @@ public class CurrencyExchangePanel extends JPanel {
                 String fromCode = fromCurrency.split(" ")[1];
                 String toCode = toCurrency.split(" ")[1];
 
+                CurrencyType currencyType = CurrencyType.getInstance();
                 BigDecimal fromRate = currencyType.getExchangeRate(fromCode);
                 BigDecimal toRate = currencyType.getExchangeRate(toCode);
 
                 if (fromRate.compareTo(BigDecimal.ZERO) == 0 || toRate.compareTo(BigDecimal.ZERO) == 0) {
-                    JOptionPane.showMessageDialog(this,
-                            "Unsupported currency conversion.",
-                            "Conversion Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    StyleUtils.showStyledErrorDialog(this, "Unsupported currency conversion.");
                     return;
                 }
 
@@ -166,17 +172,14 @@ public class CurrencyExchangePanel extends JPanel {
                 BigDecimal conversionRate = toRate.divide(fromRate, 6, BigDecimal.ROUND_HALF_UP);
 
                 conversionRateField.setText(String.format("%.4f", conversionRate));
-                JOptionPane.showMessageDialog(this,
-                        "Converted Amount: " + targetAmount.setScale(2, BigDecimal.ROUND_HALF_UP),
-                        "Conversion Result",
-                        JOptionPane.INFORMATION_MESSAGE
+                StyleUtils.showStyledSuccessDialog(this,
+                        "Converted Amount: " + targetAmount.setScale(2, BigDecimal.ROUND_HALF_UP)
                 );
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this,
-                        "Please enter a valid number.",
-                        "Input Error",
-                        JOptionPane.ERROR_MESSAGE
-                );
+                StyleUtils.showStyledErrorDialog(this, "Please enter a valid number.");
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Error during conversion: {0}", ex.getMessage());
+                StyleUtils.showStyledErrorDialog(this, "An error occurred during conversion: " + ex.getMessage());
             }
         });
 

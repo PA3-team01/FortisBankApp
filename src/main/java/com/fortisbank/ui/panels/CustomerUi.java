@@ -1,108 +1,47 @@
 package com.fortisbank.ui.panels;
 
-import com.fortisbank.data.dal_utils.StorageMode;
-import com.fortisbank.ui.components.NavigationBar;
-import com.fortisbank.ui.panels.commons.InboxPanel;
-import com.fortisbank.ui.panels.commons.ProfilePanel;
-import com.fortisbank.ui.panels.commons.SettingPanel;
-import com.fortisbank.ui.panels.customerPanels.*;
-import com.fortisbank.ui.ui_utils.StyleUtils;
+    import com.fortisbank.data.dal_utils.StorageMode;
+    import com.fortisbank.ui.components.NavigationBar;
+    import com.fortisbank.ui.panels.commons.*;
+    import com.fortisbank.ui.panels.customerPanels.*;
 
-import javax.swing.*;
-import java.awt.*;
-
-/**
- * The CustomerUi class represents the user interface for customers.
- * It extends JPanel and provides navigation and content display functionality.
- */
-public class CustomerUi extends JPanel {
-
-    private final NavigationBar navPanel;
-    private final JPanel contentPanel;
-    private StorageMode storageMode;
+    import javax.swing.*;
 
     /**
-     * Constructs a CustomerUi with the specified storage mode.
-     *
-     * @param storageMode the storage mode to use for services
+     * The CustomerUi class represents the user interface for customers.
      */
-    public CustomerUi(StorageMode storageMode) {
-        this.storageMode = storageMode;
-        setLayout(new BorderLayout());
-        StyleUtils.styleFormPanel(this);
+    public class CustomerUi extends UserUI {
 
-        // === LEFT: Navigation Panel ===
-        navPanel = new NavigationBar("Inbox", "Accounts", "Transactions", "Currency Exchange", "Profile", "Contact", "Settings", "Help");
-        StyleUtils.styleNavbar(navPanel);
-        add(navPanel, BorderLayout.WEST);
+        public CustomerUi(StorageMode storageMode) {
+            super(storageMode);
+        }
 
-        // === RIGHT: Content Area ===
-        contentPanel = new JPanel(new BorderLayout());
-        StyleUtils.styleFormPanel(contentPanel);
-        add(contentPanel, BorderLayout.CENTER);
+        @Override
+        protected NavigationBar createNavigationBar() {
+            return new NavigationBar("Inbox", "Accounts", "Transactions", "Currency Exchange", "Profile", "Contact", "Settings", "Help");
+        }
 
-        // Show default welcome content
-        showContent(new AccountPanel(storageMode));
+        @Override
+        protected void setupNavigationActions() {
+            navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
+            navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel(storageMode)));
+            navPanel.setButtonAction("Transactions", () -> showContent(new TransactionPanel(storageMode)));
+            navPanel.setButtonAction("Contact", () -> showContent(new SupportContactPanel(storageMode)));
+            navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
+            navPanel.setButtonAction("Currency Exchange", () -> showContent(new CurrencyExchangePanel(storageMode)));
+            navPanel.setButtonAction("Help", () -> showContent(new HelpPanel(storageMode)));
+            navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
+        }
 
-        // === Navigation Hooks ===
-        navPanel.setButtonAction("Inbox", () -> showContent(new InboxPanel(storageMode)));
-        navPanel.setButtonAction("Accounts", () -> showContent(new AccountPanel(storageMode)));
-        navPanel.setButtonAction("Transactions", () -> showContent(new TransactionPanel(storageMode)));
-        navPanel.setButtonAction("Contact", () -> showContent(new SupportContactPanel(storageMode)));
-        navPanel.setButtonAction("Settings", () -> showContent(new SettingPanel()));
-        navPanel.setButtonAction("Currency Exchange", () -> showContent(new CurrencyExchangePanel(storageMode)));
-        navPanel.setButtonAction("Help", () -> showContent(new HelpPanel(storageMode)));
-        navPanel.setButtonAction("Profile", () -> showContent(new ProfilePanel()));
+        @Override
+        protected JPanel createWelcomePanel() {
+            JPanel panel = new JPanel();
+            panel.add(new JLabel("Welcome to the Customer Dashboard!"));
+            return panel;
+        }
+
+        @Override
+        protected String getDashboardTitle() {
+            return "Customer Dashboard";
+        }
     }
-
-    /**
-     * Creates a welcome panel with a welcome message.
-     *
-     * @return the welcome panel
-     */
-    private JPanel createWelcomePanel() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setOpaque(false);
-
-        JLabel info = new JLabel("Welcome! Select an option from the menu.");
-        StyleUtils.styleLabel(info);
-        panel.add(Box.createVerticalStrut(15));
-        panel.add(info);
-
-        return panel;
-    }
-
-    /**
-     * Swaps the right-side content dynamically with scroll support.
-     *
-     * @param component the component to display in the content area
-     */
-    private void showContent(JComponent component) {
-        contentPanel.removeAll();
-
-        JLabel titleLabel = new JLabel("Customer Dashboard");
-        StyleUtils.styleFormTitle(titleLabel);
-        contentPanel.add(titleLabel, BorderLayout.NORTH);
-
-        JPanel wrapper = new JPanel();
-        wrapper.setLayout(new BoxLayout(wrapper, BoxLayout.Y_AXIS));
-        wrapper.setOpaque(false);
-        wrapper.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        wrapper.add(Box.createVerticalStrut(15));
-        wrapper.add(component);
-
-        // Let child grow horizontally if possible
-        component.setMaximumSize(new Dimension(Integer.MAX_VALUE, component.getPreferredSize().height));
-
-        JScrollPane scrollPane = new JScrollPane(wrapper);
-        scrollPane.setBorder(null);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16); // smoother scrolling
-        scrollPane.setOpaque(false);
-        scrollPane.getViewport().setOpaque(false);
-
-        contentPanel.add(scrollPane, BorderLayout.CENTER);
-        contentPanel.revalidate();
-        contentPanel.repaint();
-    }
-}
