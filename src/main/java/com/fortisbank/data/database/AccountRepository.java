@@ -9,10 +9,7 @@ import com.fortisbank.data.dal_utils.DatabaseConnection;
 import com.fortisbank.data.dto.AccountDTO;
 import com.fortisbank.data.interfaces.IAccountRepository;
 
-import java.math.BigDecimal;
 import java.sql.*;
-import java.time.LocalDate;
-import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
