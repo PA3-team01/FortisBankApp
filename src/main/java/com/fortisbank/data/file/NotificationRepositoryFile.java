@@ -78,13 +78,15 @@ public class NotificationRepositoryFile extends FileRepository<Notification> imp
     public NotificationList getNotificationsByUserId(String userId) throws NotificationRepositoryException {
         try {
             List<Notification> result = readAll().stream()
-                    .filter(n -> n.getRelatedCustomer().equals(userId))
+                    .filter(n -> userId.equals(n.getRecipientUserId()))
                     .toList();
             return new NotificationList(result);
         } catch (Exception e) {
             throw new NotificationRepositoryException("Error retrieving notifications for user: " + userId, e);
         }
     }
+
+
 
     @Override
     public Notification getNotificationById(String id) throws NotificationRepositoryException {

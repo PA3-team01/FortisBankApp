@@ -110,8 +110,8 @@ package com.fortisbank.ui.panels.commons;
                  messageListPanel.removeAll();
 
                  List<Notification> notifications = switch (filterSelector.getSelectedItem().toString()) {
-                     case "Unread" -> notificationService.getUnreadNotifications(SessionManager.getCurrentUser());
-                     default -> notificationService.getAllNotifications(SessionManager.getCurrentUser());
+                     case "Unread" -> notificationService.getUnreadNotifications(SessionManager.getCurrentUser().getUserId());
+                     default -> notificationService.getAllNotifications(SessionManager.getCurrentUser().getUserId());
                  };
 
                  if (notifications.isEmpty()) {

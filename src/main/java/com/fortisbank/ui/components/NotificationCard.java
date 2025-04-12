@@ -1,6 +1,7 @@
 package com.fortisbank.ui.components;
 
      import com.fortisbank.business.services.account.AccountLoanRequestService;
+     import com.fortisbank.business.services.notification.NotificationService;
      import com.fortisbank.data.dal_utils.StorageMode;
      import com.fortisbank.contracts.models.accounts.Account;
      import com.fortisbank.contracts.models.others.Notification;
@@ -22,6 +23,7 @@ package com.fortisbank.ui.components;
      public class NotificationCard extends JPanel {
 
          private static final Logger LOGGER = Logger.getLogger(NotificationCard.class.getName());
+         private final StorageMode storageMode;
 
          /**
           * Constructs a NotificationCard for the given notification and storage mode.
@@ -30,6 +32,7 @@ package com.fortisbank.ui.components;
           * @param storageMode the storage mode to use for services
           */
          public NotificationCard(Notification notification, StorageMode storageMode) {
+                this.storageMode = storageMode;
              try {
                  setLayout(new BorderLayout());
                  StyleUtils.styleFormPanel(this);
@@ -111,29 +114,33 @@ package com.fortisbank.ui.components;
                  acceptBtn.addActionListener(e -> {
                      try {
                          service.acceptAccountRequest(customer, account);
-                         notification.markAsRead();
+                         var serviceNotif = NotificationService.getInstance(storageMode);
+                         serviceNotif.markAsRead(customer, notification);
                          StyleUtils.showStyledSuccessDialog(this, "Account opened successfully.");
-                         SwingUtilities.invokeLater(() -> ((JComponent) this.getParent()).revalidate());
+                         refreshCardStatus(account);
                      } catch (Exception ex) {
                          LOGGER.log(Level.SEVERE, "Error accepting account request: {0}", ex.getMessage());
                          StyleUtils.showStyledErrorDialog(this, "Failed to accept account request: " + ex.getMessage());
                      }
                  });
 
+
                  rejectBtn.addActionListener(e -> {
                      try {
                          String reason = JOptionPane.showInputDialog(this, "Reason for rejection:");
                          if (reason != null && !reason.isBlank()) {
                              service.rejectAccountRequest(customer, reason, account);
-                             notification.markAsRead();
+                             var serviceNotif = NotificationService.getInstance(storageMode);
+                             serviceNotif.markAsRead(customer, notification);
                              StyleUtils.showStyledSuccessDialog(this, "Account request rejected.");
-                             SwingUtilities.invokeLater(() -> ((JComponent) this.getParent()).revalidate());
+                             refreshCardStatus(account);
                          }
                      } catch (Exception ex) {
                          LOGGER.log(Level.SEVERE, "Error rejecting account request: {0}", ex.getMessage());
                          StyleUtils.showStyledErrorDialog(this, "Failed to reject account request: " + ex.getMessage());
                      }
                  });
+
 
                  footer.add(acceptBtn);
                  footer.add(rejectBtn);
@@ -145,21 +152,72 @@ package com.fortisbank.ui.components;
 
          private void markNotificationAsRead(Notification notification) {
              try {
-                 notification.markAsRead();
-                 SwingUtilities.invokeLater(() -> ((JComponent) this.getParent()).revalidate());
+                 var service = NotificationService.getInstance(storageMode);
+                 var currentUser = SessionManager.getCurrentUser();
+                 service.markAsRead(currentUser, notification);
+
+                 StyleUtils.showStyledSuccessDialog(this, "Marked as read.");
+
+                 SwingUtilities.invokeLater(() -> {
+                     Container parent = this.getParent();
+                     if (parent != null) {
+                         parent.remove(this);
+                         parent.revalidate();
+                         parent.repaint();
+                     }
+                 });
              } catch (Exception e) {
                  LOGGER.log(Level.SEVERE, "Error marking notification as read: {0}", e.getMessage());
                  StyleUtils.showStyledErrorDialog(this, "Failed to mark notification as read: " + e.getMessage());
              }
          }
 
-         private void deleteNotification(Notification notification) {
+
+
+         public void deleteNotification(Notification notification) {
              try {
-                 SessionManager.getCurrentUser().getInbox().remove(notification);
-                 SwingUtilities.invokeLater(() -> ((JComponent) this.getParent()).revalidate());
+                 NotificationService.getInstance(storageMode).deleteNotification(notification);
+                    SwingUtilities.invokeLater(() -> { // Remove the card from the parent container
+                        Container parent = this.getParent();
+                        if (parent != null) {
+                            parent.remove(this);
+                            parent.revalidate();
+                            parent.repaint();
+                        }
+                    });
              } catch (Exception e) {
                  LOGGER.log(Level.SEVERE, "Error deleting notification: {0}", e.getMessage());
-                 StyleUtils.showStyledErrorDialog(this, "Failed to delete notification: " + e.getMessage());
+                 throw new RuntimeException("Failed to delete notification", e);
              }
          }
+
+
+         private void refreshCardStatus(Account account) {
+             try {
+                 JPanel footer = (JPanel) getComponent(2); // Assumes footer is at SOUTH
+                 footer.removeAll();
+
+                 JLabel timestamp = new JLabel("Updated: " + new java.util.Date());
+                 StyleUtils.styleLabel(timestamp);
+                 timestamp.setFont(timestamp.getFont().deriveFont(Font.ITALIC, 10));
+                 footer.add(timestamp);
+
+                 JLabel statusLabel = new JLabel();
+                 statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                 if (account.isActive()) {
+                     statusLabel.setText("✔ Accepted");
+                     statusLabel.setForeground(new Color(0, 128, 0));
+                 } else {
+                     statusLabel.setText("✖ Rejected");
+                     statusLabel.setForeground(new Color(200, 0, 0));
+                 }
+                 footer.add(statusLabel);
+
+                 footer.revalidate();
+                 footer.repaint();
+             } catch (Exception e) {
+                 LOGGER.log(Level.SEVERE, "Failed to update notification footer status", e);
+             }
+         }
+
      }

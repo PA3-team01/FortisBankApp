@@ -2,6 +2,7 @@ package com.fortisbank.ui.forms;
 
     import com.fortisbank.business.services.users.manager.BankManagerService;
     import com.fortisbank.business.services.notification.NotificationService;
+    import com.fortisbank.contracts.models.users.Customer;
     import com.fortisbank.data.dal_utils.StorageMode;
     import com.fortisbank.contracts.models.users.User;
     import com.fortisbank.business.services.session.SessionManager;
@@ -149,7 +150,7 @@ package com.fortisbank.ui.forms;
             try {
                 if (validateFields()) {
                     var manager = BankManagerService.getInstance(storageMode).getAllManagers().getFirst();
-                    NotificationService.getInstance(storageMode).notifyNewMessage(manager, currentUser.getFullName());
+                    NotificationService.getInstance(storageMode).notifyNewMessage(manager, (Customer) currentUser);
                     StyleUtils.showStyledSuccessDialog(this, "Message sent successfully!");
                     clearFields();
                 }

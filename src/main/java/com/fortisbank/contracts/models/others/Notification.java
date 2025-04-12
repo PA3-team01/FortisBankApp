@@ -6,7 +6,6 @@ import com.fortisbank.contracts.utils.IdGenerator;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.UUID;
 
 /**
  * Class representing a notification.
@@ -14,11 +13,8 @@ import java.util.UUID;
 public class Notification implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    /**
-     * Unique identifier for the notification.
-     */
     private String notificationId;
-
+    private String recipientUserId; // NEW FIELD: actual recipient
     private NotificationType type;
     private String title;
     private String message;
@@ -27,13 +23,6 @@ public class Notification implements Serializable {
     private Customer relatedCustomer;
     private Account relatedAccount;
 
-    /**
-     * Constructor initializing the notification with type, title, and message.
-     *
-     * @param type the type of the notification
-     * @param title the title of the notification
-     * @param message the message of the notification
-     */
     public Notification(NotificationType type, String title, String message) {
         this.notificationId = IdGenerator.generateId();
         this.type = type;
@@ -43,25 +32,23 @@ public class Notification implements Serializable {
         this.read = false;
     }
 
-    /**
-     * Constructor initializing the notification with related entities.
-     *
-     * @param type the type of the notification
-     * @param title the title of the notification
-     * @param message the message of the notification
-     * @param customer the customer related to the notification
-     * @param account the account related to the notification
-     */
     public Notification(NotificationType type, String title, String message, Customer customer, Account account) {
         this(type, title, message);
         this.relatedCustomer = customer;
         this.relatedAccount = account;
+        if (customer != null) {
+            this.recipientUserId = customer.getUserId();
+        }
     }
 
     // --- Getters ---
 
     public String getNotificationId() {
         return notificationId;
+    }
+
+    public String getRecipientUserId() {
+        return recipientUserId;
     }
 
     public NotificationType getType() {
@@ -98,6 +85,10 @@ public class Notification implements Serializable {
         this.notificationId = notificationId;
     }
 
+    public void setRecipientUserId(String recipientUserId) {
+        this.recipientUserId = recipientUserId;
+    }
+
     public void setType(NotificationType type) {
         this.type = type;
     }
@@ -122,12 +113,12 @@ public class Notification implements Serializable {
         this.relatedAccount = relatedAccount;
     }
 
-    public void markAsRead() {
-        this.read = true;
-    }
-
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public void markAsRead() {
+        this.read = true;
     }
 
     @Override
