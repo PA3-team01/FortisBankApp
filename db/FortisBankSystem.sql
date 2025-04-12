@@ -33,9 +33,12 @@ account_type VARCHAR2(30) NOT NULL CHECK (account_type IN (
 opened_date DATE NOT NULL,
 is_active NUMBER(1) DEFAULT 1 CHECK (is_active IN (0, 1)),
 available_balance NUMBER(18, 2) DEFAULT 0,
-credit_limit NUMBER(18, 2),
+credit_limit NUMBER(18, 2),         -- For CREDIT accounts
+interest_rate NUMBER(5, 2),         -- For SAVINGS and CREDIT accounts
+currency_code VARCHAR2(10),         -- For CURRENCY accounts
 FOREIGN KEY (customer_id) REFERENCES customers(user_id)
 );
+
 
 -- TRANSACTIONS (linked to 1 or 2 accounts)
 CREATE TABLE transactions (
@@ -66,3 +69,12 @@ FOREIGN KEY (recipient_user_id) REFERENCES users(user_id),
 FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
 
+-- Indexes for performance optimization (optional, based on query patterns)
+
+-- Index to speed up customer-based account lookups
+-- Recommended if querying accounts by customer_id is frequent
+CREATE INDEX idx_accounts_customer_id ON accounts(customer_id);
+
+-- Index to speed up filtering or grouping by account_type
+-- Useful if reports or analytics rely on account_type
+CREATE INDEX idx_accounts_account_type ON accounts(account_type);

@@ -242,4 +242,12 @@ public abstract class Transaction implements Serializable {
         }
         return BigDecimal.ZERO;
     }
+
+    public String getTransactionId() {
+        return transactionNumber;
+    }
+
+    public void setTransactionId(String transactionId) {
+        this.transactionNumber = transactionId;
+    }
 }

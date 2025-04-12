@@ -9,6 +9,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 import java.awt.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -236,5 +238,22 @@ public class ValidationUtils {
             @Override public void removeUpdate(javax.swing.event.DocumentEvent e) { update(); }
             @Override public void changedUpdate(javax.swing.event.DocumentEvent e) { update(); }
         });
+    }
+
+    public static LocalDate toLocalDate(Date transactionDate) {
+        // Convert Date to LocalDate
+        if (transactionDate == null) {
+            return null;
+        }
+        return new java.sql.Date(transactionDate.getTime()).toLocalDate();
+    }
+
+    public static Date toDate(LocalDate transactionDate) {
+        // Convert LocalDate to Date
+        if (transactionDate == null) {
+            return null;
+        }
+        return java.sql.Date.valueOf(transactionDate);
+
     }
 }

@@ -1,146 +1,158 @@
 package com.fortisbank.data.database;
 
-     import com.fortisbank.data.dal_utils.DatabaseConnection;
-     import com.fortisbank.data.interfaces.ICustomerRepository;
-     import com.fortisbank.contracts.exceptions.CustomerRepositoryException;
-     import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
-     import com.fortisbank.contracts.collections.CustomerList;
-     import com.fortisbank.contracts.models.users.Customer;
-     import org.jetbrains.annotations.NotNull;
+import com.fortisbank.contracts.collections.CustomerList;
+import com.fortisbank.contracts.exceptions.CustomerRepositoryException;
+import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
+import com.fortisbank.contracts.models.users.Customer;
+import com.fortisbank.data.dal_utils.DatabaseConnection;
+import com.fortisbank.data.dto.CustomerDTO;
+import com.fortisbank.data.interfaces.ICustomerRepository;
 
-     import java.sql.Connection;
-     import java.sql.PreparedStatement;
-     import java.sql.ResultSet;
-     import java.sql.SQLException;
-     import java.util.logging.Level;
-     import java.util.logging.Logger;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-     /**
-      * Repository class for managing customer data in the database.
-      * Implements the ICustomerRepository interface.
-      */
-     public class CustomerRepository implements ICustomerRepository {
-         private static final Logger LOGGER = Logger.getLogger(CustomerRepository.class.getName());
-         private final DatabaseConnection dbConnection;
-         private static CustomerRepository instance;
+public class CustomerRepository implements ICustomerRepository {
 
-         private CustomerRepository() {
-             this.dbConnection = DatabaseConnection.getInstance();
-         }
+    private static final Logger LOGGER = Logger.getLogger(CustomerRepository.class.getName());
+    private final DatabaseConnection dbConnection;
+    private static CustomerRepository instance;
 
-         public static synchronized CustomerRepository getInstance() {
-             if (instance == null) {
-                 instance = new CustomerRepository();
-             }
-             return instance;
-         }
+    private CustomerRepository() {
+        this.dbConnection = DatabaseConnection.getInstance();
+    }
 
-         @Override
-         public Customer getCustomerById(String customerId) throws CustomerRepositoryException {
-             String query = "SELECT * FROM customers WHERE CustomerID = ?";
-             try (Connection conn = dbConnection.getConnection();
-                  PreparedStatement stmt = conn.prepareStatement(query)) {
+    public static synchronized CustomerRepository getInstance() {
+        if (instance == null) {
+            instance = new CustomerRepository();
+        }
+        return instance;
+    }
 
-                 stmt.setString(1, customerId);
-                 ResultSet rs = stmt.executeQuery();
+    @Override
+    public Customer getCustomerById(String customerId) throws CustomerRepositoryException {
+        String sql = "SELECT u.*, c.phone_number FROM users u " +
+                "JOIN customers c ON u.user_id = c.user_id WHERE u.user_id = ?";
 
-                 if (rs.next()) {
-                     return mapResultSetToCustomer(rs);
-                 } else {
-                     LOGGER.log(Level.WARNING, "Customer with ID {0} not found.", customerId);
-                     throw new CustomerRepositoryException("Customer with ID " + customerId + " not found.");
-                 }
-             } catch (SQLException | DatabaseConnectionException e) {
-                 LOGGER.log(Level.SEVERE, "Error retrieving customer {0}: {1}", new Object[]{customerId, e.getMessage()});
-                 throw new CustomerRepositoryException("Error retrieving customer " + customerId, e);
-             }
-         }
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-         @Override
-         public CustomerList getAllCustomers() throws CustomerRepositoryException {
-             var customers = new CustomerList();
-             String query = "SELECT * FROM customers";
+            stmt.setString(1, customerId);
+            ResultSet rs = stmt.executeQuery();
 
-             try (Connection conn = dbConnection.getConnection();
-                  PreparedStatement stmt = conn.prepareStatement(query);
-                  ResultSet rs = stmt.executeQuery()) {
+            if (rs.next()) {
+                return mapResultSetToCustomer(rs);
+            } else {
+                throw new CustomerRepositoryException("Customer with ID " + customerId + " not found.");
+            }
+        } catch (SQLException | DatabaseConnectionException e) {
+            LOGGER.log(Level.SEVERE, "Error retrieving customer: " + e.getMessage(), e);
+            throw new CustomerRepositoryException("Error retrieving customer", e);
+        }
+    }
 
-                 while (rs.next()) {
-                     customers.add(mapResultSetToCustomer(rs));
-                 }
-             } catch (SQLException | DatabaseConnectionException e) {
-                 LOGGER.log(Level.SEVERE, "Error retrieving all customers: {0}", e.getMessage());
-                 throw new CustomerRepositoryException("Error retrieving all customers", e);
-             }
-             return customers;
-         }
+    @Override
+    public CustomerList getAllCustomers() throws CustomerRepositoryException {
+        String sql = "SELECT u.*, c.phone_number FROM users u " +
+                "JOIN customers c ON u.user_id = c.user_id WHERE u.role = 'CUSTOMER'";
+        CustomerList list = new CustomerList();
 
-         @Override
-         public void insertCustomer(Customer customer) throws CustomerRepositoryException {
-             String query = "INSERT INTO customers (CustomerID, FirstName, LastName, Email, PhoneNumber, PINHash) VALUES (?, ?, ?, ?, ?, ?)";
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
 
-             try (Connection conn = dbConnection.getConnection();
-                  PreparedStatement stmt = conn.prepareStatement(query)) {
+            while (rs.next()) {
+                list.add(mapResultSetToCustomer(rs));
+            }
 
-                 stmt.setString(1, customer.getUserId());
-                 stmt.setString(2, customer.getFirstName());
-                 stmt.setString(3, customer.getLastName());
-                 stmt.setString(4, customer.getEmail());
-                 stmt.setString(5, customer.getPhoneNumber());
-                 stmt.setString(6, customer.getPINHash());
+        } catch (SQLException | DatabaseConnectionException e) {
+            throw new CustomerRepositoryException("Error retrieving all customers", e);
+        }
 
-                 stmt.executeUpdate();
-             } catch (SQLException | DatabaseConnectionException e) {
-                 LOGGER.log(Level.SEVERE, "Error inserting customer: {0}", e.getMessage());
-                 throw new CustomerRepositoryException("Error inserting customer", e);
-             }
-         }
+        return list;
+    }
 
-         @Override
-         public void updateCustomer(Customer customer) throws CustomerRepositoryException {
-             String query = "UPDATE customers SET FirstName = ?, LastName = ?, Email = ?, PhoneNumber = ?, PINHash = ? WHERE CustomerID = ?";
+    @Override
+    public void insertCustomer(Customer customer) throws CustomerRepositoryException {
+        CustomerDTO dto = CustomerDTO.fromEntity(customer);
 
-             try (Connection conn = dbConnection.getConnection();
-                  PreparedStatement stmt = conn.prepareStatement(query)) {
+        String userSql = "INSERT INTO users (user_id, first_name, last_name, email, hashed_password, pin_hash, role) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String customerSql = "INSERT INTO customers (user_id, phone_number) VALUES (?, ?)";
 
-                 stmt.setString(1, customer.getFirstName());
-                 stmt.setString(2, customer.getLastName());
-                 stmt.setString(3, customer.getEmail());
-                 stmt.setString(4, customer.getPhoneNumber());
-                 stmt.setString(5, customer.getPINHash());
-                 stmt.setString(6, customer.getUserId());
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement userStmt = conn.prepareStatement(userSql);
+             PreparedStatement custStmt = conn.prepareStatement(customerSql)) {
 
-                 stmt.executeUpdate();
-             } catch (SQLException | DatabaseConnectionException e) {
-                 LOGGER.log(Level.SEVERE, "Error updating customer: {0}", e.getMessage());
-                 throw new CustomerRepositoryException("Error updating customer", e);
-             }
-         }
+            userStmt.setString(1, dto.userId());
+            userStmt.setString(2, dto.firstName());
+            userStmt.setString(3, dto.lastName());
+            userStmt.setString(4, dto.email());
+            userStmt.setString(5, dto.hashedPassword());
+            userStmt.setString(6, dto.pinHash());
+            userStmt.setString(7, dto.role());
+            userStmt.executeUpdate();
 
-         @Override
-         public void deleteCustomer(String customerId) throws CustomerRepositoryException {
-             String query = "DELETE FROM customers WHERE CustomerID = ?";
+            custStmt.setString(1, dto.userId());
+            custStmt.setString(2, dto.phoneNumber());
+            custStmt.executeUpdate();
 
-             try (Connection conn = dbConnection.getConnection();
-                  PreparedStatement stmt = conn.prepareStatement(query)) {
+        } catch (SQLException | DatabaseConnectionException e) {
+            throw new CustomerRepositoryException("Error inserting customer", e);
+        }
+    }
 
-                 stmt.setString(1, customerId);
-                 stmt.executeUpdate();
-             } catch (SQLException | DatabaseConnectionException e) {
-                 LOGGER.log(Level.SEVERE, "Error deleting customer with ID {0}: {1}", new Object[]{customerId, e.getMessage()});
-                 throw new CustomerRepositoryException("Error deleting customer with ID " + customerId, e);
-             }
-         }
+    @Override
+    public void updateCustomer(Customer customer) throws CustomerRepositoryException {
+        CustomerDTO dto = CustomerDTO.fromEntity(customer);
 
-         private Customer mapResultSetToCustomer(@NotNull ResultSet rs) throws SQLException {
-             return new Customer(
-                     rs.getString("CustomerID"),
-                     rs.getString("FirstName"),
-                     rs.getString("LastName"),
-                     rs.getString("Email"),
-                     rs.getString("PasswordHash"),
-                     rs.getString("PhoneNumber"),
-                     rs.getString("PINHash")
-             );
-         }
-     }
+        String userSql = "UPDATE users SET first_name = ?, last_name = ?, email = ?, hashed_password = ?, pin_hash = ? " +
+                "WHERE user_id = ?";
+        String custSql = "UPDATE customers SET phone_number = ? WHERE user_id = ?";
+
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement userStmt = conn.prepareStatement(userSql);
+             PreparedStatement custStmt = conn.prepareStatement(custSql)) {
+
+            userStmt.setString(1, dto.firstName());
+            userStmt.setString(2, dto.lastName());
+            userStmt.setString(3, dto.email());
+            userStmt.setString(4, dto.hashedPassword());
+            userStmt.setString(5, dto.pinHash());
+            userStmt.setString(6, dto.userId());
+            userStmt.executeUpdate();
+
+            custStmt.setString(1, dto.phoneNumber());
+            custStmt.setString(2, dto.userId());
+            custStmt.executeUpdate();
+
+        } catch (SQLException | DatabaseConnectionException e) {
+            throw new CustomerRepositoryException("Error updating customer", e);
+        }
+    }
+
+    @Override
+    public void deleteCustomer(String customerId) throws CustomerRepositoryException {
+        try (Connection conn = dbConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+            stmt.setString(1, customerId);
+            stmt.executeUpdate();
+        } catch (SQLException | DatabaseConnectionException e) {
+            throw new CustomerRepositoryException("Error deleting customer", e);
+        }
+    }
+
+    private Customer mapResultSetToCustomer(ResultSet rs) throws SQLException {
+        CustomerDTO dto = new CustomerDTO(
+                rs.getString("user_id"),
+                rs.getString("first_name"),
+                rs.getString("last_name"),
+                rs.getString("email"),
+                rs.getString("hashed_password"),
+                rs.getString("pin_hash"),
+                rs.getString("role"),
+                rs.getString("phone_number")
+        );
+        return dto.toEntity();
+    }
+}

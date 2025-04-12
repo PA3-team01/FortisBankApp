@@ -99,4 +99,8 @@ public class CurrencyAccount extends Account {
                 "Currency Code: " + getCurrencyCode() + "\n" +
                 "Customer Name: " + getCustomer().getFullName();
     }
+
+    public String getCurrencyType() {
+        return currencyCode;
+    }
 }
