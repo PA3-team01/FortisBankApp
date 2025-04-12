@@ -56,14 +56,13 @@ FOREIGN KEY (destination_account_id) REFERENCES accounts(account_id)
 CREATE TABLE notifications (
 notification_id VARCHAR2(50) PRIMARY KEY,
 title VARCHAR2(255) NOT NULL,
-user_id VARCHAR2(50) NOT NULL,
+recipient_user_id VARCHAR2(50) NOT NULL, -- NEW: recipient user ID (customer or manager)
 account_id VARCHAR2(50), -- nullable
 message VARCHAR2(500),
 type VARCHAR2(30),
 seen NUMBER(1) DEFAULT 0 CHECK (seen IN (0, 1)),
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-FOREIGN KEY (user_id) REFERENCES users(user_id),
+FOREIGN KEY (recipient_user_id) REFERENCES users(user_id),
 FOREIGN KEY (account_id) REFERENCES accounts(account_id)
 );
-
 

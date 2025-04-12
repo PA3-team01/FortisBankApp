@@ -41,6 +41,10 @@ public class Notification implements Serializable {
         }
     }
 
+    public Notification(String notificationId, String recipientUserId, String accountId, String type, String title, String message, boolean seen, Date timestamp) {
+        // DTO constructor
+    }
+
     // --- Getters ---
 
     public String getNotificationId() {

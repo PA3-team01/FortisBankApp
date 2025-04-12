@@ -37,11 +37,11 @@ public class NotificationRepository implements INotificationRepository {
 
     @Override
     public void insertNotification(Notification notification) throws NotificationRepositoryException {
-        String sql = "INSERT INTO notifications (notification_id, user_id, account_id, title, message, type, seen, created_at) " +
+        String sql = "INSERT INTO notifications (notification_id, recipient_user_id, account_id, title, message, type, seen, created_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, notification.getNotificationId());
-            stmt.setString(2, notification.getRelatedCustomer().getUserId());
+            stmt.setString(2, notification.getRecipientUserId());
             stmt.setString(3, notification.getRelatedAccount() != null ? notification.getRelatedAccount().getAccountNumber() : null);
             stmt.setString(4, notification.getTitle());
             stmt.setString(5, notification.getMessage());
@@ -78,7 +78,9 @@ public class NotificationRepository implements INotificationRepository {
 
     @Override
     public NotificationList getNotificationsByUserId(String userId) throws NotificationRepositoryException {
-        String sql = "SELECT n.*, a.account_type FROM notifications n LEFT JOIN accounts a ON n.account_id = a.account_id WHERE n.user_id = ? ORDER BY n.created_at DESC";
+        String sql = "SELECT n.*, a.account_type FROM notifications n " +
+                "LEFT JOIN accounts a ON n.account_id = a.account_id " +
+                "WHERE n.recipient_user_id = ? ORDER BY n.created_at DESC";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
@@ -94,7 +96,9 @@ public class NotificationRepository implements INotificationRepository {
 
     @Override
     public Notification getNotificationById(String id) throws NotificationRepositoryException {
-        String sql = "SELECT n.*, a.account_type FROM notifications n LEFT JOIN accounts a ON n.account_id = a.account_id WHERE n.notification_id = ?";
+        String sql = "SELECT n.*, a.account_type FROM notifications n " +
+                "LEFT JOIN accounts a ON n.account_id = a.account_id " +
+                "WHERE n.notification_id = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -117,16 +121,15 @@ public class NotificationRepository implements INotificationRepository {
         notification.setNotificationId(rs.getString("notification_id"));
         notification.setRead(rs.getInt("seen") == 1);
         notification.setTimestamp(rs.getTimestamp("created_at"));
+        notification.setRecipientUserId(rs.getString("recipient_user_id"));
 
-        // Minimal Customer
-        String userId = rs.getString("user_id");
+        String userId = rs.getString("recipient_user_id");
         if (userId != null) {
             Customer customer = new Customer();
             customer.setUserId(userId);
-            notification.setRelatedCustomer(customer);
+            notification.setRelatedCustomer(customer); // optional: for context
         }
 
-        // Minimal Account
         String accountId = rs.getString("account_id");
         String accountType = rs.getString("account_type");
 
