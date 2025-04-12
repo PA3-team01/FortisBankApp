@@ -1,4 +1,4 @@
-package com.fortisbank.data.dal_utils;
+package com.fortisbank.contracts.exceptions;
 
 /**
  * Custom exception for notification repository operations.

@@ -2,7 +2,7 @@ package com.fortisbank.data.file;
 
 import com.fortisbank.contracts.models.others.Notification;
 import com.fortisbank.contracts.collections.NotificationList;
-import com.fortisbank.data.dal_utils.NotificationRepositoryException;
+import com.fortisbank.contracts.exceptions.NotificationRepositoryException;
 import com.fortisbank.data.interfaces.INotificationRepository;
 
 import java.io.File;

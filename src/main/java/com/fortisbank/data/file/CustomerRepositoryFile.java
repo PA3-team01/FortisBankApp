@@ -4,7 +4,7 @@ import com.fortisbank.contracts.collections.CustomerList;
 import com.fortisbank.contracts.exceptions.CustomerRepositoryException;
 import com.fortisbank.contracts.models.users.Customer;
 import com.fortisbank.data.interfaces.ICustomerRepository;
-import com.fortisbank.data.dal_utils.NotificationRepositoryException;
+import com.fortisbank.contracts.exceptions.NotificationRepositoryException;
 
 import java.io.File;
 import java.util.List;
