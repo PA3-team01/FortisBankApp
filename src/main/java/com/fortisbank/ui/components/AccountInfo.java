@@ -86,30 +86,33 @@ public class AccountInfo extends JPanel {
             centerPanel.add(controls);
 
             // === Close Account Button ===
-            if (account.isActive() && account.getAvailableBalance().compareTo(java.math.BigDecimal.ZERO) == 0) {
-                JButton closeBtn = new JButton("Close Account");
-                StyleUtils.styleButton(closeBtn, false);
-                closeBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
-                closeBtn.addActionListener(e -> {
-                    int confirm = JOptionPane.showConfirmDialog(this,
-                            "Are you sure you want to close this account?",
-                            "Confirm Closure",
-                            JOptionPane.YES_NO_OPTION);
+            JButton closeBtn = new JButton("Close Account");
+            boolean canClose = account.isActive() && account.getAvailableBalance().compareTo(java.math.BigDecimal.ZERO) == 0;
+            StyleUtils.styleButton(closeBtn, false);
+            closeBtn.setAlignmentX(Component.LEFT_ALIGNMENT);
+            closeBtn.setEnabled(canClose);
+            closeBtn.setToolTipText(canClose ? null : "You can only close an active account with a zero balance.");
 
-                    if (confirm == JOptionPane.YES_OPTION) {
-                        try {
-                            AccountService.getInstance(storageMode).closeAccount(account);
-                            StyleUtils.showStyledSuccessDialog(this, "Account closed successfully.");
-                            SwingUtilities.getWindowAncestor(this).dispose(); // refresh by closing and reopening panel if needed
-                        } catch (Exception ex) {
-                            StyleUtils.showStyledErrorDialog(this, ex.getMessage());
-                        }
+            closeBtn.addActionListener(e -> {
+                int confirm = JOptionPane.showConfirmDialog(this,
+                        "Are you sure you want to close this account?",
+                        "Confirm Closure",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (confirm == JOptionPane.YES_OPTION) {
+                    try {
+                        AccountService.getInstance(storageMode).closeAccount(account);
+                        StyleUtils.showStyledSuccessDialog(this, "Account closed successfully.");
+                        SwingUtilities.getWindowAncestor(this).dispose();
+                    } catch (Exception ex) {
+                        StyleUtils.showStyledErrorDialog(this, ex.getMessage());
                     }
-                });
+                }
+            });
 
-                centerPanel.add(Box.createVerticalStrut(10));
-                centerPanel.add(closeBtn);
-            }
+            centerPanel.add(Box.createVerticalStrut(10));
+            centerPanel.add(closeBtn);
+
 
             add(centerPanel, BorderLayout.CENTER);
         } catch (Exception e) {
