@@ -5,6 +5,12 @@ import com.fortisbank.contracts.models.others.NotificationType;
 
 import java.util.Date;
 
+/**
+ * DTO (Data Transfer Object) for Notification.
+ * This class is used to transfer notification data between layers of the application.
+ * It includes validation and conversion methods to and from the Notification entity.
+ */
+
 public record NotificationDTO(
         String notificationId,
         String recipientUserId,
