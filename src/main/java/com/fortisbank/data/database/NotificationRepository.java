@@ -2,15 +2,12 @@ package com.fortisbank.data.database;
 
 import com.fortisbank.contracts.collections.NotificationList;
 import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
-import com.fortisbank.contracts.models.accounts.*;
 import com.fortisbank.contracts.models.others.Notification;
-import com.fortisbank.contracts.models.others.NotificationType;
-import com.fortisbank.contracts.models.users.Customer;
 import com.fortisbank.data.dal_utils.DatabaseConnection;
 import com.fortisbank.data.dal_utils.NotificationRepositoryException;
+import com.fortisbank.data.dto.NotificationDTO;
 import com.fortisbank.data.interfaces.INotificationRepository;
 
-import java.math.BigDecimal;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -37,17 +34,19 @@ public class NotificationRepository implements INotificationRepository {
 
     @Override
     public void insertNotification(Notification notification) throws NotificationRepositoryException {
+        NotificationDTO dto = NotificationDTO.fromEntity(notification);
+
         String sql = "INSERT INTO notifications (notification_id, recipient_user_id, account_id, title, message, type, seen, created_at) " +
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, notification.getNotificationId());
-            stmt.setString(2, notification.getRecipientUserId());
-            stmt.setString(3, notification.getRelatedAccount() != null ? notification.getRelatedAccount().getAccountNumber() : null);
-            stmt.setString(4, notification.getTitle());
-            stmt.setString(5, notification.getMessage());
-            stmt.setString(6, notification.getType().name());
-            stmt.setInt(7, notification.isRead() ? 1 : 0);
-            stmt.setTimestamp(8, new Timestamp(notification.getTimestamp().getTime()));
+            stmt.setString(1, dto.notificationId());
+            stmt.setString(2, dto.recipientUserId());
+            stmt.setString(3, dto.accountId());
+            stmt.setString(4, dto.title());
+            stmt.setString(5, dto.message());
+            stmt.setString(6, dto.type());
+            stmt.setInt(7, dto.seen() ? 1 : 0);
+            stmt.setTimestamp(8, new Timestamp(dto.timestamp().getTime()));
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new NotificationRepositoryException("Failed to insert notification", e);
@@ -86,7 +85,7 @@ public class NotificationRepository implements INotificationRepository {
             ResultSet rs = stmt.executeQuery();
             List<Notification> notifications = new ArrayList<>();
             while (rs.next()) {
-                notifications.add(mapResultSetToNotification(rs));
+                notifications.add(mapResultSetToDTO(rs).toEntity());
             }
             return new NotificationList(notifications);
         } catch (SQLException e) {
@@ -103,7 +102,7 @@ public class NotificationRepository implements INotificationRepository {
             stmt.setString(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return mapResultSetToNotification(rs);
+                return mapResultSetToDTO(rs).toEntity();
             } else {
                 throw new NotificationRepositoryException("Notification with ID " + id + " not found.");
             }
@@ -112,34 +111,16 @@ public class NotificationRepository implements INotificationRepository {
         }
     }
 
-    private Notification mapResultSetToNotification(ResultSet rs) throws SQLException {
-        Notification notification = new Notification(
-                NotificationType.valueOf(rs.getString("type")),
+    private NotificationDTO mapResultSetToDTO(ResultSet rs) throws SQLException {
+        return new NotificationDTO(
+                rs.getString("notification_id"),
+                rs.getString("recipient_user_id"),
+                rs.getString("account_id"),
+                rs.getString("type"),
                 rs.getString("title"),
-                rs.getString("message")
+                rs.getString("message"),
+                rs.getInt("seen") == 1,
+                rs.getTimestamp("created_at")
         );
-        notification.setNotificationId(rs.getString("notification_id"));
-        notification.setRead(rs.getInt("seen") == 1);
-        notification.setTimestamp(rs.getTimestamp("created_at"));
-        notification.setRecipientUserId(rs.getString("recipient_user_id"));
-
-        String userId = rs.getString("recipient_user_id");
-        if (userId != null) {
-            Customer customer = new Customer();
-            customer.setUserId(userId);
-            notification.setRelatedCustomer(customer); // optional: for context
-        }
-
-        String accountId = rs.getString("account_id");
-        String accountType = rs.getString("account_type");
-
-        if (accountId != null && accountType != null) {
-            AccountType type = AccountType.valueOf(accountType.toUpperCase());
-            Account account = AccountFactory.createAccount(type, accountId, null, null, BigDecimal.ZERO);
-            account.setAccountNumber(accountId);
-            notification.setRelatedAccount(account);
-        }
-
-        return notification;
     }
 }
