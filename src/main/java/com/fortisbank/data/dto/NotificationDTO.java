@@ -2,6 +2,7 @@ package com.fortisbank.data.dto;
 
 import com.fortisbank.contracts.models.others.Notification;
 import com.fortisbank.contracts.models.others.NotificationType;
+import com.fortisbank.data.dal_utils.StorageMode;
 
 import java.util.Date;
 
@@ -74,12 +75,13 @@ public record NotificationDTO(
         return new Notification(
                 notificationId,
                 recipientUserId,
-                accountId,
+                accountId,//TODO: get account from accountId
                 parsedType,
                 title,
                 message,
                 seen,
-                timestamp
+                timestamp,
+                StorageMode.DATABASE
         );
     }
 

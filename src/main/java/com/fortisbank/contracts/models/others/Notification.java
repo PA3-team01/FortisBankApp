@@ -1,8 +1,10 @@
 package com.fortisbank.contracts.models.others;
 
+import com.fortisbank.business.services.account.AccountService;
 import com.fortisbank.contracts.models.accounts.Account;
 import com.fortisbank.contracts.models.users.Customer;
 import com.fortisbank.contracts.utils.IdGenerator;
+import com.fortisbank.data.dal_utils.StorageMode;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -41,8 +43,17 @@ public class Notification implements Serializable {
         }
     }
 
-    public Notification(String notificationId, String recipientUserId, String accountId, NotificationType type, String title, String message, boolean seen, Date timestamp) {
-        // DTO constructor
+    public Notification(String notificationId, String recipientUserId, String accountId, NotificationType type, String title, String message, boolean seen, Date timestamp, StorageMode storageMode) {
+        this.notificationId = notificationId;
+        this.recipientUserId = recipientUserId;
+        this.type = NotificationType.valueOf(type.name());
+        this.title = title;
+        this.message = message;
+        this.timestamp = timestamp;
+        this.read = seen;
+        this.relatedCustomer = null;
+        this.relatedAccount = AccountService.getInstance(storageMode).getAccount(accountId);
+        System.out.println(this);
     }
 
     // --- Getters ---
