@@ -36,8 +36,8 @@ public class NotificationRepository implements INotificationRepository {
     public void insertNotification(Notification notification) throws NotificationRepositoryException {
         NotificationDTO dto = NotificationDTO.fromEntity(notification);
 
-        String sql = "INSERT INTO notifications (notification_id, recipient_user_id, account_id, title, message, type, seen, created_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO notifications (notification_id, recipient_user_id, account_id, title, message, type, seen, created_at, related_customer_id) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, dto.notificationId());
             stmt.setString(2, dto.recipientUserId());
@@ -47,6 +47,7 @@ public class NotificationRepository implements INotificationRepository {
             stmt.setString(6, dto.type());
             stmt.setInt(7, dto.seen() ? 1 : 0);
             stmt.setTimestamp(8, new Timestamp(dto.timestamp().getTime()));
+            stmt.setString(9, dto.relatedCustomerId());
             stmt.executeUpdate();
         } catch (SQLException e) {
             throw new NotificationRepositoryException("Failed to insert notification", e);
@@ -120,7 +121,8 @@ public class NotificationRepository implements INotificationRepository {
                 rs.getString("title"),
                 rs.getString("message"),
                 rs.getInt("seen") == 1,
-                rs.getTimestamp("created_at")
+                rs.getTimestamp("created_at"),
+                rs.getString("related_customer_id")
         );
     }
 }

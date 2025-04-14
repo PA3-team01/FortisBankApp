@@ -1,5 +1,7 @@
 package com.fortisbank.data.dto;
 
+import com.fortisbank.business.services.account.AccountService;
+import com.fortisbank.business.services.users.customer.CustomerService;
 import com.fortisbank.contracts.models.others.Notification;
 import com.fortisbank.contracts.models.others.NotificationType;
 import com.fortisbank.data.dal_utils.StorageMode;
@@ -20,7 +22,8 @@ public record NotificationDTO(
         String title,
         String message,
         boolean seen,
-        Date timestamp
+        Date timestamp,
+        String relatedCustomerId
 ) {
     public NotificationDTO {
         // Field validation
@@ -36,6 +39,7 @@ public record NotificationDTO(
             throw new IllegalArgumentException("Message cannot be null.");
         if (timestamp == null)
             throw new IllegalArgumentException("Timestamp cannot be null.");
+
     }
 
     /**
@@ -55,7 +59,8 @@ public record NotificationDTO(
                 n.getTitle(),
                 n.getMessage(),
                 n.isRead(),
-                n.getTimestamp()
+                n.getTimestamp(),
+                n.getRelatedCustomer() != null ? n.getRelatedCustomer().getUserId() : null
         );
     }
 
@@ -65,24 +70,39 @@ public record NotificationDTO(
      * @return Notification object
      */
     public Notification toEntity() {
-        NotificationType parsedType;
-        try {
-            parsedType = NotificationType.valueOf(type);
-        } catch (IllegalArgumentException | NullPointerException ex) {
-            throw new IllegalStateException("Invalid or null NotificationType: " + type);
-        }
+        NotificationType parsedType = NotificationType.valueOf(type);
 
-        return new Notification(
+        Notification notification = new Notification(
                 notificationId,
                 recipientUserId,
-                accountId,//TODO: get account from accountId
                 parsedType,
                 title,
                 message,
                 seen,
-                timestamp,
-                StorageMode.DATABASE
+                timestamp
         );
+
+        if (accountId != null) {
+            try {
+                notification.setRelatedAccount(AccountService.getInstance(StorageMode.DATABASE).getAccount(accountId));
+            } catch (Exception e) {
+                // Log but allow fallback
+                System.err.println("Failed to load related account: " + e.getMessage()); //TODO: replace with proper logging
+            }
+        }
+
+        if (relatedCustomerId != null) {
+            try {
+                notification.setRelatedCustomer(CustomerService.getInstance(StorageMode.DATABASE).getCustomer(relatedCustomerId));
+            } catch (Exception e) {
+                // Log but allow fallback (e.g., for managers)
+                System.err.println("No customer found for relatedCustomerId: " + relatedCustomerId); //TODO: replace with proper logging
+            }
+        }
+
+        return notification;
     }
+
+
 
 }

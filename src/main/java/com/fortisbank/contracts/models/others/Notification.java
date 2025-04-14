@@ -1,6 +1,7 @@
 package com.fortisbank.contracts.models.others;
 
 import com.fortisbank.business.services.account.AccountService;
+import com.fortisbank.business.services.users.customer.CustomerService;
 import com.fortisbank.contracts.models.accounts.Account;
 import com.fortisbank.contracts.models.users.Customer;
 import com.fortisbank.contracts.utils.IdGenerator;
@@ -43,18 +44,25 @@ public class Notification implements Serializable {
         }
     }
 
-    public Notification(String notificationId, String recipientUserId, String accountId, NotificationType type, String title, String message, boolean seen, Date timestamp, StorageMode storageMode) {
+    public Notification(String notificationId, String recipientUserId, NotificationType type, String title,
+                        String message, boolean seen, Date timestamp) {
         this.notificationId = notificationId;
         this.recipientUserId = recipientUserId;
-        this.type = NotificationType.valueOf(type.name());
+        this.type = type;
         this.title = title;
         this.message = message;
         this.timestamp = timestamp;
         this.read = seen;
-        this.relatedCustomer = null;
-        this.relatedAccount = AccountService.getInstance(storageMode).getAccount(accountId);
-        System.out.println(this);
+        // relatedCustomer and relatedAccount can be set later, if applicable
     }
+
+    public Notification(String notificationId, String recipientUserId, NotificationType type, String title,
+                        String message, boolean seen, Date timestamp, Customer relatedCustomer, Account relatedAccount) {
+        this(notificationId, recipientUserId, type, title, message, seen, timestamp);
+        this.relatedCustomer = relatedCustomer;
+        this.relatedAccount = relatedAccount;
+    }
+
 
     // --- Getters ---
 

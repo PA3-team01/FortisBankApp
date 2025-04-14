@@ -76,9 +76,14 @@ message VARCHAR2(500),
 type VARCHAR2(30),
 seen NUMBER(1) DEFAULT 0 NOT NULL CHECK (seen IN (0, 1)),
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+related_customer_id VARCHAR2(50),-- nullable
+
 FOREIGN KEY (recipient_user_id) REFERENCES users(user_id) ON DELETE CASCADE,
-FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE SET NULL
+FOREIGN KEY (account_id) REFERENCES accounts(account_id) ON DELETE SET NULL,
+FOREIGN KEY (related_customer_id) REFERENCES  users(user_id) ON DELETE SET NULL
 );
+
+
 
 -- =======================
 -- INDEXES FOR PERFORMANCE
