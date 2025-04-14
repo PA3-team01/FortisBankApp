@@ -23,7 +23,7 @@ public class Main {
                  */
 
                 //Define the storage mode for the application
-                StorageMode storageMode = StorageMode.FILE;
+                StorageMode storageMode = StorageMode.DATABASE;
                 // Initialize the data for testing purposes
                 initData(storageMode);
                 // LoginFrame is the entry point of the application

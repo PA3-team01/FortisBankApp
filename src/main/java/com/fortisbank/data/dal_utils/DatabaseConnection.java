@@ -1,97 +1,62 @@
 package com.fortisbank.data.dal_utils;
 
-    import com.fortisbank.data.interfaces.IDatabaseConnection;
-    import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
+import com.fortisbank.data.interfaces.IDatabaseConnection;
+import com.fortisbank.contracts.exceptions.DatabaseConnectionException;
 
-    import java.sql.Connection;
-    import java.sql.DriverManager;
-    import java.sql.SQLException;
-    import java.util.logging.Level;
-    import java.util.logging.Logger;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-    /**
-     * Manages the connection and disconnection to the database.
-     */
-    public class DatabaseConnection implements IDatabaseConnection {
-        private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
-        private static final int MAX_RETRIES = 3; // Retry limit
-        private static DatabaseConnection instance;
-        private Connection connection;
-        private final String connectionString = "jdbc:oracle:thin:@//aedev.pro:1521/XEPDB1";
+public class DatabaseConnection implements IDatabaseConnection {
+    private static final Logger LOGGER = Logger.getLogger(DatabaseConnection.class.getName());
+    private static DatabaseConnection instance;
 
-        private final String username = "java_course";
-        private final String password = "Baddemon665";
+    private final String connectionString = "jdbc:oracle:thin:@//aedev.pro:1521/XEPDB1";
+    private final String username = "java_course";
+    private final String password = "Baddemon665";
 
-        private DatabaseConnection() {
-        }
-
-        public static DatabaseConnection getInstance() {
-            if (instance == null) {
-                synchronized (DatabaseConnection.class) {
-                    if (instance == null) {
-                        instance = new DatabaseConnection();
-                    }
-                }
-            }
-            return instance;
-        }
-
-        @Override
-        public Connection getConnection() throws DatabaseConnectionException {
-            if (connection == null || isConnectionClosed()) {
-                connectWithRetry();
-            }
-            return connection;
-        }
-
-        @Override
-        public boolean TestConnection() {
-            // This method does not rethrow exceptions because its purpose is to provide a simple
-            // boolean result indicating whether the connection test was successful or not.
-            // This design avoids burdening the caller with exception handling for a test operation.
-            try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
-                LOGGER.log(Level.INFO, "Database connection test successful.");
-                return true;
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Database connection test failed.", e);
-                return false;
-            }
-        }
-
-        private void connectWithRetry() throws DatabaseConnectionException {
-            int attempts = 0;
-            while (attempts < MAX_RETRIES) {
-                try {
-                    connect();
-                    return;
-                } catch (SQLException e) {
-                    attempts++;
-                    LOGGER.log(Level.WARNING, "Connection attempt {0} failed. Retrying...", attempts);
-                    if (attempts >= MAX_RETRIES) {
-                        LOGGER.log(Level.SEVERE, "All connection attempts failed.", e);
-                        throw new DatabaseConnectionException("Failed to connect to the database after " + MAX_RETRIES + " attempts.", e);
-                    }
-                }
-            }
-        }
-
-        private void connect() throws SQLException {
-            try {
-                Class.forName("oracle.jdbc.OracleDriver");
-                connection = DriverManager.getConnection(connectionString, username, password);
-                LOGGER.log(Level.INFO, "Connected to Oracle Database successfully.");
-            } catch (ClassNotFoundException e) {
-                LOGGER.log(Level.SEVERE, "Oracle JDBC Driver not found.", e);
-                throw new SQLException("Oracle JDBC Driver not found.", e);
-            }
-        }
-
-        private boolean isConnectionClosed() {
-            try {
-                return connection == null || connection.isClosed();
-            } catch (SQLException e) {
-                LOGGER.log(Level.SEVERE, "Error checking connection status.", e);
-                return true;
-            }
+    private DatabaseConnection() {
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+        } catch (ClassNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Oracle JDBC Driver not found.", e);
+            throw new RuntimeException("Oracle JDBC Driver not found.", e);
         }
     }
+
+    public static DatabaseConnection getInstance() {
+        if (instance == null) {
+            synchronized (DatabaseConnection.class) {
+                if (instance == null) {
+                    instance = new DatabaseConnection();
+                }
+            }
+        }
+        return instance;
+    }
+
+    @Override
+    public Connection getConnection() throws DatabaseConnectionException {
+        try {
+            Connection conn = DriverManager.getConnection(connectionString, username, password);
+            LOGGER.log(Level.INFO, "Connected to Oracle Database successfully.");
+            return conn;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Failed to connect to the database.", e);
+            throw new DatabaseConnectionException("Failed to connect to the database.", e);
+        }
+    }
+
+    @Override
+    public boolean TestConnection() {
+        try (Connection testConn = DriverManager.getConnection(connectionString, username, password)) {
+            LOGGER.log(Level.INFO, "Database connection test successful.");
+            return true;
+        } catch (SQLException e) {
+            LOGGER.log(Level.SEVERE, "Database connection test failed.", e);
+            return false;
+        }
+    }
+}
