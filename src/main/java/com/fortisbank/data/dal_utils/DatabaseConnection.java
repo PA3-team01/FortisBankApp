@@ -17,9 +17,10 @@ package com.fortisbank.data.dal_utils;
         private static final int MAX_RETRIES = 3; // Retry limit
         private static DatabaseConnection instance;
         private Connection connection;
-        private final String connectionString = "jdbc:oracle:thin:@localhost:1521:xe"; // TODO: Change this
-        private final String username = "your_username"; // TODO: Change this
-        private final String password = "your_password"; // TODO: Change this
+        private final String connectionString = "jdbc:oracle:thin:@//aedev.pro:1521/XEPDB1";
+
+        private final String username = "java_course";
+        private final String password = "Baddemon665";
 
         private DatabaseConnection() {
         }

@@ -2,6 +2,7 @@ package com.fortisbank.ui;
 
 import com.fortisbank.business.services.automation.AutomationService;
 import com.fortisbank.business.services.users.customer.RegisterService;
+import com.fortisbank.data.dal_utils.DatabaseConnection;
 import com.fortisbank.data.dal_utils.StorageMode;
 import com.fortisbank.ui.frames.mainFrames.LoginFrame;
 
@@ -29,7 +30,11 @@ public class Main {
                 new LoginFrame(storageMode).setVisible(true);
                 // Start background tasks
                 AutomationService.startAllDaemonTasks(storageMode);
-
+                if (DatabaseConnection.getInstance().TestConnection()){
+                    System.out.println("Database connection test successful.");
+                } else {
+                    System.out.println("Database connection test failed.");
+                }
             }
         });
     }
