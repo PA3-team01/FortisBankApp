@@ -61,7 +61,20 @@ public class ReportsPanel extends JPanel {
             StyleUtils.styleButton(generateBtn, true);
             StyleUtils.styleButton(downloadBtn, false);
 
-            for (Customer c : allCustomers) customerSelector.addItem(c);
+            for (Customer c : allCustomers) {
+                customerSelector.addItem(c); // Add Customer objects directly
+            }
+
+            // Set a custom renderer to display the full name
+            customerSelector.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                    if (value instanceof Customer customer) {
+                        value = customer.getFullName(); // Display full name
+                    }
+                    return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                }
+            });
             for (int i = 0; i < 12; i++) monthSelector.addItem(YearMonth.now().minusMonths(i));
 
             topPanel.add(reportLabel);

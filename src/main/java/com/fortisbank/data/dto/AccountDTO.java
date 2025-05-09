@@ -1,5 +1,6 @@
 package com.fortisbank.data.dto;
 
+import com.fortisbank.business.services.account.InterestRateConfigService;
 import com.fortisbank.contracts.models.accounts.*;
 import com.fortisbank.contracts.models.users.Customer;
 import com.fortisbank.contracts.utils.ValidationUtils;
@@ -54,10 +55,15 @@ public record AccountDTO(
         AccountType type = AccountType.valueOf(accountType);
         Date date = ValidationUtils.toDate(openedDate);
 
+        BigDecimal resolvedInterestRate = interestRate;
+        if ((type == AccountType.SAVINGS || type == AccountType.CREDIT) && resolvedInterestRate == null) {
+            resolvedInterestRate = InterestRateConfigService.getInstance().getRate(type);
+        }
+
         return switch (type) {
             case CHECKING -> AccountFactory.createAccount(type, accountId, customer, date, availableBalance);
-            case SAVINGS -> AccountFactory.createAccount(type, accountId, customer, date, availableBalance, interestRate);
-            case CREDIT -> AccountFactory.createAccount(type, accountId, customer, date, creditLimit, interestRate);
+            case SAVINGS -> AccountFactory.createAccount(type, accountId, customer, date, availableBalance, resolvedInterestRate);
+            case CREDIT -> AccountFactory.createAccount(type, accountId, customer, date, creditLimit, resolvedInterestRate);
             case CURRENCY -> AccountFactory.createAccount(type, accountId, customer, date, availableBalance, currencyCode);
             default -> throw new IllegalStateException("Unsupported account type: " + type);
         };
